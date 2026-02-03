@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, db } from '@/lib/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
 import { Heart, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -18,7 +17,7 @@ interface Business {
 }
 
 export default function FavoritesPage() {
-  const [user, loading] = useAuthState(auth);
+  const { user, loading } = useAuth();
   const { favorites, toggleFavorite } = useFavorites();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loadingBusinesses, setLoadingBusinesses] = useState(true);
@@ -40,18 +39,14 @@ export default function FavoritesPage() {
   const fetchFavoriteBusinesses = async () => {
     try {
       setLoadingBusinesses(true);
-      const businessesData: Business[] = [];
-      
-      for (const businessId of favorites) {
-        const q = query(collection(db, 'businesses'), where('__name__', '==', businessId));
-        const snapshot = await getDocs(q);
-        
-        snapshot.forEach(doc => {
-          businessesData.push({ id: doc.id, ...doc.data() } as Business);
-        });
-      }
-      
-      setBusinesses(businessesData);
+
+      const { data, error } = await supabase
+        .from('businesses')
+        .select('id, name, description, category, images, rating')
+        .in('id', favorites);
+
+      if (error) throw error;
+      setBusinesses(data || []);
     } catch (error) {
       console.error('Error fetching favorite businesses:', error);
     } finally {
@@ -110,7 +105,7 @@ export default function FavoritesPage() {
                   </div>
                 )}
               </div>
-              
+
               <div className="p-6">
                 <div className="flex items-start justify-between mb-2">
                   <h3 className="text-xl font-bold text-gray-900 flex-1">{business.name}</h3>
@@ -121,10 +116,10 @@ export default function FavoritesPage() {
                     <Trash2 className="h-5 w-5" />
                   </button>
                 </div>
-                
+
                 <p className="text-sm text-gray-500 mb-2">{business.category}</p>
                 <p className="text-gray-600 mb-4 line-clamp-2">{business.description}</p>
-                
+
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-gray-600">
                     ⭐ {business.rating ? business.rating.toFixed(1) : '0.0'}

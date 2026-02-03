@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib/firebase';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { useNotification } from '@/components/ui/NotificationSystem';
 
@@ -28,7 +28,7 @@ interface InviteData {
 }
 
 const InvitesPage = () => {
-  const [user, loading] = useAuthState(auth);
+  const { user, loading } = useAuth();
   const [inviteData, setInviteData] = useState<InviteData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showInviteForm, setShowInviteForm] = useState(false);
@@ -57,10 +57,11 @@ const InvitesPage = () => {
     if (!user) return;
 
     try {
-      const idToken = await user.getIdToken();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
       const response = await fetch('/api/invites', {
         headers: {
-          'Authorization': `Bearer ${idToken}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
 
@@ -88,12 +89,13 @@ const InvitesPage = () => {
 
     setIsSubmitting(true);
     try {
-      const idToken = await user!.getIdToken();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
       const response = await fetch('/api/invites', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(inviteForm),
       });
@@ -209,7 +211,7 @@ const InvitesPage = () => {
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Invite Type
@@ -294,13 +296,12 @@ const InvitesPage = () => {
                           <p className="text-sm text-blue-600">Business: {invite.businessName}</p>
                         )}
                       </div>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        invite.status === 'accepted' 
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${invite.status === 'accepted'
                           ? 'bg-green-100 text-green-800'
                           : invite.status === 'pending'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
                         {invite.status}
                       </span>
                     </div>
@@ -344,13 +345,12 @@ const InvitesPage = () => {
                           <p className="text-sm text-blue-600">Business: {invite.businessName}</p>
                         )}
                       </div>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        invite.status === 'accepted' 
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${invite.status === 'accepted'
                           ? 'bg-green-100 text-green-800'
                           : invite.status === 'pending'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
                         {invite.status}
                       </span>
                     </div>

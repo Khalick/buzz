@@ -1,18 +1,16 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, updateDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
-import { updateProfile } from 'firebase/auth';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase, signOut } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 
 interface UserProfile {
-  uid: string;
+  id: string;
   email: string;
-  displayName: string;
+  display_name: string;
   role: string;
-  createdAt: string;
+  created_at: string;
   phone?: string;
   location?: string;
   bio?: string;
@@ -23,16 +21,16 @@ interface UserActivity {
   type: 'business' | 'deal' | 'proof';
   title: string;
   status: string;
-  createdAt: string;
+  created_at: string;
 }
 
 const ProfilePage = () => {
-  const [user, loading] = useAuthState(auth);
+  const { user, loading } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [activities, setActivities] = useState<UserActivity[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
-    displayName: '',
+    display_name: '',
     phone: '',
     location: '',
     bio: ''
@@ -57,17 +55,21 @@ const ProfilePage = () => {
     if (!user) return;
 
     try {
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userDocRef);
-      
-      if (userDoc.exists()) {
-        const userData = userDoc.data() as UserProfile;
-        setProfile(userData);
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setProfile(data as UserProfile);
         setEditForm({
-          displayName: userData.displayName || user.displayName || '',
-          phone: userData.phone || '',
-          location: userData.location || '',
-          bio: userData.bio || ''
+          display_name: data.display_name || user.user_metadata?.full_name || '',
+          phone: data.phone || '',
+          location: data.location || '',
+          bio: data.bio || ''
         });
       }
     } catch (error) {
@@ -84,43 +86,45 @@ const ProfilePage = () => {
       const activities: UserActivity[] = [];
 
       // Fetch businesses submitted by user
-      const businessQuery = query(
-        collection(db, 'businesses'),
-        where('submittedBy', '==', user.uid),
-        orderBy('createdAt', 'desc')
-      );
-      const businessSnapshot = await getDocs(businessQuery);
-      businessSnapshot.forEach(doc => {
-        const data = doc.data();
-        activities.push({
-          id: doc.id,
-          type: 'business',
-          title: data.name,
-          status: data.approved ? 'Approved' : 'Pending',
-          createdAt: data.createdAt
+      const { data: businesses } = await supabase
+        .from('businesses')
+        .select('id, name, approved, created_at')
+        .eq('submitted_by', user.id)
+        .order('created_at', { ascending: false });
+
+      if (businesses) {
+        businesses.forEach(biz => {
+          activities.push({
+            id: biz.id,
+            type: 'business',
+            title: biz.name,
+            status: biz.approved ? 'Approved' : 'Pending',
+            created_at: biz.created_at
+          });
         });
-      });
+      }
 
       // Fetch proof of visits submitted by user
-      const proofQuery = query(
-        collection(db, 'proofs'),
-        where('submittedBy', '==', user.uid),
-        orderBy('createdAt', 'desc')
-      );
-      const proofSnapshot = await getDocs(proofQuery);
-      proofSnapshot.forEach(doc => {
-        const data = doc.data();
-        activities.push({
-          id: doc.id,
-          type: 'proof',
-          title: `Visit to ${data.businessName}`,
-          status: data.approved ? 'Approved' : 'Pending',
-          createdAt: data.createdAt
+      const { data: proofs } = await supabase
+        .from('proofs')
+        .select('id, business_name, approved, created_at')
+        .eq('submitted_by', user.id)
+        .order('created_at', { ascending: false });
+
+      if (proofs) {
+        proofs.forEach(proof => {
+          activities.push({
+            id: proof.id,
+            type: 'proof',
+            title: `Visit to ${proof.business_name}`,
+            status: proof.approved ? 'Approved' : 'Pending',
+            created_at: proof.created_at
+          });
         });
-      });
+      }
 
       // Sort by date
-      activities.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      activities.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       setActivities(activities);
     } catch (error) {
       console.error('Error fetching activities:', error);
@@ -132,23 +136,28 @@ const ProfilePage = () => {
 
     setSaving(true);
     try {
-      // Update Firebase Auth profile
-      await updateProfile(user, {
-        displayName: editForm.displayName
+      // Update Supabase user metadata
+      await supabase.auth.updateUser({
+        data: { full_name: editForm.display_name }
       });
 
-      // Update Firestore document
-      const userDocRef = doc(db, 'users', user.uid);
-      await updateDoc(userDocRef, {
-        displayName: editForm.displayName,
-        phone: editForm.phone,
-        location: editForm.location,
-        bio: editForm.bio
-      });
+      // Update users table
+      const { error } = await supabase
+        .from('users')
+        .update({
+          display_name: editForm.display_name,
+          phone: editForm.phone,
+          location: editForm.location,
+          bio: editForm.bio,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
 
       setProfile(prev => prev ? {
         ...prev,
-        displayName: editForm.displayName,
+        display_name: editForm.display_name,
         phone: editForm.phone,
         location: editForm.location,
         bio: editForm.bio
@@ -192,7 +201,7 @@ const ProfilePage = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">My Profile</h1>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Card */}
           <div className="lg:col-span-1">
@@ -200,16 +209,15 @@ const ProfilePage = () => {
               <div className="text-center mb-6">
                 <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-3xl font-bold text-purple-600">
-                    {profile.displayName ? profile.displayName.charAt(0).toUpperCase() : profile.email.charAt(0).toUpperCase()}
+                    {profile.display_name ? profile.display_name.charAt(0).toUpperCase() : profile.email.charAt(0).toUpperCase()}
                   </span>
                 </div>
-                <h2 className="text-xl font-bold">{profile.displayName || 'No name set'}</h2>
+                <h2 className="text-xl font-bold">{profile.display_name || 'No name set'}</h2>
                 <p className="text-gray-600">{profile.email}</p>
-                <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-2 ${
-                  profile.role === 'admin' 
-                    ? 'bg-purple-100 text-purple-800' 
+                <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-2 ${profile.role === 'admin'
+                    ? 'bg-purple-100 text-purple-800'
                     : 'bg-blue-100 text-blue-800'
-                }`}>
+                  }`}>
                   {profile.role === 'admin' ? 'Administrator' : 'User'}
                 </span>
               </div>
@@ -230,7 +238,7 @@ const ProfilePage = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Member Since</label>
-                    <p className="text-gray-900">{new Date(profile.createdAt).toLocaleDateString()}</p>
+                    <p className="text-gray-900">{new Date(profile.created_at).toLocaleDateString()}</p>
                   </div>
                   <button
                     onClick={() => setIsEditing(true)}
@@ -245,8 +253,8 @@ const ProfilePage = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
                     <input
                       type="text"
-                      value={editForm.displayName}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, displayName: e.target.value }))}
+                      value={editForm.display_name}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, display_name: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
                     />
                   </div>
@@ -302,7 +310,7 @@ const ProfilePage = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-lg p-6">
               <h3 className="text-xl font-bold mb-6">My Activity</h3>
-              
+
               {activities.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-gray-600 mb-4">No activity yet</p>
@@ -328,13 +336,12 @@ const ProfilePage = () => {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
-                            <span className={`w-3 h-3 rounded-full ${
-                              activity.type === 'business' 
-                                ? 'bg-blue-500' 
+                            <span className={`w-3 h-3 rounded-full ${activity.type === 'business'
+                                ? 'bg-blue-500'
                                 : activity.type === 'deal'
-                                ? 'bg-green-500'
-                                : 'bg-purple-500'
-                            }`}></span>
+                                  ? 'bg-green-500'
+                                  : 'bg-purple-500'
+                              }`}></span>
                             <h4 className="font-medium text-gray-900">{activity.title}</h4>
                           </div>
                           <p className="text-sm text-gray-600">
@@ -343,14 +350,13 @@ const ProfilePage = () => {
                             {activity.type === 'proof' && 'Proof of visit shared'}
                           </p>
                           <p className="text-xs text-gray-500 mt-1">
-                            {new Date(activity.createdAt).toLocaleDateString()}
+                            {new Date(activity.created_at).toLocaleDateString()}
                           </p>
                         </div>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          activity.status === 'Approved' 
-                            ? 'bg-green-100 text-green-800' 
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${activity.status === 'Approved'
+                            ? 'bg-green-100 text-green-800'
                             : 'bg-yellow-100 text-yellow-800'
-                        }`}>
+                          }`}>
                           {activity.status}
                         </span>
                       </div>

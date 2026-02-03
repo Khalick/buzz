@@ -1,22 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import admin from '@/lib/firebaseAdmin';
-import { getAuth } from 'firebase-admin/auth';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 // Helper function to verify the token and check for admin role
 async function verifyTokenAndAdmin(req: NextRequest) {
+    const supabaseAdmin = getSupabaseAdmin();
     const authorization = req.headers.get('Authorization');
     if (!authorization?.startsWith('Bearer ')) {
         return { error: 'Unauthorized: No token provided', status: 401 };
     }
-    const idToken = authorization.split('Bearer ')[1];
+    const token = authorization.split('Bearer ')[1];
 
     try {
-        const decodedToken = await getAuth(admin.app()).verifyIdToken(idToken);
-        const user = await getAuth(admin.app()).getUser(decodedToken.uid);
-        
-        if (user.customClaims?.role !== 'admin') {
+        const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+        if (authError || !user) {
+            return { error: 'Unauthorized: Invalid token', status: 401 };
+        }
+
+        // Check if user is admin
+        const { data: userData, error: userError } = await supabaseAdmin
+            .from('users')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+        if (userError || userData?.role !== 'admin') {
             return { error: 'Forbidden: User is not an admin', status: 403 };
         }
+
         return { error: null, status: 200 };
     } catch (error) {
         console.error('Error verifying token:', error);
@@ -37,10 +47,17 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-        await getAuth(admin.app()).setCustomUserClaims(uid, { role });
+        const supabaseAdmin = getSupabaseAdmin();
+        const { error: updateError } = await supabaseAdmin
+            .from('users')
+            .update({ role })
+            .eq('id', uid);
+
+        if (updateError) throw updateError;
+
         return NextResponse.json({ message: `Successfully set role '${role}' for user ${uid}` }, { status: 200 });
     } catch (error) {
-        console.error('Error setting custom claims:', error);
+        console.error('Error setting role:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

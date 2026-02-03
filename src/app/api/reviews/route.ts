@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth, adminDb } from '@/lib/firebaseAdmin';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 export async function GET(request: NextRequest) {
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     const { searchParams } = new URL(request.url);
     const businessId = searchParams.get('businessId');
 
@@ -10,26 +11,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Business ID required' }, { status: 400 });
     }
 
-    const reviewsSnapshot = await adminDb
-      .collection('reviews')
-      .where('businessId', '==', businessId)
-      .orderBy('createdAt', 'desc')
-      .get();
+    const { data: reviews, error } = await supabaseAdmin
+      .from('reviews')
+      .select('*')
+      .eq('business_id', businessId)
+      .order('created_at', { ascending: false });
 
-    const reviews = reviewsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    if (error) throw error;
 
     // Calculate average rating
-    const totalRating = reviews.reduce((sum, review: any) => sum + review.rating, 0);
-    const averageRating = reviews.length > 0 ? totalRating / reviews.length : 0;
+    const totalRating = (reviews || []).reduce((sum: number, review: any) => sum + review.rating, 0);
+    const averageRating = reviews && reviews.length > 0 ? totalRating / reviews.length : 0;
 
     return NextResponse.json({
-      reviews,
+      reviews: reviews || [],
       stats: {
         averageRating: averageRating.toFixed(1),
-        totalReviews: reviews.length
+        totalReviews: reviews?.length || 0
       }
     });
   } catch (error) {
@@ -40,14 +38,19 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const token = authHeader.split('Bearer ')[1];
-    const decodedToken = await adminAuth.verifyIdToken(token);
-    
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { businessId, rating, comment, images } = body;
 
@@ -60,47 +63,52 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already reviewed this business
-    const existingReview = await adminDb
-      .collection('reviews')
-      .where('businessId', '==', businessId)
-      .where('userId', '==', decodedToken.uid)
-      .get();
+    const { data: existingReview } = await supabaseAdmin
+      .from('reviews')
+      .select('id')
+      .eq('business_id', businessId)
+      .eq('user_id', user.id)
+      .maybeSingle();
 
-    if (!existingReview.empty) {
+    if (existingReview) {
       return NextResponse.json({ error: 'You have already reviewed this business' }, { status: 400 });
     }
 
     const reviewData = {
-      businessId,
-      userId: decodedToken.uid,
-      userEmail: decodedToken.email,
+      business_id: businessId,
+      user_id: user.id,
       rating,
       comment: comment || '',
-      images: images || [],
-      createdAt: new Date().toISOString(),
-      helpful: 0,
     };
 
-    const reviewRef = await adminDb.collection('reviews').add(reviewData);
+    const { data: review, error: insertError } = await supabaseAdmin
+      .from('reviews')
+      .insert(reviewData)
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
 
     // Update business rating
-    const reviewsSnapshot = await adminDb
-      .collection('reviews')
-      .where('businessId', '==', businessId)
-      .get();
+    const { data: allReviews } = await supabaseAdmin
+      .from('reviews')
+      .select('rating')
+      .eq('business_id', businessId);
 
-    const allReviews = reviewsSnapshot.docs.map(doc => doc.data());
-    const totalRating = allReviews.reduce((sum, review: any) => sum + review.rating, 0);
-    const averageRating = allReviews.length > 0 ? totalRating / allReviews.length : 0;
+    const totalRating = (allReviews || []).reduce((sum: number, r: any) => sum + r.rating, 0);
+    const averageRating = allReviews && allReviews.length > 0 ? totalRating / allReviews.length : 0;
 
-    await adminDb.collection('businesses').doc(businessId).update({
-      rating: averageRating,
-      reviewCount: allReviews.length
-    });
+    await supabaseAdmin
+      .from('businesses')
+      .update({
+        rating: averageRating,
+        review_count: allReviews?.length || 0
+      })
+      .eq('id', businessId);
 
-    return NextResponse.json({ 
-      success: true, 
-      reviewId: reviewRef.id,
+    return NextResponse.json({
+      success: true,
+      reviewId: review.id,
       averageRating: averageRating.toFixed(1)
     });
   } catch (error) {

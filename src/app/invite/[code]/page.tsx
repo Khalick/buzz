@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib/firebase';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { useNotification } from '@/components/ui/NotificationSystem';
 
@@ -26,7 +26,7 @@ interface InvitePageProps {
 
 const InvitePage = ({ params }: InvitePageProps) => {
   const { code } = params;
-  const [user, loading] = useAuthState(auth);
+  const { user, loading } = useAuth();
   const [invite, setInvite] = useState<InviteDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAccepting, setIsAccepting] = useState(false);
@@ -64,11 +64,13 @@ const InvitePage = ({ params }: InvitePageProps) => {
 
     setIsAccepting(true);
     try {
-      const idToken = await user.getIdToken();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
       const response = await fetch(`/api/invites/${code}`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${idToken}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
 
@@ -80,7 +82,7 @@ const InvitePage = ({ params }: InvitePageProps) => {
           title: 'Invite Accepted!',
           message: `Welcome! You've successfully joined via ${data.inviter.name}'s invitation.`,
         });
-        
+
         // Redirect based on invite type
         switch (data.type) {
           case 'admin':
@@ -208,21 +210,21 @@ const InvitePage = ({ params }: InvitePageProps) => {
                 <p className="font-medium">{invite.inviterName}</p>
                 <p className="text-sm text-gray-600">{invite.inviterEmail}</p>
               </div>
-              
+
               {invite.businessName && (
                 <div>
                   <span className="text-sm font-medium text-gray-500">Business:</span>
                   <p className="font-medium">{invite.businessName}</p>
                 </div>
               )}
-              
+
               {invite.message && (
                 <div>
                   <span className="text-sm font-medium text-gray-500">Message:</span>
                   <p className="italic text-gray-700">"{invite.message}"</p>
                 </div>
               )}
-              
+
               <div>
                 <span className="text-sm font-medium text-gray-500">Expires:</span>
                 <p className="text-sm">{new Date(invite.expiresAt).toLocaleDateString()}</p>
@@ -233,7 +235,7 @@ const InvitePage = ({ params }: InvitePageProps) => {
           {!user && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
               <p className="text-blue-800 text-sm">
-                You need to be logged in to accept this invitation. 
+                You need to be logged in to accept this invitation.
                 You'll be redirected to login and then back here.
               </p>
             </div>
@@ -243,22 +245,21 @@ const InvitePage = ({ params }: InvitePageProps) => {
             <button
               onClick={handleAcceptInvite}
               disabled={isAccepting}
-              className={`w-full py-3 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 ${
-                inviteType.color === 'purple'
+              className={`w-full py-3 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 ${inviteType.color === 'purple'
                   ? 'bg-purple-600 hover:bg-purple-700 text-white'
                   : inviteType.color === 'blue'
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                  : 'bg-green-600 hover:bg-green-700 text-white'
-              }`}
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    : 'bg-green-600 hover:bg-green-700 text-white'
+                }`}
             >
-              {isAccepting 
-                ? 'Accepting...' 
-                : user 
-                ? 'Accept Invitation' 
-                : 'Login & Accept Invitation'
+              {isAccepting
+                ? 'Accepting...'
+                : user
+                  ? 'Accept Invitation'
+                  : 'Login & Accept Invitation'
               }
             </button>
-            
+
             <button
               onClick={() => router.push('/')}
               className="w-full bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition-colors"

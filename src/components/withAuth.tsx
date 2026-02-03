@@ -3,7 +3,7 @@
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { auth } from '@/lib/firebase';
+import { supabase } from '@/lib/supabase';
 
 const withAuth = (Component: React.ComponentType<any>) => {
   const AuthenticatedComponent = (props: any) => {
@@ -33,11 +33,11 @@ const withAuth = (Component: React.ComponentType<any>) => {
 
     const handleForceRefresh = async () => {
       if (!user) return;
-      
+
       setIsRefreshing(true);
       try {
-        // Force refresh the ID token to get latest custom claims
-        await user.getIdToken(true);
+        // Force refresh the session
+        await supabase.auth.refreshSession();
         // Reload the page to re-evaluate all auth hooks
         window.location.reload();
       } catch (error) {
@@ -89,10 +89,10 @@ const withAuth = (Component: React.ComponentType<any>) => {
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
               <h1 className="text-2xl font-semibold text-yellow-800 mb-4">Access Restricted</h1>
               <p className="text-yellow-700 mb-6">
-                You don't have permission to view this page. If you were recently granted admin access, 
+                You don't have permission to view this page. If you were recently granted admin access,
                 you may need to refresh your session.
               </p>
-              
+
               {showRefreshOption && (
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <button
@@ -111,7 +111,7 @@ const withAuth = (Component: React.ComponentType<any>) => {
                 </div>
               )}
             </div>
-            
+
             <p className="text-sm text-gray-500">
               If the problem persists, try logging out and logging back in.
             </p>

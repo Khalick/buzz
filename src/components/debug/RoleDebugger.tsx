@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib/firebase';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
 
 const RoleDebugger = () => {
-  const [user] = useAuthState(auth);
+  const { user } = useAuth();
   const [debugInfo, setDebugInfo] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
@@ -17,17 +17,25 @@ const RoleDebugger = () => {
 
     setLoading(true);
     try {
-      // Get token with fresh claims
-      const idTokenResult = await user.getIdTokenResult(true);
-      
+      // Get latest user data from DB
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      const { data: { session } } = await supabase.auth.getSession();
+
       setDebugInfo({
-        uid: user.uid,
+        id: user.id,
         email: user.email,
-        displayName: user.displayName,
-        claims: idTokenResult.claims,
-        authTime: idTokenResult.authTime,
-        issuedAtTime: idTokenResult.issuedAtTime,
-        expirationTime: idTokenResult.expirationTime,
+        metadata: user.user_metadata,
+        role: userData?.role,
+        dbUser: userData,
+        session: {
+          expires_at: session?.expires_at,
+          token_type: session?.token_type
+        }
       });
     } catch (error) {
       let errorMessage = 'Unknown error';
@@ -42,17 +50,18 @@ const RoleDebugger = () => {
 
   const forceTokenRefresh = async () => {
     if (!user) return;
-    
+
     setLoading(true);
     try {
-      await user.getIdToken(true); // Force refresh
-      alert('Token refreshed! Try accessing admin pages again.');
+      const { error } = await supabase.auth.refreshSession();
+      if (error) throw error;
+      alert('Session refreshed! Try accessing admin pages again.');
     } catch (error) {
       let errorMessage = 'Unknown error';
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      alert('Error refreshing token: ' + errorMessage);
+      alert('Error refreshing session: ' + errorMessage);
     } finally {
       setLoading(false);
     }
@@ -73,7 +82,7 @@ const RoleDebugger = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-bold mb-4">Role Debugger</h2>
-        
+
         <div className="space-y-4">
           <button
             onClick={checkUserRole}
@@ -82,13 +91,13 @@ const RoleDebugger = () => {
           >
             {loading ? 'Checking...' : 'Check Current Role'}
           </button>
-          
+
           <button
             onClick={forceTokenRefresh}
             disabled={loading}
             className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 disabled:opacity-50 ml-2"
           >
-            {loading ? 'Refreshing...' : 'Force Token Refresh'}
+            {loading ? 'Refreshing...' : 'Force Session Refresh'}
           </button>
 
           {debugInfo && (
@@ -97,16 +106,16 @@ const RoleDebugger = () => {
               <pre className="text-xs overflow-x-auto whitespace-pre-wrap bg-gray-50 p-3 rounded border">
                 {JSON.stringify(debugInfo, null, 2)}
               </pre>
-              
+
               <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
                 <h4 className="font-medium text-yellow-800">Current Status:</h4>
                 <p className="text-sm text-yellow-700 mt-1">
-                  <strong>Role:</strong> {debugInfo.claims?.role || 'user'}<br/>
-                  <strong>Is Admin:</strong> {debugInfo.claims?.role === 'admin' ? 'YES' : 'NO'}<br/>
-                  {debugInfo.claims?.role === 'admin' && (
+                  <strong>Role:</strong> {debugInfo.role || 'user'}<br />
+                  <strong>Is Admin:</strong> {debugInfo.role === 'admin' ? 'YES' : 'NO'}<br />
+                  {debugInfo.role === 'admin' && (
                     <span className="text-green-600">✅ You should have admin access!</span>
                   )}
-                  {debugInfo.claims?.role !== 'admin' && (
+                  {debugInfo.role !== 'admin' && (
                     <span className="text-red-600">❌ You don't have admin access</span>
                   )}
                 </p>

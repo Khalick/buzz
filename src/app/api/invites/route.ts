@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import admin from '@/lib/firebaseAdmin';
-import { getAuth } from 'firebase-admin/auth';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
+
+
 
 // Generate invite code
 function generateInviteCode(): string {
@@ -14,46 +14,40 @@ export async function GET(req: NextRequest) {
   if (!authorization?.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized: No token provided' }, { status: 401 });
   }
-  const idToken = authorization.split('Bearer ')[1];
+  const token = authorization.split('Bearer ')[1];
 
   try {
-    const decodedToken = await getAuth(admin.app()).verifyIdToken(idToken);
-    const { uid } = decodedToken;
+    const supabaseAdmin = getSupabaseAdmin();
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
+    }
 
-    const db = getFirestore(admin.app());
-    
-    // Get all invites for this user and sort in memory to avoid index requirements
-    const sentInvitesSnapshot = await db.collection('invites')
-      .where('inviterId', '==', uid)
-      .get();
-    
-    const sentInvites = sentInvitesSnapshot.docs
-      .map(doc => ({
-        id: doc.id,
-        ...(doc.data() as any),
-      }))
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    // Get all invites sent by this user
+    const { data: sentInvites, error: sentError } = await supabaseAdmin
+      .from('invites')
+      .select('*')
+      .eq('inviter_id', user.id)
+      .order('created_at', { ascending: false });
 
-    // Get invites received by user
-    const userEmail = (await getAuth(admin.app()).getUser(uid)).email;
-    const receivedInvitesSnapshot = await db.collection('invites')
-      .where('inviteeEmail', '==', userEmail)
-      .get();
-    
-    const receivedInvites = receivedInvitesSnapshot.docs
-      .map(doc => ({
-        id: doc.id,
-        ...(doc.data() as any),
-      }))
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    if (sentError) throw sentError;
+
+    // Get invites received by user (by email)
+    const { data: receivedInvites, error: receivedError } = await supabaseAdmin
+      .from('invites')
+      .select('*')
+      .eq('invitee_email', user.email)
+      .order('created_at', { ascending: false });
+
+    if (receivedError) throw receivedError;
 
     return NextResponse.json({
-      sentInvites,
-      receivedInvites,
+      sentInvites: sentInvites || [],
+      receivedInvites: receivedInvites || [],
       stats: {
-        totalSent: sentInvites.length,
-        accepted: sentInvites.filter(i => i.status === 'accepted').length,
-        pending: sentInvites.filter(i => i.status === 'pending').length,
+        totalSent: sentInvites?.length || 0,
+        accepted: sentInvites?.filter((i: any) => i.status === 'accepted').length || 0,
+        pending: sentInvites?.filter((i: any) => i.status === 'pending').length || 0,
       },
     });
 
@@ -69,58 +63,71 @@ export async function POST(req: NextRequest) {
   if (!authorization?.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized: No token provided' }, { status: 401 });
   }
-  const idToken = authorization.split('Bearer ')[1];
+  const token = authorization.split('Bearer ')[1];
 
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     const { email, type, message, businessName } = await req.json();
-    
+
     if (!email || !type) {
       return NextResponse.json({ error: 'Email and type are required' }, { status: 400 });
     }
 
-    const decodedToken = await getAuth(admin.app()).verifyIdToken(idToken);
-    const { uid: inviterId } = decodedToken;
-    const inviterUser = await getAuth(admin.app()).getUser(inviterId);
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
+    }
 
-    const db = getFirestore(admin.app());
-    
+    // Get inviter's profile
+    const { data: inviterProfile } = await supabaseAdmin
+      .from('users')
+      .select('display_name, email')
+      .eq('id', user.id)
+      .single();
+
     // Check if invite already exists
-    const existingInvite = await db.collection('invites')
-      .where('inviterId', '==', inviterId)
-      .where('inviteeEmail', '==', email)
-      .where('type', '==', type)
-      .where('status', '==', 'pending')
-      .get();
-    
-    if (!existingInvite.empty) {
+    const { data: existingInvite } = await supabaseAdmin
+      .from('invites')
+      .select('id')
+      .eq('inviter_id', user.id)
+      .eq('invitee_email', email)
+      .eq('type', type)
+      .eq('status', 'pending')
+      .maybeSingle();
+
+    if (existingInvite) {
       return NextResponse.json({ error: 'Invite already sent to this email' }, { status: 400 });
     }
-    
+
     // Create invite
     const inviteCode = generateInviteCode();
     const inviteData = {
-      inviterId,
-      inviterEmail: inviterUser.email,
-      inviterName: inviterUser.displayName || inviterUser.email,
-      inviteeEmail: email,
+      inviter_id: user.id,
+      inviter_email: inviterProfile?.email || user.email,
+      inviter_name: inviterProfile?.display_name || user.email,
+      invitee_email: email,
       type, // 'business', 'user', 'admin'
-      businessName: businessName || null,
+      business_name: businessName || null,
       message: message || '',
-      inviteCode,
+      code: inviteCode,
       status: 'pending',
-      createdAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
     };
-    
-    const inviteRef = await db.collection('invites').add(inviteData);
-    
+
+    const { data: invite, error: insertError } = await supabaseAdmin
+      .from('invites')
+      .insert(inviteData)
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
+
     // In a real app, you would send an email here
-    // For now, we'll just return the invite link
     const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/invite/${inviteCode}`;
-    
+
     return NextResponse.json({
       message: 'Invite sent successfully',
-      inviteId: inviteRef.id,
+      inviteId: invite.id,
       inviteLink,
       inviteCode,
     });

@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, db } from '@/lib/firebase';
-import { collection, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from './useAuth';
 
 export const useFavorites = () => {
-  const [user] = useAuthState(auth);
+  const { user } = useAuth();
   const [favorites, setFavorites] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -19,12 +18,16 @@ export const useFavorites = () => {
 
   const loadFavorites = async () => {
     if (!user) return;
-    
+
     try {
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (userDoc.exists()) {
-        setFavorites(userDoc.data()?.favorites || []);
-      }
+      const { data, error } = await supabase
+        .from('users')
+        .select('favorites')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+      setFavorites(data?.favorites || []);
     } catch (error) {
       console.error('Error loading favorites:', error);
     } finally {
@@ -39,26 +42,22 @@ export const useFavorites = () => {
     }
 
     try {
-      const userRef = doc(db, 'users', user.uid);
       const isFavorite = favorites.includes(businessId);
+      let newFavorites: string[];
 
       if (isFavorite) {
-        await updateDoc(userRef, {
-          favorites: arrayRemove(businessId)
-        });
-        setFavorites(prev => prev.filter(id => id !== businessId));
+        newFavorites = favorites.filter(id => id !== businessId);
       } else {
-        const userDoc = await getDoc(userRef);
-        if (!userDoc.exists()) {
-          await setDoc(userRef, { favorites: [businessId] });
-        } else {
-          await updateDoc(userRef, {
-            favorites: arrayUnion(businessId)
-          });
-        }
-        setFavorites(prev => [...prev, businessId]);
+        newFavorites = [...favorites, businessId];
       }
 
+      const { error } = await supabase
+        .from('users')
+        .update({ favorites: newFavorites })
+        .eq('id', user.id);
+
+      if (error) throw error;
+      setFavorites(newFavorites);
       return true;
     } catch (error) {
       console.error('Error toggling favorite:', error);

@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from 'react';
-import { db, storage } from '@/lib/firebase';
-import { collection, addDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { supabase, uploadFile } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
 import { MapPin, Clock, Upload, X } from 'lucide-react';
 
 const AddBusinessPage = () => {
+  const { user } = useAuth();
   const [business, setBusiness] = useState({
     name: '',
     category: '',
@@ -18,7 +18,7 @@ const AddBusinessPage = () => {
     instagram: '',
     twitter: '',
   });
-  
+
   const [businessHours, setBusinessHours] = useState({
     monday: { open: '09:00', close: '17:00', closed: false },
     tuesday: { open: '09:00', close: '17:00', closed: false },
@@ -28,7 +28,7 @@ const AddBusinessPage = () => {
     saturday: { open: '09:00', close: '17:00', closed: false },
     sunday: { open: '09:00', close: '17:00', closed: true },
   });
-  
+
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState('');
   const [gettingLocation, setGettingLocation] = useState(false);
@@ -54,9 +54,9 @@ const AddBusinessPage = () => {
       alert('Maximum 5 images allowed');
       return;
     }
-    
+
     setImages(prev => [...prev, ...files]);
-    
+
     // Create previews
     files.forEach(file => {
       const reader = new FileReader();
@@ -105,29 +105,33 @@ const AddBusinessPage = () => {
       // Upload images first
       const imageUrls: string[] = [];
       for (const image of images) {
-        const storageRef = ref(storage, `businesses/${Date.now()}_${image.name}`);
-        await uploadBytes(storageRef, image);
-        const url = await getDownloadURL(storageRef);
+        const path = `${Date.now()}_${image.name}`;
+        const url = await uploadFile('businesses', path, image);
         imageUrls.push(url);
       }
 
       const businessData: any = {
-        ...business,
+        name: business.name,
+        description: business.description,
+        category: business.category,
+        whatsapp: business.whatsapp,
+        address: business.address,
+        website: business.website || null,
         approved: false,
-        createdAt: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
         images: imageUrls,
-        businessHours,
-        socialMedia: {
-          facebook: business.facebook,
-          instagram: business.instagram,
-          twitter: business.twitter,
+        business_hours: businessHours,
+        social_media: {
+          facebook: business.facebook || null,
+          instagram: business.instagram || null,
+          twitter: business.twitter || null,
         },
-        stats: {
-          views: 0,
-          favorites: 0,
-          clicks: 0,
-        },
-        isPremium: false,
+        views: 0,
+        rating: 0,
+        review_count: 0,
+        is_premium: false,
+        submitted_by: user?.id || null,
       };
 
       // Add location coordinates if available
@@ -138,9 +142,14 @@ const AddBusinessPage = () => {
         };
       }
 
-      await addDoc(collection(db, "businesses"), businessData);
+      const { error } = await supabase
+        .from('businesses')
+        .insert(businessData);
+
+      if (error) throw error;
+
       alert('Your business has been submitted for review. Thank you!');
-      
+
       // Reset form
       setBusiness({ name: '', category: '', whatsapp: '', description: '', address: '', website: '', facebook: '', instagram: '', twitter: '' });
       setLocation(null);

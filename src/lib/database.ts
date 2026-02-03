@@ -4,92 +4,12 @@ declare global {
   }
 }
 
-import { db } from './firebase';
-import { 
-  collection, 
-  doc, 
-  enableIndexedDbPersistence,
-  connectFirestoreEmulator
-} from 'firebase/firestore';
-
-// Enable offline persistence
-export async function enableOfflineSupport() {
-  try {
-    await enableIndexedDbPersistence(db);
-    console.log('Offline persistence enabled');
-  } catch (err) {
-    console.warn('Failed to enable offline persistence:', err);
-  }
-}
-
-// Database collections with proper typing
-export const collections = {
-  users: collection(db, 'users'),
-  businesses: collection(db, 'businesses'),
-  categories: collection(db, 'categories'),
-  invites: collection(db, 'invites'),
-  notifications: collection(db, 'notifications'),
-  reviews: collection(db, 'reviews'),
-  analytics: collection(db, 'analytics')
-};
-
-// Helper function to get user document reference
-export function getUserDocRef(userId: string) {
-  return doc(db, 'users', userId);
-}
-
-// Helper function to get business document reference
-export function getBusinessDocRef(businessId: string) {
-  return doc(db, 'businesses', businessId);
-}
-
-// Database indexes that should be created in Firestore console
-export const REQUIRED_INDEXES = [
-  {
-    collection: 'users',
-    fields: [
-      { field: 'role', order: 'ASCENDING' },
-      { field: 'createdAt', order: 'DESCENDING' }
-    ]
-  },
-  {
-    collection: 'businesses',
-    fields: [
-      { field: 'category', order: 'ASCENDING' },
-      { field: 'isApproved', order: 'ASCENDING' },
-      { field: 'createdAt', order: 'DESCENDING' }
-    ]
-  },
-  {
-    collection: 'businesses',
-    fields: [
-      { field: 'isApproved', order: 'ASCENDING' },
-      { field: 'location.county', order: 'ASCENDING' },
-      { field: 'createdAt', order: 'DESCENDING' }
-    ]
-  },
-  {
-    collection: 'invites',
-    fields: [
-      { field: 'inviterId', order: 'ASCENDING' },
-      { field: 'status', order: 'ASCENDING' },
-      { field: 'createdAt', order: 'DESCENDING' }
-    ]
-  },
-  {
-    collection: 'notifications',
-    fields: [
-      { field: 'userId', order: 'ASCENDING' },
-      { field: 'read', order: 'ASCENDING' },
-      { field: 'createdAt', order: 'DESCENDING' }
-    ]
-  }
-];
+import { supabase } from './supabase';
 
 // Performance monitoring
 export function logPerformanceMetric(operation: string, duration: number) {
   console.log(`[Performance] ${operation}: ${duration}ms`);
-  
+
   // In production, send to analytics service
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', 'timing_complete', {
@@ -157,4 +77,28 @@ export function monitorConnectionState() {
       console.log('Connection lost - using cached data');
     });
   }
+}
+
+// Helper to get user document
+export async function getUserProfile(userId: string) {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// Helper to get business document
+export async function getBusiness(businessId: string) {
+  const { data, error } = await supabase
+    .from('businesses')
+    .select('*')
+    .eq('id', businessId)
+    .single();
+
+  if (error) throw error;
+  return data;
 }

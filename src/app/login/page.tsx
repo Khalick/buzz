@@ -1,32 +1,16 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { auth } from '@/lib/firebase';
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, UserCredential } from 'firebase/auth';
+import { useState } from 'react';
+import { signInWithEmail, signInWithGoogle } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-
-// Function to call the backend API to create a user document
-const createUserDocument = async (user: UserCredential['user']) => {
-  if (!user) return;
-
-  const idToken = await user.getIdToken();
-  const response = await fetch('/api/users/create', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${idToken}`,
-    },
-    body: JSON.stringify({}),
-  });
-  
-  return response.json();
-};
+import Link from 'next/link';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -34,12 +18,11 @@ const LoginPage = () => {
     setError(null);
     setLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      
-      // Create user document
-      await createUserDocument(userCredential.user);
-      
-      router.push('/admin');
+      const { data, error } = await signInWithEmail(email, password);
+
+      if (error) throw error;
+
+      router.push('/');
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -51,94 +34,187 @@ const LoginPage = () => {
     setError(null);
     setLoading(true);
     try {
-      const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
-      
-      // Create user document
-      await createUserDocument(userCredential.user);
-      
-      router.push('/admin');
+      const { error } = await signInWithGoogle();
+
+      if (error) throw error;
     } catch (error: any) {
       setError(error.message || 'Google sign-in failed');
-    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-md">
-        <form onSubmit={handleLogin} className="bg-white shadow-xl rounded-lg px-8 pt-6 pb-8 mb-4">
-          <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Admin Login</h1>
-          
-          {error && <p className="text-red-500 text-xs italic mb-4 bg-red-100 p-3 rounded">{error}</p>}
+    <div className="min-h-screen flex">
+      {/* Left Panel - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-hero relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 pattern-dots opacity-30"></div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-              Email
-            </label>
-            <input
-              className="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500"
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+        {/* Decorative Elements */}
+        <div className="absolute top-20 left-20 w-64 h-64 bg-[#D4AF37]/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-20 w-80 h-80 bg-[#40916C]/20 rounded-full blur-3xl"></div>
+
+        <div className="relative flex flex-col justify-center items-center w-full p-12">
+          {/* Logo */}
+          <div className="mb-12">
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
+                <span className="text-[#D4AF37] font-bold text-2xl">T</span>
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-white">
+                  ThikaBiz<span className="text-[#D4AF37]">Hub</span>
+                </h1>
+                <p className="text-sm text-white/60">Your Local Business Directory</p>
+              </div>
+            </div>
           </div>
-          <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-              Password
-            </label>
-            <input
-              className="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500"
-              id="password"
-              type="password"
-              placeholder="******************"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+
+          {/* Features List */}
+          <div className="space-y-6 max-w-md">
+            {[
+              { icon: '🏪', text: 'Discover 500+ verified local businesses' },
+              { icon: '💰', text: 'Access exclusive deals and discounts' },
+              { icon: '📍', text: 'Share and read authentic reviews' },
+              { icon: '🎉', text: 'Stay updated with local events' },
+            ].map((item, index) => (
+              <div key={index} className="flex items-center gap-4 text-white/80">
+                <span className="text-2xl">{item.icon}</span>
+                <span className="text-lg">{item.text}</span>
+              </div>
+            ))}
           </div>
-          
-          <div className="flex flex-col space-y-4">
-            <button
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-300 disabled:bg-gray-400"
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? 'Signing In...' : 'Sign In'}
-            </button>
-            
-            <div className="relative flex py-2 items-center">
-                <div className="flex-grow border-t border-gray-300"></div>
-                <span className="flex-shrink mx-4 text-gray-400 text-sm">OR</span>
-                <div className="flex-grow border-t border-gray-300"></div>
+
+          {/* Trust Badge */}
+          <div className="mt-16 flex items-center gap-3 px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
+            <span className="text-[#D4AF37]">⭐</span>
+            <span className="text-white/90 text-sm font-medium">Trusted by 1,000+ users in Thika</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Panel - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-[#FAFAF8]">
+        <div className="w-full max-w-md">
+          {/* Mobile Logo */}
+          <div className="lg:hidden mb-8 text-center">
+            <Link href="/" className="inline-flex items-center gap-2">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1B4332] to-[#2D6A4F] flex items-center justify-center">
+                <span className="text-white font-bold text-lg">T</span>
+              </div>
+              <span className="text-xl font-bold text-[#1B4332]">
+                ThikaBiz<span className="text-[#D4AF37]">Hub</span>
+              </span>
+            </Link>
+          </div>
+
+          {/* Form Card */}
+          <div className="glass-card rounded-2xl p-8 md:p-10">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] mb-2">
+                {isSignUp ? 'Create Account' : 'Welcome Back'}
+              </h2>
+              <p className="text-[#525252]">
+                {isSignUp ? 'Join the ThikaBizHub community' : 'Sign in to your account'}
+              </p>
             </div>
 
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-[#1A1A1A] mb-2" htmlFor="email">
+                  Email Address
+                </label>
+                <input
+                  className="input"
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#1A1A1A] mb-2" htmlFor="password">
+                  Password
+                </label>
+                <input
+                  className="input"
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+
+              <button
+                className="w-full btn btn-primary btn-lg"
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span>Please wait...</span>
+                  </div>
+                ) : (
+                  isSignUp ? 'Create Account' : 'Sign In'
+                )}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="my-6 flex items-center">
+              <div className="flex-1 h-px bg-[#E5E5E5]"></div>
+              <span className="px-4 text-sm text-[#737373]">or continue with</span>
+              <div className="flex-1 h-px bg-[#E5E5E5]"></div>
+            </div>
+
+            {/* Google Sign In */}
             <button
               type="button"
               onClick={handleGoogleSignIn}
               disabled={loading}
-              className="w-full bg-white border border-gray-300 text-gray-700 font-medium py-2 px-4 rounded flex items-center justify-center space-x-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-300 disabled:bg-gray-200"
-              aria-label="Sign in with Google"
+              className="w-full btn btn-lg bg-white border-2 border-[#E5E5E5] text-[#1A1A1A] hover:bg-[#F5F5F5] hover:border-[#D4D4D4]"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="w-5 h-5">
                 <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.3l6.8-6.8C35.5 2.1 30.1 0 24 0 14.8 0 6.9 5.2 2.8 12.7l7.9 6.1C12.9 13.2 18 9.5 24 9.5z" />
                 <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-2.8-.3-4H24v8h12.9c-.6 3.5-3.1 6.4-6.6 8.1l7.9 6.1C42.9 38.6 46.5 31.9 46.5 24.5z" />
                 <path fill="#FBBC05" d="M10.7 29.8c-.8-2.4-1.3-4.9-1.3-7.8s.5-5.4 1.3-7.8L2.8 7.6C1 11.3 0 15.5 0 20c0 4.6 1 8.7 2.8 12.4l7.9-2.6z" />
                 <path fill="#34A853" d="M24 48c6.1 0 11.5-2 15.4-5.4l-7.3-5.6C29.8 37.5 27.1 38.6 24 38.6c-6 0-11.1-3.7-13.5-9.1l-7.9 6.1C6.9 42.8 14.8 48 24 48z" />
-                <path fill="none" d="M0 0h48v48H0z" />
               </svg>
-              <span>Sign in with Google</span>
+              <span>Continue with Google</span>
             </button>
+
+            {/* Toggle Sign Up / Sign In */}
+            <p className="mt-8 text-center text-sm text-[#525252]">
+              {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="font-semibold text-[#1B4332] hover:text-[#D4AF37] transition-colors"
+              >
+                {isSignUp ? 'Sign In' : 'Sign Up'}
+              </button>
+            </p>
           </div>
-          
-          <div className="text-center text-sm text-gray-500 mt-6">
-            <p>New users are assigned a 'user' role by default. Contact an admin for elevated privileges.</p>
+
+          {/* Back to Home */}
+          <div className="mt-6 text-center">
+            <Link href="/" className="text-sm text-[#737373] hover:text-[#1B4332] transition-colors">
+              ← Back to Home
+            </Link>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

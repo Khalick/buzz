@@ -1,39 +1,57 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib/firebase';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from './useAuth';
 
-export const useAdminAuth = () => {
-  const [user, loading, error] = useAuthState(auth);
+interface AdminAuthResult {
+  isAdmin: boolean;
+  isLoading: boolean;
+  loading: boolean; // Alias for isLoading for withAuth.tsx
+  isAdminLoading: boolean; // Alias for isLoading for backward compatibility
+  user: any;
+}
+
+export const useAdminAuth = (): AdminAuthResult => {
+  const { user, loading: authLoading } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isAdminLoading, setIsAdminLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    const checkAdminStatus = async () => {
-      if (user) {
-        try {
-          // Force refresh the token to get the latest custom claims.
-          const idTokenResult = await user.getIdTokenResult(true);
-          if (idTokenResult.claims.role === 'admin') {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-          }
-        } catch (err) {
-          console.error("Error fetching user role:", err);
-          setIsAdmin(false);
-        }
-      } else {
-        setIsAdmin(false);
+    const checkAdmin = async () => {
+      if (authLoading) return;
+
+      if (!user) {
+        router.push('/login');
+        return;
       }
-      setIsAdminLoading(false);
+
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        if (error) throw error;
+
+        if (data?.role === 'admin') {
+          setIsAdmin(true);
+        } else {
+          router.push('/');
+        }
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+        router.push('/');
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    if (!loading) {
-      checkAdminStatus();
-    }
-  }, [user, loading]);
+    checkAdmin();
+  }, [user, authLoading, router]);
 
-  return { user, loading, error, isAdmin, isAdminLoading };
+  return { isAdmin, isLoading, loading: isLoading, isAdminLoading: isLoading, user };
 };

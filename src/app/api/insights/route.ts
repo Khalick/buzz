@@ -1,34 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth, adminDb } from '@/lib/firebaseAdmin';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
+
+
 
 export async function GET(request: NextRequest) {
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const token = authHeader.split('Bearer ')[1];
-    const decodedToken = await adminAuth.verifyIdToken(token);
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
 
-    if (decodedToken.role !== 'admin') {
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if admin
+    const { data: userData, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (userError || userData?.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
     }
 
     // Get all businesses
-    const businessesSnapshot = await adminDb.collection('businesses').get();
-    const businesses = businessesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const { data: businesses, error: bizError } = await supabaseAdmin
+      .from('businesses')
+      .select('*');
+
+    if (bizError) throw bizError;
 
     // Get all reviews
-    const reviewsSnapshot = await adminDb.collection('reviews').get();
-    const reviews = reviewsSnapshot.docs.map(doc => doc.data());
+    const { data: reviews, error: revError } = await supabaseAdmin
+      .from('reviews')
+      .select('*');
+
+    if (revError) throw revError;
 
     // Calculate category stats
     const categoryMap = new Map();
 
-    businesses.forEach((business: any) => {
+    (businesses || []).forEach((business: any) => {
       const category = business.category || 'Other';
-      
+
       if (!categoryMap.has(category)) {
         categoryMap.set(category, {
           category,
@@ -54,7 +74,7 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      stats.totalReviews += business.reviewCount || 0;
+      stats.totalReviews += business.review_count || 0;
     });
 
     const categoryStats = Array.from(categoryMap.values()).map(stats => ({

@@ -1,40 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
-import admin from '@/lib/firebaseAdmin';
-import { getAuth } from 'firebase-admin/auth';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 // GET - Get invite details by code
 export async function GET(req: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     const { code } = await params;
-    const db = getFirestore(admin.app());
-    
+
     // Find invite by code
-    const inviteSnapshot = await db.collection('invites')
-      .where('inviteCode', '==', code)
-      .get();
-    
-    if (inviteSnapshot.empty) {
+    const { data: invite, error } = await supabaseAdmin
+      .from('invites')
+      .select('*')
+      .eq('code', code)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (!invite) {
       return NextResponse.json({ error: 'Invalid invite code' }, { status: 404 });
     }
-    
-    const inviteDoc = inviteSnapshot.docs[0];
-    const inviteData = inviteDoc.data();
-    
+
     // Check if invite is expired
-    if (new Date(inviteData.expiresAt) < new Date()) {
+    if (new Date(invite.expires_at) < new Date()) {
       return NextResponse.json({ error: 'Invite has expired' }, { status: 400 });
     }
-    
+
     // Check if already accepted
-    if (inviteData.status !== 'pending') {
+    if (invite.status !== 'pending') {
       return NextResponse.json({ error: 'Invite already processed' }, { status: 400 });
     }
-    
+
     return NextResponse.json({
       invite: {
-        id: inviteDoc.id,
-        ...inviteData,
+        id: invite.id,
+        inviterEmail: invite.inviter_email,
+        inviterName: invite.inviter_name,
+        inviteeEmail: invite.invitee_email,
+        type: invite.type,
+        businessName: invite.business_name,
+        message: invite.message,
+        createdAt: invite.created_at,
+        expiresAt: invite.expires_at,
       },
     });
 
@@ -50,85 +56,101 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ cod
   if (!authorization?.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized: No token provided' }, { status: 401 });
   }
-  const idToken = authorization.split('Bearer ')[1];
+  const token = authorization.split('Bearer ')[1];
 
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     const { code } = await params;
-    const decodedToken = await getAuth(admin.app()).verifyIdToken(idToken);
-    const { uid, email } = decodedToken;
 
-    const db = getFirestore(admin.app());
-    
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
+    }
+
     // Find invite
-    const inviteSnapshot = await db.collection('invites')
-      .where('inviteCode', '==', code)
-      .get();
-    
-    if (inviteSnapshot.empty) {
+    const { data: invite, error: findError } = await supabaseAdmin
+      .from('invites')
+      .select('*')
+      .eq('code', code)
+      .maybeSingle();
+
+    if (findError) throw findError;
+
+    if (!invite) {
       return NextResponse.json({ error: 'Invalid invite code' }, { status: 404 });
     }
-    
-    const inviteDoc = inviteSnapshot.docs[0];
-    const inviteData = inviteDoc.data();
-    
+
     // Validate invite
-    if (new Date(inviteData.expiresAt) < new Date()) {
+    if (new Date(invite.expires_at) < new Date()) {
       return NextResponse.json({ error: 'Invite has expired' }, { status: 400 });
     }
-    
-    if (inviteData.status !== 'pending') {
+
+    if (invite.status !== 'pending') {
       return NextResponse.json({ error: 'Invite already processed' }, { status: 400 });
     }
-    
-    if (inviteData.inviteeEmail !== email) {
+
+    if (invite.invitee_email !== user.email) {
       return NextResponse.json({ error: 'Invite not intended for this email address' }, { status: 400 });
     }
-    
+
     // Accept invite
-    await db.collection('invites').doc(inviteDoc.id).update({
-      status: 'accepted',
-      acceptedAt: new Date().toISOString(),
-      acceptedBy: uid,
-    });
-    
+    const { error: updateError } = await supabaseAdmin
+      .from('invites')
+      .update({
+        status: 'accepted',
+        invitee_id: user.id,
+      })
+      .eq('id', invite.id);
+
+    if (updateError) throw updateError;
+
     // Process based on invite type
-    const userRef = db.collection('users').doc(uid);
-    
-    switch (inviteData.type) {
+    switch (invite.type) {
       case 'business':
         // Add user to a business team or grant business privileges
-        await userRef.update({
-          businessRole: 'member',
-          invitedToBusiness: inviteData.businessName,
-          joinedBusinessAt: new Date().toISOString(),
-        });
+        await supabaseAdmin
+          .from('users')
+          .update({
+            business_role: 'member',
+            invited_to_business: invite.business_name,
+          })
+          .eq('id', user.id);
         break;
-        
+
       case 'admin':
-        // Grant admin privileges (only if inviter is admin)
-        const inviter = await getAuth(admin.app()).getUser(inviteData.inviterId);
-        if (inviter.customClaims?.role === 'admin') {
-          await getAuth(admin.app()).setCustomUserClaims(uid, { role: 'admin' });
-          await userRef.update({ role: 'admin' });
+        // Grant admin privileges (check if inviter is admin first)
+        const { data: inviterData } = await supabaseAdmin
+          .from('users')
+          .select('role')
+          .eq('id', invite.inviter_id)
+          .single();
+
+        if (inviterData?.role === 'admin') {
+          await supabaseAdmin
+            .from('users')
+            .update({ role: 'admin' })
+            .eq('id', user.id);
         }
         break;
-        
+
       case 'user':
       default:
         // Regular user invite - maybe give some bonus or special access
-        await userRef.update({
-          invitedBy: inviteData.inviterId,
-          joinedViaInvite: true,
-        });
+        await supabaseAdmin
+          .from('users')
+          .update({
+            invited_by: invite.inviter_id,
+          })
+          .eq('id', user.id);
         break;
     }
-    
+
     return NextResponse.json({
       message: 'Invite accepted successfully',
-      type: inviteData.type,
+      type: invite.type,
       inviter: {
-        name: inviteData.inviterName,
-        email: inviteData.inviterEmail,
+        name: invite.inviter_name,
+        email: invite.inviter_email,
       },
     });
 

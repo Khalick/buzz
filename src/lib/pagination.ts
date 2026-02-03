@@ -1,134 +1,77 @@
-import { 
-  query, 
-  orderBy, 
-  limit as firestoreLimit, 
-  startAfter, 
-  endBefore,
-  DocumentData,
-  QueryDocumentSnapshot,
-  CollectionReference,
-  Query,
-  getDocs,
-  where
-} from 'firebase/firestore';
+import { supabase } from './supabase';
 
 export interface PaginationOptions {
+  page?: number;     // Changed from cursor-based to page-based
   pageSize?: number;
   orderByField?: string;
   orderDirection?: 'asc' | 'desc';
-  startAfterDoc?: QueryDocumentSnapshot<DocumentData>;
-  endBeforeDoc?: QueryDocumentSnapshot<DocumentData>;
   filters?: Array<{
     field: string;
-    operator: any;
+    operator: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'like' | 'ilike' | 'is' | 'in' | 'cs' | 'cd' | 'sl' | 'sr' | 'nxl' | 'nxr' | 'adj' | 'ov' | 'fts' | 'plfts' | 'phfts' | 'wfts';
     value: any;
   }>;
 }
 
 export interface PaginatedResult<T> {
   data: T[];
-  nextPageToken?: QueryDocumentSnapshot<DocumentData>;
-  prevPageToken?: QueryDocumentSnapshot<DocumentData>;
+  count: number | null;
+  page: number;
+  pageSize: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
-  totalCount?: number;
+  totalPages: number;
 }
 
 export class PaginationHelper {
   static async paginate<T>(
-    collection: CollectionReference<DocumentData>,
+    table: string,
     options: PaginationOptions = {}
   ): Promise<PaginatedResult<T>> {
     const {
+      page = 1,
       pageSize = 10,
-      orderByField = 'createdAt',
+      orderByField = 'created_at',
       orderDirection = 'desc',
-      startAfterDoc,
-      endBeforeDoc,
       filters = []
     } = options;
 
-    // Build the query
-    let q: Query<DocumentData> = collection;
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    let query = supabase
+      .from(table)
+      .select('*', { count: 'exact' });
 
     // Apply filters
     for (const filter of filters) {
-      q = query(q, where(filter.field, filter.operator, filter.value));
+      // @ts-ignore - dynamic method access
+      if (query[filter.operator]) {
+        // @ts-ignore
+        query = query[filter.operator](filter.field, filter.value);
+      }
     }
 
-    // Add ordering
-    q = query(q, orderBy(orderByField, orderDirection));
+    // Apply ordering
+    query = query.order(orderByField, { ascending: orderDirection === 'asc' });
 
-    // Add pagination
-    if (startAfterDoc) {
-      q = query(q, startAfter(startAfterDoc));
-    }
-    if (endBeforeDoc) {
-      q = query(q, endBefore(endBeforeDoc));
-    }
+    // Apply pagination
+    query = query.range(from, to);
 
-    // Add limit (request one extra to check if there's a next page)
-    q = query(q, firestoreLimit(pageSize + 1));
+    const { data, error, count } = await query;
 
-    // Execute query
-    const snapshot = await getDocs(q);
-    const docs = snapshot.docs;
+    if (error) throw error;
 
-    // Check if we have more pages
-    const hasNextPage = docs.length > pageSize;
-    const hasPrevPage = !!startAfterDoc;
-
-    // Remove the extra document if present
-    const data = docs.slice(0, pageSize).map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as T[];
-
-    // Get pagination tokens
-    const nextPageToken = hasNextPage ? docs[pageSize - 1] : undefined;
-    const prevPageToken = hasPrevPage ? docs[0] : undefined;
+    const totalCount = count || 0;
+    const totalPages = Math.ceil(totalCount / pageSize);
 
     return {
-      data,
-      nextPageToken,
-      prevPageToken,
-      hasNextPage,
-      hasPrevPage
+      data: (data || []) as T[],
+      count: totalCount,
+      page,
+      pageSize,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
+      totalPages
     };
-  }
-
-  // Get total count for a collection (cached)
-  static async getTotalCount(
-    collection: CollectionReference<DocumentData>,
-    filters: Array<{ field: string; operator: any; value: any }> = []
-  ): Promise<number> {
-    let q: Query<DocumentData> = collection;
-
-    // Apply filters
-    for (const filter of filters) {
-      q = query(q, where(filter.field, filter.operator, filter.value));
-    }
-
-    const snapshot = await getDocs(q);
-    return snapshot.size;
-  }
-
-  // Search with pagination
-  static async search<T>(
-    collection: CollectionReference<DocumentData>,
-    searchField: string,
-    searchTerm: string,
-    options: Omit<PaginationOptions, 'filters'> = {}
-  ): Promise<PaginatedResult<T>> {
-    // For simple prefix search
-    const searchFilters = [
-      { field: searchField, operator: '>=', value: searchTerm },
-      { field: searchField, operator: '<=', value: searchTerm + '\uf8ff' }
-    ];
-
-    return this.paginate<T>(collection, {
-      ...options,
-      filters: searchFilters
-    });
   }
 }

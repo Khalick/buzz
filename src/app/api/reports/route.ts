@@ -1,16 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth, adminDb } from '@/lib/firebaseAdmin';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 export async function POST(request: NextRequest) {
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const token = authHeader.split('Bearer ')[1];
-    const decodedToken = await adminAuth.verifyIdToken(token);
-    
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { businessId, reason, description } = body;
 
@@ -19,16 +24,20 @@ export async function POST(request: NextRequest) {
     }
 
     const reportData = {
-      businessId,
-      reportedBy: decodedToken.uid,
-      reporterEmail: decodedToken.email,
+      business_id: businessId,
+      reported_by: user.id,
+      reporter_email: user.email,
       reason,
       description: description || '',
       status: 'pending',
-      createdAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     };
 
-    await adminDb.collection('reports').add(reportData);
+    const { error } = await supabaseAdmin
+      .from('reports')
+      .insert(reportData);
+
+    if (error) throw error;
 
     return NextResponse.json({ success: true, message: 'Report submitted successfully' });
   } catch (error) {

@@ -1,78 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cache } from '@/lib/cache';
-import { adminAuth } from '@/lib/firebaseAdmin';
-import admin from '@/lib/firebaseAdmin';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
+
+
 
 export async function GET(request: NextRequest) {
   try {
+    const supabaseAdmin = getSupabaseAdmin();
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const category = searchParams.get('category');
     const county = searchParams.get('county');
     const search = searchParams.get('search');
-    
-    // Build cache key
-    const cacheKey = `businesses_${page}_${limit}_${category || ''}_${county || ''}_${search || ''}`;
-    
-    // Check cache first
-    const cachedResult = cache.get(cacheKey);
-    if (cachedResult) {
-      return NextResponse.json(cachedResult);
-    }
 
-    // For development, use simpler queries to avoid index requirements
-    // Get all approved businesses and filter in memory
-    const db = getFirestore(admin.app());
-    const businessesSnapshot = await db.collection('businesses')
-      .where('isApproved', '==', true)
-      .get();
+    let query = supabaseAdmin
+      .from('businesses')
+      .select('*', { count: 'exact' })
+      .eq('approved', true)
+      .order('created_at', { ascending: false });
 
-    let allBusinesses = businessesSnapshot.docs.map((doc: any) => ({
-      id: doc.id,
-      ...doc.data()
-    })) as any[];
-
-    // Apply filters in memory
+    // Apply filters
     if (category && category !== 'all') {
-      allBusinesses = allBusinesses.filter(b => b.category === category);
+      query = query.eq('category', category);
     }
 
     if (county && county !== 'all') {
-      allBusinesses = allBusinesses.filter(b => b.location?.county === county);
+      query = query.contains('location', { county });
     }
 
-    // Apply search filter
     if (search) {
-      const searchLower = search.toLowerCase();
-      allBusinesses = allBusinesses.filter(business => 
-        business.name?.toLowerCase().includes(searchLower) ||
-        business.description?.toLowerCase().includes(searchLower) ||
-        business.category?.toLowerCase().includes(searchLower)
-      );
+      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%,category.ilike.%${search}%`);
     }
 
-    // Sort by creation date (newest first)
-    allBusinesses.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-    // Apply pagination manually
+    // Apply pagination
     const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedBusinesses = allBusinesses.slice(startIndex, endIndex);
+    query = query.range(startIndex, startIndex + limit - 1);
 
+    const { data, error, count } = await query;
+
+    if (error) throw error;
+
+    const totalCount = count || 0;
     const response = {
-      businesses: paginatedBusinesses,
+      businesses: data || [],
       pagination: {
         currentPage: page,
-        hasNextPage: endIndex < allBusinesses.length,
+        hasNextPage: startIndex + limit < totalCount,
         hasPrevPage: page > 1,
-        totalPages: Math.ceil(allBusinesses.length / limit)
+        totalPages: Math.ceil(totalCount / limit)
       }
     };
-
-    // Cache the result for 5 minutes
-    cache.set(cacheKey, response, 300);
 
     return NextResponse.json(response);
   } catch (error) {
@@ -86,15 +63,22 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
+    const supabaseAdmin = getSupabaseAdmin();
+    // Verify authentication via Authorization header
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const token = authHeader.split('Bearer ')[1];
-    const decodedToken = await adminAuth.verifyIdToken(token);
-    
+
+    // Verify the JWT token
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const {
       name,
@@ -132,26 +116,28 @@ export async function POST(request: NextRequest) {
       },
       website: website || null,
       images: images || [],
-      ownerId: decodedToken.uid,
-      isApproved: false,
-      isPremium: false,
+      owner_id: user.id,
+      submitted_by: user.id,
+      approved: false,
+      is_premium: false,
       views: 0,
       rating: 0,
-      reviewCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      review_count: 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     };
 
-    // Add to Firestore using Admin SDK
-    const db = getFirestore(admin.app());
-    const docRef = await db.collection('businesses').add(businessData);
-    
-    // Clear relevant caches
-    cache.delete('businesses_stats');
-    
+    const { data, error } = await supabaseAdmin
+      .from('businesses')
+      .insert(businessData)
+      .select()
+      .single();
+
+    if (error) throw error;
+
     return NextResponse.json({
       message: 'Business submitted successfully',
-      businessId: docRef.id,
+      businessId: data.id,
       status: 'pending_approval'
     });
 

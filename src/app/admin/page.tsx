@@ -1,23 +1,22 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, orderBy } from 'firebase/firestore';
+import { supabase, uploadFile } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
 import Image from 'next/image';
-import withAuth from '@/components/withAuth';
 
 interface Deal {
   title: string;
   description: string;
-  businessName: string;
-  expiryDate: string;
+  business_name: string;
+  expiry_date: string;
 }
 
 interface Proof {
   id: string;
   name: string;
-  businessName: string;
-  imageUrl: string;
+  business_name: string;
+  image_url: string;
   approved: boolean;
 }
 
@@ -36,11 +35,13 @@ interface Business {
 }
 
 const AdminPage = () => {
+  const { user, loading: authLoading } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
   const [deal, setDeal] = useState<Deal>({
     title: '',
     description: '',
-    businessName: '',
-    expiryDate: '',
+    business_name: '',
+    expiry_date: '',
   });
   const [unapprovedProofs, setUnapprovedProofs] = useState<Proof[]>([]);
   const [loadingProofs, setLoadingProofs] = useState(true);
@@ -48,32 +49,67 @@ const AdminPage = () => {
   const [loadingBusinesses, setLoadingBusinesses] = useState(true);
 
   useEffect(() => {
-    const fetchUnapproved = async () => {
-      setLoadingProofs(true);
-      setLoadingBusinesses(true);
-      try {
-        // Fetch unapproved proofs
-        const proofsQuery = query(collection(db, "proofs"), where("approved", "==", false), orderBy("createdAt", "desc"));
-        const proofsSnapshot = await getDocs(proofsQuery);
-        const proofsData = proofsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Proof));
-        setUnapprovedProofs(proofsData);
+    if (!authLoading && user) {
+      checkAdminAndFetch();
+    }
+  }, [user, authLoading]);
 
-        // Fetch unapproved businesses
-        const businessesQuery = query(collection(db, "businesses"), where("approved", "==", false), orderBy("createdAt", "desc"));
-        const businessesSnapshot = await getDocs(businessesQuery);
-        const businessesData = businessesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Business));
-        setUnapprovedBusinesses(businessesData);
+  const checkAdminAndFetch = async () => {
+    if (!user) return;
 
-      } catch (error) {
-        console.error("Error fetching unapproved items: ", error);
-      } finally {
-        setLoadingProofs(false);
-        setLoadingBusinesses(false);
+    try {
+      // Check if user is admin
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      if (userError) throw userError;
+      if (userData?.role !== 'admin') {
+        window.location.href = '/';
+        return;
       }
-    };
 
-    fetchUnapproved();
-  }, []);
+      setIsAdmin(true);
+      fetchUnapproved();
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      window.location.href = '/';
+    }
+  };
+
+  const fetchUnapproved = async () => {
+    setLoadingProofs(true);
+    setLoadingBusinesses(true);
+    try {
+      // Fetch unapproved proofs
+      const { data: proofsData, error: proofsError } = await supabase
+        .from('proofs')
+        .select('*')
+        .eq('approved', false)
+        .order('created_at', { ascending: false });
+
+      if (proofsError) throw proofsError;
+      setUnapprovedProofs(proofsData || []);
+
+      // Fetch unapproved businesses
+      const { data: businessesData, error: businessesError } = await supabase
+        .from('businesses')
+        .select('*')
+        .eq('approved', false)
+        .order('created_at', { ascending: false });
+
+      if (businessesError) throw businessesError;
+      setUnapprovedBusinesses(businessesData || []);
+
+    } catch (error) {
+      console.error("Error fetching unapproved items: ", error);
+    } finally {
+      setLoadingProofs(false);
+      setLoadingBusinesses(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -83,28 +119,35 @@ const AdminPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Convert expiryDate (YYYY-MM-DD string) to a Date object so Firestore stores a timestamp
-      const expiry = deal.expiryDate ? new Date(deal.expiryDate) : null;
-      await addDoc(collection(db, "deals"), {
-        title: deal.title,
-        description: deal.description,
-        businessName: deal.businessName,
-        expiryDate: expiry,
-        createdAt: new Date(),
-      });
+      const { error } = await supabase
+        .from('deals')
+        .insert({
+          title: deal.title,
+          description: deal.description,
+          business_name: deal.business_name,
+          expiry_date: deal.expiry_date ? new Date(deal.expiry_date).toISOString() : null,
+          created_at: new Date().toISOString(),
+        });
+
+      if (error) throw error;
       alert('Deal submitted successfully!');
-      setDeal({ title: '', description: '', businessName: '', expiryDate: '' }); // Clear form
+      setDeal({ title: '', description: '', business_name: '', expiry_date: '' });
     } catch (error) {
-      console.error("Error adding document: ", error);
+      console.error("Error adding deal: ", error);
       alert('Error submitting deal.');
     }
   };
 
-  const handleApprove = async (collectionName: string, id: string) => {
+  const handleApprove = async (tableName: string, id: string) => {
     try {
-      const itemRef = doc(db, collectionName, id);
-      await updateDoc(itemRef, { approved: true });
-      if (collectionName === 'proofs') {
+      const { error } = await supabase
+        .from(tableName)
+        .update({ approved: true })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      if (tableName === 'proofs') {
         setUnapprovedProofs(prev => prev.filter(p => p.id !== id));
       } else {
         setUnapprovedBusinesses(prev => prev.filter(b => b.id !== id));
@@ -116,10 +159,16 @@ const AdminPage = () => {
     }
   };
 
-  const handleReject = async (collectionName: string, id: string) => {
+  const handleReject = async (tableName: string, id: string) => {
     try {
-      await deleteDoc(doc(db, collectionName, id));
-      if (collectionName === 'proofs') {
+      const { error } = await supabase
+        .from(tableName)
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      if (tableName === 'proofs') {
         setUnapprovedProofs(prev => prev.filter(p => p.id !== id));
       } else {
         setUnapprovedBusinesses(prev => prev.filter(b => b.id !== id));
@@ -132,7 +181,7 @@ const AdminPage = () => {
   };
 
   const shareOnSocialMedia = (platform: 'whatsapp' | 'facebook' | 'instagram' | 'tiktok') => {
-    const text = `Check out this deal from ${deal.businessName}: ${deal.title} - ${deal.description}`;
+    const text = `Check out this deal from ${deal.business_name}: ${deal.title} - ${deal.description}`;
     let url = '';
     switch (platform) {
       case 'whatsapp':
@@ -151,12 +200,20 @@ const AdminPage = () => {
     window.open(url, '_blank');
   };
 
+  if (authLoading || !isAdmin) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        
+
         {/* Deals Management */}
         <div className="lg:col-span-1">
           <h2 className="text-2xl font-bold mb-4">Manage Deals</h2>
@@ -174,24 +231,24 @@ const AdminPage = () => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="businessName" className="block text-gray-700 font-bold mb-2">Business Name</label>
+              <label htmlFor="business_name" className="block text-gray-700 font-bold mb-2">Business Name</label>
               <input
                 type="text"
-                id="businessName"
-                name="businessName"
-                value={deal.businessName}
+                id="business_name"
+                name="business_name"
+                value={deal.business_name}
                 onChange={handleChange}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700"
                 required
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="expiryDate" className="block text-gray-700 font-bold mb-2">Expiry Date</label>
+              <label htmlFor="expiry_date" className="block text-gray-700 font-bold mb-2">Expiry Date</label>
               <input
                 type="date"
-                id="expiryDate"
-                name="expiryDate"
-                value={deal.expiryDate}
+                id="expiry_date"
+                name="expiry_date"
+                value={deal.expiry_date}
                 onChange={handleChange}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700"
                 required
@@ -256,7 +313,7 @@ const AdminPage = () => {
                       {business.coordinates && (
                         <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded">
                           <p className="text-xs text-green-800 font-medium">📍 Location Pinned</p>
-                          <a 
+                          <a
                             href={`https://www.google.com/maps?q=${business.coordinates.latitude},${business.coordinates.longitude}`}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -290,9 +347,9 @@ const AdminPage = () => {
                   unapprovedProofs.map(proof => (
                     <div key={proof.id} className="bg-white p-4 rounded-lg shadow-md">
                       <div className="relative h-48 w-full mb-4 rounded-md overflow-hidden">
-                        <Image src={proof.imageUrl} alt={`Visit to ${proof.businessName}`} layout="fill" objectFit="cover" />
+                        <Image src={proof.image_url} alt={`Visit to ${proof.business_name}`} layout="fill" objectFit="cover" />
                       </div>
-                      <p className="font-bold">{proof.businessName}</p>
+                      <p className="font-bold">{proof.business_name}</p>
                       <p className="text-sm text-gray-600">By: {proof.name}</p>
                       <div className="flex justify-end space-x-2 mt-4">
                         <button onClick={() => handleReject('proofs', proof.id)} className="bg-red-500 text-white font-bold py-1 px-3 rounded text-sm">Reject</button>
@@ -312,4 +369,4 @@ const AdminPage = () => {
   );
 };
 
-export default withAuth(AdminPage);
+export default AdminPage;

@@ -127,13 +127,6 @@ export default function DirectoryPage() {
     }
   };
 
-  const handleSearch = (query: string, category: string, county: string) => {
-    setSearchQuery(query);
-    setSelectedCategory(category);
-    setSelectedCounty(county);
-    setPagination(prev => ({ ...prev, currentPage: 1 }));
-  };
-
   const handlePageChange = (newPage: number) => {
     setPagination(prev => ({ ...prev, currentPage: newPage }));
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -149,124 +142,110 @@ export default function DirectoryPage() {
     const isTrending = business.stats && business.stats.views > 100;
 
     return (
-    <div className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 relative ${business.isPremium ? 'ring-2 ring-yellow-400' : ''}`}>
-      <div className="absolute top-2 left-2 z-10">
-        <FavoriteButton businessId={business.id} />
-      </div>
-      
-      {business.isPremium && (
-        <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white text-xs font-bold py-1 px-3 flex items-center justify-between">
-          <span>PREMIUM</span>
-          {isTrending && (
-            <span className="flex items-center gap-1">
-              <TrendingUp className="h-3 w-3" />
-              Trending
-            </span>
-          )}
+      <div className={`group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 relative ${business.isPremium ? 'ring-2 ring-[#D4AF37]' : ''}`}>
+        <div className="absolute top-3 left-3 z-10">
+          <FavoriteButton businessId={business.id} />
         </div>
-      )}
-      
-      <div className="relative h-48 bg-gray-200">
-        {business.images && business.images.length > 0 ? (
-          <img
-            src={business.images[0]}
-            alt={business.name}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-400">
-            <Grid className="h-12 w-12" />
+
+        {business.isPremium && (
+          <div className="bg-gradient-to-r from-[#D4AF37] to-[#E4C767] text-[#1B4332] text-xs font-bold py-1.5 px-4 flex items-center justify-between">
+            <span className="flex items-center gap-1">⭐ PREMIUM</span>
+            {isTrending && (
+              <span className="flex items-center gap-1">
+                <TrendingUp className="h-3 w-3" />
+                Trending
+              </span>
+            )}
           </div>
         )}
-        <div className="absolute top-2 right-2 bg-white rounded-full px-2 py-1 text-xs font-medium text-gray-700">
-          {business.category}
-        </div>
-        {business.stats && business.stats.views > 0 && (
-          <div className="absolute bottom-2 right-2 bg-black/70 text-white rounded-full px-2 py-1 text-xs flex items-center gap-1">
-            <Eye className="h-3 w-3" />
-            {business.stats.views} views
+
+        <div className="relative h-48 bg-gradient-to-br from-[#1B4332]/5 to-[#2D6A4F]/10">
+          {business.images && business.images.length > 0 ? (
+            <img
+              src={business.images[0]}
+              alt={business.name}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-[#1B4332]/30">
+              <Grid className="h-12 w-12" />
+            </div>
+          )}
+          <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-xs font-medium text-[#1B4332]">
+            {business.category}
           </div>
-        )}
-      </div>
-
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-2">{business.name}</h3>
-        <p className="text-gray-600 mb-4 line-clamp-2">{business.description}</p>
-
-        <div className="space-y-2 mb-4">
-          {business.location && (
-            <div className="flex items-center text-sm text-gray-600">
-              <MapPin className="h-4 w-4 mr-2" />
-              {business.location.town && business.location.county ? 
-                `${business.location.town}, ${business.location.county}` : 
-                'Location not specified'}
+          {business.stats && business.stats.views > 0 && (
+            <div className="absolute bottom-3 right-3 bg-[#1B4332]/80 text-white rounded-full px-2 py-1 text-xs flex items-center gap-1 backdrop-blur-sm">
+              <Eye className="h-3 w-3" />
+              {business.stats.views}
             </div>
           )}
-          {business.contact && business.contact.phone && (
-            <div className="flex items-center text-sm text-gray-600">
-              <Phone className="h-4 w-4 mr-2" />
-              {business.contact.phone}
+        </div>
+
+        <div className="p-6">
+          <h3 className="text-lg font-bold text-[#1A1A1A] mb-2 group-hover:text-[#1B4332] transition-colors">{business.name}</h3>
+          <p className="text-[#525252] text-sm mb-4 line-clamp-2">{business.description}</p>
+
+          <div className="space-y-2 mb-4">
+            {business.location && (
+              <div className="flex items-center text-sm text-[#525252]">
+                <MapPin className="h-4 w-4 mr-2 text-[#1B4332]" />
+                {business.location.town && business.location.county ?
+                  `${business.location.town}, ${business.location.county}` :
+                  'Location not specified'}
+              </div>
+            )}
+            {business.contact && business.contact.phone && (
+              <div className="flex items-center text-sm text-[#525252]">
+                <Phone className="h-4 w-4 mr-2 text-[#1B4332]" />
+                {business.contact.phone}
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between mb-4 pb-4 border-b border-[#E5E5E5]">
+            <div className="flex items-center">
+              <Star className="h-4 w-4 text-[#D4AF37] fill-current" />
+              <span className="text-sm text-[#525252] ml-1">
+                {business.rating ? business.rating.toFixed(1) : '0.0'} ({business.reviewCount || 0})
+              </span>
             </div>
-          )}
-          {business.website && (
-            <div className="flex items-center text-sm text-gray-600">
-              <Globe className="h-4 w-4 mr-2" />
-              <a href={business.website} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600">
+            {business.website && (
+              <a href={business.website} target="_blank" rel="noopener noreferrer" className="text-sm text-[#1B4332] hover:text-[#D4AF37] flex items-center gap-1">
+                <Globe className="h-4 w-4" />
                 Website
               </a>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center">
-            <Star className="h-4 w-4 text-yellow-400 fill-current" />
-            <span className="text-sm text-gray-600 ml-1">
-              {business.rating ? business.rating.toFixed(1) : '0.0'} ({business.reviewCount || 0} reviews)
-            </span>
+          <div className="grid grid-cols-2 gap-2">
+            {(business.contact.whatsapp || business.contact.phone) && (
+              <a
+                href={getWhatsAppLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-[#25D366] text-white px-3 py-2.5 rounded-xl hover:bg-[#20BD5C] transition-colors text-sm font-medium flex items-center justify-center gap-1.5"
+              >
+                <MessageCircle className="h-4 w-4" />
+                WhatsApp
+              </a>
+            )}
+            <Link
+              href={`/business/${business.id}`}
+              className="bg-[#1B4332] text-white px-3 py-2.5 rounded-xl hover:bg-[#2D6A4F] transition-colors text-sm font-medium text-center"
+            >
+              View Details
+            </Link>
           </div>
         </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          {(business.contact.whatsapp || business.contact.phone) && (
-            <a
-              href={getWhatsAppLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
-            >
-              <MessageCircle className="h-4 w-4" />
-              WhatsApp
-            </a>
-          )}
-          {business.coordinates && (
-            <a
-              href={`https://www.google.com/maps?q=${business.coordinates.latitude},${business.coordinates.longitude}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center gap-1"
-            >
-              <MapPin className="h-4 w-4" />
-              Directions
-            </a>
-          )}
-        </div>
-        
-        <Link
-          href={`/business/${business.id}`}
-          className="block mt-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium text-center"
-        >
-          View Details
-        </Link>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
   const BusinessListItem = ({ business }: { business: Business }) => (
-    <div className={`bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 ${business.isPremium ? 'ring-2 ring-yellow-400' : ''}`}>
+    <div className={`bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 ${business.isPremium ? 'ring-2 ring-[#D4AF37]' : ''}`}>
       <div className="flex items-start space-x-6">
-        <div className="relative w-24 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+        <div className="relative w-28 h-28 bg-gradient-to-br from-[#1B4332]/5 to-[#2D6A4F]/10 rounded-xl overflow-hidden flex-shrink-0">
           {business.images && business.images.length > 0 ? (
             <img
               src={business.images[0]}
@@ -274,76 +253,55 @@ export default function DirectoryPage() {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="flex items-center justify-center h-full text-gray-400">
+            <div className="flex items-center justify-center h-full text-[#1B4332]/30">
               <Grid className="h-8 w-8" />
             </div>
           )}
           {business.isPremium && (
-            <div className="absolute top-0 right-0 bg-yellow-400 text-white text-xs font-bold px-1">
-              PREMIUM
+            <div className="absolute top-0 right-0 bg-[#D4AF37] text-[#1B4332] text-[10px] font-bold px-1.5 py-0.5 rounded-bl">
+              ⭐
             </div>
           )}
         </div>
 
-        <div className="flex-1">
-          <div className="flex items-start justify-between">
-            <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-1">{business.name}</h3>
-              <p className="text-sm text-blue-600 mb-2">{business.category}</p>
-              <p className="text-gray-600 mb-3 line-clamp-2">{business.description}</p>
-              
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h3 className="text-lg font-bold text-[#1A1A1A] mb-1">{business.name}</h3>
+              <p className="text-sm text-[#1B4332] font-medium mb-2">{business.category}</p>
+              <p className="text-[#525252] text-sm mb-3 line-clamp-2">{business.description}</p>
+
+              <div className="flex flex-wrap items-center gap-4 text-sm text-[#525252]">
                 {business.location && (
                   <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    {business.location.town && business.location.county ? 
-                      `${business.location.town}, ${business.location.county}` : 
+                    <MapPin className="h-4 w-4 mr-1 text-[#1B4332]" />
+                    {business.location.town && business.location.county ?
+                      `${business.location.town}, ${business.location.county}` :
                       'Location not specified'}
                   </div>
                 )}
                 {business.contact && business.contact.phone && (
                   <div className="flex items-center">
-                    <Phone className="h-4 w-4 mr-1" />
+                    <Phone className="h-4 w-4 mr-1 text-[#1B4332]" />
                     {business.contact.phone}
-                  </div>
-                )}
-                {business.website && (
-                  <div className="flex items-center">
-                    <Globe className="h-4 w-4 mr-1" />
-                    <a href={business.website} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600">
-                      Website
-                    </a>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="text-right">
-              <div className="flex items-center mb-2">
-                <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                <span className="text-sm text-gray-600 ml-1">
+            <div className="flex flex-col items-end gap-3 flex-shrink-0">
+              <div className="flex items-center">
+                <Star className="h-4 w-4 text-[#D4AF37] fill-current" />
+                <span className="text-sm text-[#525252] ml-1">
                   {business.rating ? business.rating.toFixed(1) : '0.0'} ({business.reviewCount || 0})
                 </span>
               </div>
-              <div className="flex flex-col gap-2">
-                {business.coordinates && (
-                  <a
-                    href={`https://www.google.com/maps?q=${business.coordinates.latitude},${business.coordinates.longitude}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center gap-1 justify-center"
-                  >
-                    <MapPin className="h-4 w-4" />
-                    Directions
-                  </a>
-                )}
-                <Link
-                  href={`/business/${business.id}`}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                >
-                  View Details
-                </Link>
-              </div>
+              <Link
+                href={`/business/${business.id}`}
+                className="bg-[#1B4332] text-white px-4 py-2 rounded-xl hover:bg-[#2D6A4F] transition-colors text-sm font-medium"
+              >
+                View Details
+              </Link>
             </div>
           </div>
         </div>
@@ -352,40 +310,39 @@ export default function DirectoryPage() {
   );
 
   const Pagination = () => (
-    <div className="flex items-center justify-center space-x-2 mt-8">
+    <div className="flex items-center justify-center gap-2 mt-12">
       <button
         onClick={() => handlePageChange(pagination.currentPage - 1)}
         disabled={!pagination.hasPrevPage}
-        className="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-4 py-2 border-2 border-[#1B4332]/20 rounded-xl text-[#1B4332] hover:bg-[#1B4332]/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-medium"
       >
         Previous
       </button>
-      
-      <div className="flex space-x-1">
+
+      <div className="flex gap-1">
         {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
           const pageNum = Math.max(1, pagination.currentPage - 2) + i;
           if (pageNum > pagination.totalPages) return null;
-          
+
           return (
             <button
               key={pageNum}
               onClick={() => handlePageChange(pageNum)}
-              className={`px-3 py-2 rounded-lg ${
-                pageNum === pagination.currentPage
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
+              className={`w-10 h-10 rounded-xl font-medium transition-all ${pageNum === pagination.currentPage
+                  ? 'bg-[#1B4332] text-white shadow-lg'
+                  : 'text-[#525252] hover:bg-[#1B4332]/10'
+                }`}
             >
               {pageNum}
             </button>
           );
         })}
       </div>
-      
+
       <button
         onClick={() => handlePageChange(pagination.currentPage + 1)}
         disabled={!pagination.hasNextPage}
-        className="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-4 py-2 border-2 border-[#1B4332]/20 rounded-xl text-[#1B4332] hover:bg-[#1B4332]/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-medium"
       >
         Next
       </button>
@@ -393,111 +350,134 @@ export default function DirectoryPage() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Business Directory</h1>
-        <p className="text-xl text-gray-600">
-          Discover amazing businesses in your area
-        </p>
-      </div>
-
-      {/* Search and Filters */}
-      <div className="mb-8">
-        <SearchFilter
-          onSearch={(query: string) => {
-            setSearchQuery(query);
-            setPagination(prev => ({ ...prev, currentPage: 1 }));
-          }}
-          onCategoryFilter={(category: string) => {
-            setSelectedCategory(category);
-            setPagination(prev => ({ ...prev, currentPage: 1 }));
-          }}
-          onLocationFilter={(county: string) => {
-            setSelectedCounty(county);
-            setPagination(prev => ({ ...prev, currentPage: 1 }));
-          }}
-          categories={categories}
-          locations={counties}
-        />
-      </div>
-
-      {/* View Toggle and Results Count */}
-      <div className="flex items-center justify-between mb-6">
-        <p className="text-gray-600">
-          Showing {businesses.length} businesses
-          {searchQuery && ` for "${searchQuery}"`}
-          {selectedCategory !== 'All Categories' && ` in ${selectedCategory}`}
-          {selectedCounty !== 'All Counties' && ` in ${selectedCounty}`}
-        </p>
-        
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setViewMode('grid')}
-            className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
-          >
-            <Grid className="h-5 w-5" />
-          </button>
-          <button
-            onClick={() => setViewMode('list')}
-            className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
-          >
-            <List className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
-
-      {/* Businesses Grid/List */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="bg-gray-200 rounded-xl h-96 animate-pulse"></div>
-          ))}
-        </div>
-      ) : businesses.length > 0 ? (
-        <div className={
-          viewMode === 'grid' 
-            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-            : 'space-y-4'
-        }>
-          {businesses.map((business) => (
-            viewMode === 'grid' ? (
-              <BusinessCard key={business.id} business={business} />
-            ) : (
-              <BusinessListItem key={business.id} business={business} />
-            )
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No businesses found</h3>
-          <p className="text-gray-600">
-            Try adjusting your search criteria or{' '}
-            <Link href="/directory/add" className="text-blue-600 hover:text-blue-700">
-              add a new business
-            </Link>
+    <div className="min-h-screen bg-gradient-subtle">
+      {/* Header Section */}
+      <div className="bg-gradient-hero py-16 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <span className="inline-block px-4 py-1.5 bg-white/10 text-white text-sm font-medium rounded-full mb-4 backdrop-blur-sm border border-white/20">
+            500+ Verified Businesses
+          </span>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 heading-display">
+            Business Directory
+          </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto">
+            Discover amazing local businesses in Thika and connect with them instantly
           </p>
         </div>
-      )}
+      </div>
 
-      {/* Pagination */}
-      {businesses.length > 0 && <Pagination />}
+      <div className="max-w-7xl mx-auto px-4 lg:px-8 -mt-8">
+        {/* Search Card */}
+        <div className="glass-card rounded-2xl p-6 mb-8 shadow-xl">
+          <SearchFilter
+            onSearch={(query: string) => {
+              setSearchQuery(query);
+              setPagination(prev => ({ ...prev, currentPage: 1 }));
+            }}
+            onCategoryFilter={(category: string) => {
+              setSelectedCategory(category);
+              setPagination(prev => ({ ...prev, currentPage: 1 }));
+            }}
+            onLocationFilter={(county: string) => {
+              setSelectedCounty(county);
+              setPagination(prev => ({ ...prev, currentPage: 1 }));
+            }}
+            categories={categories}
+            locations={counties}
+          />
+        </div>
 
-      {/* Add Business CTA */}
-      <div className="text-center mt-12 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-8">
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">
-          Don't see your business?
-        </h3>
-        <p className="text-gray-600 mb-6">
-          Join our directory and connect with local customers
-        </p>
-        <Link
-          href="/directory/add"
-          className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-        >
-          Add Your Business
-        </Link>
+        {/* Results Header */}
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-[#525252]">
+            Showing <span className="font-semibold text-[#1B4332]">{businesses.length}</span> businesses
+            {searchQuery && <span> for "<span className="font-medium">{searchQuery}</span>"</span>}
+            {selectedCategory !== 'All Categories' && <span> in <span className="font-medium">{selectedCategory}</span></span>}
+          </p>
+
+          <div className="flex items-center gap-1 p-1 bg-[#1B4332]/5 rounded-xl">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-[#1B4332] text-white shadow' : 'text-[#525252] hover:text-[#1B4332]'}`}
+            >
+              <Grid className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-[#1B4332] text-white shadow' : 'text-[#525252] hover:text-[#1B4332]'}`}
+            >
+              <List className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Business Grid/List */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl h-[420px] animate-pulse overflow-hidden">
+                <div className="h-48 bg-gradient-to-br from-[#1B4332]/10 to-[#2D6A4F]/5"></div>
+                <div className="p-6 space-y-4">
+                  <div className="h-5 bg-[#1B4332]/10 rounded w-3/4"></div>
+                  <div className="h-4 bg-[#1B4332]/5 rounded w-full"></div>
+                  <div className="h-4 bg-[#1B4332]/5 rounded w-2/3"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : businesses.length > 0 ? (
+          <div className={
+            viewMode === 'grid'
+              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+              : 'space-y-4'
+          }>
+            {businesses.map((business) => (
+              viewMode === 'grid' ? (
+                <BusinessCard key={business.id} business={business} />
+              ) : (
+                <BusinessListItem key={business.id} business={business} />
+              )
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#1B4332]/10 flex items-center justify-center">
+              <Search className="h-8 w-8 text-[#1B4332]/50" />
+            </div>
+            <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">No businesses found</h3>
+            <p className="text-[#525252] mb-6">
+              Try adjusting your search criteria or{' '}
+              <Link href="/directory/add" className="text-[#1B4332] hover:text-[#D4AF37] font-medium">
+                add a new business
+              </Link>
+            </p>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {businesses.length > 0 && <Pagination />}
+
+        {/* Add Business CTA */}
+        <div className="mt-16 mb-8 relative overflow-hidden rounded-2xl bg-gradient-hero p-10 md:p-12">
+          <div className="absolute inset-0 pattern-dots opacity-20"></div>
+          <div className="relative text-center max-w-2xl mx-auto">
+            <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+              Don't see your business?
+            </h3>
+            <p className="text-white/70 mb-8">
+              Join our directory and connect with thousands of local customers in Thika
+            </p>
+            <Link
+              href="/directory/add"
+              className="btn btn-gold btn-lg btn-pill font-bold shadow-xl"
+            >
+              Add Your Business Free
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

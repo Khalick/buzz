@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import withAuth from '@/components/withAuth';
-import { auth } from '@/lib/firebase';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
 
 interface User {
   uid: string;
@@ -15,6 +16,7 @@ interface User {
 }
 
 const UserManagementPage = () => {
+  const { user } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,15 +25,15 @@ const UserManagementPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const user = auth.currentUser;
       if (!user) {
         throw new Error("Not authenticated");
       }
-      const idToken = await user.getIdToken();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
       const response = await fetch('/api/users', {
         headers: {
-          'Authorization': `Bearer ${idToken}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
 
@@ -55,17 +57,17 @@ const UserManagementPage = () => {
 
   const handleRoleChange = async (uid: string, newRole: string) => {
     try {
-      const user = auth.currentUser;
       if (!user) {
         throw new Error("Not authenticated");
       }
-      const idToken = await user.getIdToken();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
       const response = await fetch('/api/users/set-role', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ uid, role: newRole }),
       });
@@ -76,11 +78,11 @@ const UserManagementPage = () => {
       }
 
       alert('Role updated successfully!');
-      
+
       // If the admin changed their own role, force a token refresh and reload the page
       // to ensure the new role is applied for access control.
-      if (user && user.uid === uid) {
-        await user.getIdToken(true);
+      // If the admin changed their own role, refresh the page
+      if (user && user.id === uid) {
         window.location.reload();
       } else {
         // Otherwise, just refresh the user list to show the new role
@@ -94,10 +96,10 @@ const UserManagementPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">User Management</h1>
-      
+
       {loading && <p>Loading users...</p>}
       {error && <p className="text-red-500">Error: {error}</p>}
-      
+
       {!loading && !error && (
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
           <table className="min-w-full leading-normal">
