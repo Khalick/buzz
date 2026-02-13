@@ -2,11 +2,11 @@
 
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ComponentType } from 'react';
 import { supabase } from '@/lib/supabase';
 
-const withAuth = (Component: React.ComponentType<any>) => {
-  const AuthenticatedComponent = (props: any) => {
+const withAuth = <P extends object>(Component: ComponentType<P>) => {
+  const AuthenticatedComponent = (props: P) => {
     const { user, loading, isAdmin, isAdminLoading } = useAdminAuth();
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [showRefreshOption, setShowRefreshOption] = useState(false);
@@ -15,18 +15,14 @@ const withAuth = (Component: React.ComponentType<any>) => {
     useEffect(() => {
       const isAuthLoading = loading || isAdminLoading;
       if (isAuthLoading) {
-        // Still loading, do nothing yet.
         return;
       }
 
       if (!user) {
-        // If auth is done and there's no user, redirect to login.
         router.push('/login');
       } else if (!isAdmin) {
-        // If auth is done and the user is not an admin, show option to refresh or redirect.
         setShowRefreshOption(true);
       } else {
-        // User is authenticated and is an admin
         setShowRefreshOption(false);
       }
     }, [user, isAdmin, loading, isAdminLoading, router]);
@@ -36,9 +32,7 @@ const withAuth = (Component: React.ComponentType<any>) => {
 
       setIsRefreshing(true);
       try {
-        // Force refresh the session
         await supabase.auth.refreshSession();
-        // Reload the page to re-evaluate all auth hooks
         window.location.reload();
       } catch (error) {
         console.error('Error refreshing token:', error);
@@ -54,7 +48,6 @@ const withAuth = (Component: React.ComponentType<any>) => {
 
     const isAuthLoading = loading || isAdminLoading;
 
-    // While authentication is in progress, show loading
     if (isAuthLoading || isRefreshing) {
       return (
         <div className="flex items-center justify-center h-screen">
@@ -69,7 +62,6 @@ const withAuth = (Component: React.ComponentType<any>) => {
       );
     }
 
-    // If user is not logged in, this will be handled by the useEffect redirect
     if (!user) {
       return (
         <div className="flex items-center justify-center h-screen">
@@ -81,7 +73,6 @@ const withAuth = (Component: React.ComponentType<any>) => {
       );
     }
 
-    // If user is not admin, show refresh option or deny access
     if (!isAdmin) {
       return (
         <div className="flex items-center justify-center h-screen">
@@ -120,7 +111,6 @@ const withAuth = (Component: React.ComponentType<any>) => {
       );
     }
 
-    // If all checks pass, render the protected component.
     return <Component {...props} />;
   };
 

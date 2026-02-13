@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 
 
 export async function GET(request: NextRequest) {
   try {
-    const supabaseAdmin = getSupabaseAdmin();
+    const supabaseClient = supabase;
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const county = searchParams.get('county');
     const search = searchParams.get('search');
 
-    let query = supabaseAdmin
+    let query = supabaseClient
       .from('businesses')
       .select('*', { count: 'exact' })
       .eq('approved', true)
