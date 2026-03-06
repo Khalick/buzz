@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { signInWithEmail, signInWithGoogle } from '@/lib/supabase';
+import { signInWithEmail, signUpWithEmail, signInWithGoogle } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -13,14 +13,24 @@ const LoginPage = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
     try {
-      const { data, error } = await signInWithEmail(email, password);
-
-      if (error) throw error;
+      if (isSignUp) {
+        const { data, error } = await signUpWithEmail(email, password);
+        if (error) throw error;
+        // Check if email confirmation is required
+        if (data?.user && !data?.session) {
+          setError('Check your email for a confirmation link to complete sign up.');
+          setLoading(false);
+          return;
+        }
+      } else {
+        const { data, error } = await signInWithEmail(email, password);
+        if (error) throw error;
+      }
 
       router.push('/');
     } catch (error: any) {
@@ -125,7 +135,7 @@ const LoginPage = () => {
               </div>
             )}
 
-            <form onSubmit={handleLogin} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-[#1A1A1A] mb-2" htmlFor="email">
                   Email Address
