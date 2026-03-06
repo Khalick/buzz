@@ -1,3 +1,4 @@
+import { getURL } from '@/lib/utils';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
@@ -123,7 +124,7 @@ export async function POST(req: NextRequest) {
     if (insertError) throw insertError;
 
     // In a real app, you would send an email here
-    const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/invite/${inviteCode}`;
+    const inviteLink = `${getURL()}/invite/${inviteCode}`;
 
     return NextResponse.json({
       message: 'Invite sent successfully',
