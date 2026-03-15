@@ -1,10 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Search, Filter, Grid, List, MapPin, Phone, Globe, Star, MessageCircle, TrendingUp, Eye } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Search, Filter, Grid, List, MapPin as MapPinIcon, Phone, Globe, Star, MessageCircle, TrendingUp, Eye, Clock, GitCompareArrows, Map, Bell } from 'lucide-react';
 import Link from 'next/link';
 import SearchFilter from '@/components/ui/SearchFilter';
 import FavoriteButton from '@/components/ui/FavoriteButton';
+import BusinessCompare from '@/components/ui/BusinessCompare';
+import MapView from '@/components/ui/MapView';
+import SmartAlertsModal from '@/components/ui/SmartAlertsModal';
+import { isBusinessOpen, getTodayHours } from '@/lib/business-hours';
 
 interface Business {
   id: string;
@@ -50,46 +54,19 @@ interface PaginationInfo {
   totalPages: number;
 }
 
-const ITEMS_PER_PAGE = 12;
-
-const categories = [
-  'All Categories',
-  'Retail & Shopping',
-  'Food & Restaurants',
-  'Services',
-  'Technology',
-  'Healthcare',
-  'Education',
-  'Entertainment',
-  'Agriculture',
-  'Manufacturing',
-  'Other'
-];
-
-const counties = [
-  'All Counties',
-  'Kiambu',
-  'Murang\'a',
-  'Nyeri',
-  'Nyandarua',
-  'Kirinyaga',
-  'Embu',
-  'Tharaka Nithi',
-  'Meru',
-  'Isiolo',
-  'Marsabit',
-  'Samburu',
-  'Baringo',
-  'Laikipia'
-];
-
 export default function DirectoryPage() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [selectedCounty, setSelectedCounty] = useState('All Counties');
+  const [sortBy, setSortBy] = useState('newest');
+  const [minRating, setMinRating] = useState(0);
+  const [openNowOnly, setOpenNowOnly] = useState(false);
+  const [compareList, setCompareList] = useState<Business[]>([]);
+  const [showCompare, setShowCompare] = useState(false);
+  const [showAlertModal, setShowAlertModal] = useState(false);
   const [pagination, setPagination] = useState<PaginationInfo>({
     currentPage: 1,
     hasNextPage: false,
@@ -97,29 +74,41 @@ export default function DirectoryPage() {
     totalPages: 1
   });
 
+  // Client-side Open Now filter
+  const filteredBusinesses = useMemo(() => {
+    let result = businesses;
+    if (openNowOnly) {
+      result = result.filter(b => isBusinessOpen(b.businessHours));
+    }
+    return result;
+  }, [businesses, openNowOnly]);
+
   useEffect(() => {
     fetchBusinesses();
-  }, [searchQuery, selectedCategory, selectedCounty, pagination.currentPage]);
+  }, [searchQuery, selectedCategory, selectedCounty, sortBy, minRating, pagination.currentPage]);
 
   const fetchBusinesses = async () => {
-    setLoading(true);
     try {
-      const params = new URLSearchParams({
+      setLoading(true);
+      const queryParams = new URLSearchParams({
         page: pagination.currentPage.toString(),
-        limit: ITEMS_PER_PAGE.toString(),
-        ...(searchQuery && { search: searchQuery }),
-        ...(selectedCategory !== 'All Categories' && { category: selectedCategory }),
-        ...(selectedCounty !== 'All Counties' && { county: selectedCounty })
+        limit: '12',
       });
 
-      const response = await fetch(`/api/businesses?${params}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch businesses');
-      }
+      if (searchQuery) queryParams.append('search', searchQuery);
+      if (selectedCategory !== 'All Categories') queryParams.append('category', selectedCategory);
+      if (selectedCounty !== 'All Counties') queryParams.append('county', selectedCounty);
+      if (sortBy) queryParams.append('sort', sortBy);
+      if (minRating > 0) queryParams.append('minRating', minRating.toString());
 
-      const data = await response.json();
-      setBusinesses(data.businesses);
-      setPagination(data.pagination);
+      const res = await fetch(`/api/businesses?${queryParams.toString()}`);
+      if (!res.ok) throw new Error('Failed to fetch businesses');
+      const data = await res.json();
+
+      setBusinesses(data.businesses || []);
+      if (data.pagination) {
+        setPagination(data.pagination);
+      }
     } catch (error) {
       console.error('Error fetching businesses:', error);
     } finally {
@@ -132,23 +121,65 @@ export default function DirectoryPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const toggleCompare = (business: Business) => {
+    setCompareList(prev => {
+      const exists = prev.find(b => b.id === business.id);
+      if (exists) {
+        return prev.filter(b => b.id !== business.id);
+      }
+      if (prev.length >= 3) {
+        alert("You can only compare up to 3 businesses at a time.");
+        return prev;
+      }
+      return [...prev, business];
+    });
+  };
+
+  // Convert custom Business to MapView expectation
+  const mapBusinesses = filteredBusinesses.map(b => ({
+    id: b.id,
+    name: b.name,
+    category: b.category,
+    rating: b.rating,
+    location: {
+      lat: b.coordinates?.latitude,
+      lng: b.coordinates?.longitude,
+      town: b.location?.town,
+      county: b.location?.county
+    }
+  }));
+
   const BusinessCard = ({ business }: { business: Business }) => {
     const getWhatsAppLink = () => {
-      const phone = business.contact.whatsapp || business.contact.phone;
-      const message = `Hi! I found your business "${business.name}" on ThikaBizHub. I'd like to know more.`;
-      return `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+      const phone = business.contact.whatsapp || business.contact.phone || '';
+      return `https://wa.me/${phone?.replace(/\D/g, '')}`;
     };
 
     const isTrending = business.stats && business.stats.views > 100;
+    const isOpen = isBusinessOpen(business.businessHours);
+    const isCompared = compareList.some(b => b.id === business.id);
 
     return (
       <div className={`group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 relative ${business.isPremium ? 'ring-2 ring-[#D4AF37]' : ''}`}>
-        <div className="absolute top-3 left-3 z-10">
+        <div className="absolute top-3 left-3 z-10 flex gap-1.5 items-center">
           <FavoriteButton businessId={business.id} />
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleCompare(business);
+            }}
+            title={isCompared ? "Remove from compare" : "Add to compare (max 3)"}
+            className={`p-2 rounded-full transition-colors flex items-center justify-center backdrop-blur-sm shadow-sm ${
+              isCompared ? 'bg-[#1B4332] text-white' : 'bg-white/80 text-[#525252] hover:bg-white hover:text-[#1B4332]'
+            }`}
+          >
+            <GitCompareArrows className="h-4 w-4" />
+          </button>
         </div>
 
         {business.isPremium && (
-          <div className="bg-gradient-to-r from-[#D4AF37] to-[#E4C767] text-[#1B4332] text-xs font-bold py-1.5 px-4 flex items-center justify-between">
+          <div className="bg-gradient-to-r from-[#D4AF37] to-[#E4C767] text-[#1B4332] text-xs font-bold py-1.5 px-4 flex items-center justify-between relative z-20">
             <span className="flex items-center gap-1">⭐ PREMIUM</span>
             {isTrending && (
               <span className="flex items-center gap-1">
@@ -159,20 +190,25 @@ export default function DirectoryPage() {
           </div>
         )}
 
-        <div className="relative h-48 bg-gradient-to-br from-[#1B4332]/5 to-[#2D6A4F]/10">
-          {business.images && business.images.length > 0 ? (
-            <img
-              src={business.images[0]}
-              alt={business.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full text-[#1B4332]/30">
-              <Grid className="h-12 w-12" />
-            </div>
-          )}
-          <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-xs font-medium text-[#1B4332]">
-            {business.category}
+        <div className={`relative h-48 bg-gradient-to-br from-[#1B4332]/5 to-[#2D6A4F]/10 ${!business.isPremium ? 'pt-10' : ''}`}>
+          <div className="absolute inset-0 flex items-center justify-center text-[#1B4332]/30">
+            <Grid className="h-12 w-12" />
+          </div>
+          
+          <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
+            <span className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-xs font-medium text-[#1B4332]">
+              {business.category}
+            </span>
+            {business.businessHours && (
+              <span className={`backdrop-blur-sm rounded-full px-2.5 py-1 text-[10px] font-bold flex items-center gap-1 transition-colors shadow-sm ${
+                isOpen
+                  ? 'bg-green-500/90 text-white'
+                  : 'bg-red-500/80 text-white'
+              }`}>
+                <Clock className="h-2.5 w-2.5" />
+                {isOpen ? 'Open Now' : 'Closed'}
+              </span>
+            )}
           </div>
           {business.stats && business.stats.views > 0 && (
             <div className="absolute bottom-3 right-3 bg-[#1B4332]/80 text-white rounded-full px-2 py-1 text-xs flex items-center gap-1 backdrop-blur-sm">
@@ -189,7 +225,7 @@ export default function DirectoryPage() {
           <div className="space-y-2 mb-4">
             {business.location && (
               <div className="flex items-center text-sm text-[#525252]">
-                <MapPin className="h-4 w-4 mr-2 text-[#1B4332]" />
+                <MapPinIcon className="h-4 w-4 mr-2 text-[#1B4332]" />
                 {business.location.town && business.location.county ?
                   `${business.location.town}, ${business.location.county}` :
                   'Location not specified'}
@@ -232,7 +268,7 @@ export default function DirectoryPage() {
             )}
             <Link
               href={`/business/${business.id}`}
-              className="bg-[#1B4332] text-white px-3 py-2.5 rounded-xl hover:bg-[#2D6A4F] transition-colors text-sm font-medium text-center"
+              className="bg-[#1B4332] text-white px-3 py-2.5 rounded-xl hover:bg-[#2D6A4F] transition-colors text-sm font-medium text-center flex items-center justify-center"
             >
               View Details
             </Link>
@@ -242,243 +278,227 @@ export default function DirectoryPage() {
     );
   };
 
-  const BusinessListItem = ({ business }: { business: Business }) => (
-    <div className={`bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 ${business.isPremium ? 'ring-2 ring-[#D4AF37]' : ''}`}>
-      <div className="flex items-start space-x-6">
-        <div className="relative w-28 h-28 bg-gradient-to-br from-[#1B4332]/5 to-[#2D6A4F]/10 rounded-xl overflow-hidden flex-shrink-0">
-          {business.images && business.images.length > 0 ? (
-            <img
-              src={business.images[0]}
-              alt={business.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full text-[#1B4332]/30">
-              <Grid className="h-8 w-8" />
-            </div>
-          )}
-          {business.isPremium && (
-            <div className="absolute top-0 right-0 bg-[#D4AF37] text-[#1B4332] text-[10px] font-bold px-1.5 py-0.5 rounded-bl">
-              ⭐
-            </div>
-          )}
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <h3 className="text-lg font-bold text-[#1A1A1A] mb-1">{business.name}</h3>
-              <p className="text-sm text-[#1B4332] font-medium mb-2">{business.category}</p>
-              <p className="text-[#525252] text-sm mb-3 line-clamp-2">{business.description}</p>
-
-              <div className="flex flex-wrap items-center gap-4 text-sm text-[#525252]">
-                {business.location && (
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1 text-[#1B4332]" />
-                    {business.location.town && business.location.county ?
-                      `${business.location.town}, ${business.location.county}` :
-                      'Location not specified'}
-                  </div>
-                )}
-                {business.contact && business.contact.phone && (
-                  <div className="flex items-center">
-                    <Phone className="h-4 w-4 mr-1 text-[#1B4332]" />
-                    {business.contact.phone}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-col items-end gap-3 flex-shrink-0">
-              <div className="flex items-center">
-                <Star className="h-4 w-4 text-[#D4AF37] fill-current" />
-                <span className="text-sm text-[#525252] ml-1">
-                  {business.rating ? business.rating.toFixed(1) : '0.0'} ({business.reviewCount || 0})
-                </span>
-              </div>
-              <Link
-                href={`/business/${business.id}`}
-                className="bg-[#1B4332] text-white px-4 py-2 rounded-xl hover:bg-[#2D6A4F] transition-colors text-sm font-medium"
-              >
-                View Details
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const Pagination = () => (
-    <div className="flex items-center justify-center gap-2 mt-12">
-      <button
-        onClick={() => handlePageChange(pagination.currentPage - 1)}
-        disabled={!pagination.hasPrevPage}
-        className="px-4 py-2 border-2 border-[#1B4332]/20 rounded-xl text-[#1B4332] hover:bg-[#1B4332]/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-medium"
-      >
-        Previous
-      </button>
-
-      <div className="flex gap-1">
-        {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-          const pageNum = Math.max(1, pagination.currentPage - 2) + i;
-          if (pageNum > pagination.totalPages) return null;
-
-          return (
-            <button
-              key={pageNum}
-              onClick={() => handlePageChange(pageNum)}
-              className={`w-10 h-10 rounded-xl font-medium transition-all ${pageNum === pagination.currentPage
-                  ? 'bg-[#1B4332] text-white shadow-lg'
-                  : 'text-[#525252] hover:bg-[#1B4332]/10'
-                }`}
-            >
-              {pageNum}
-            </button>
-          );
-        })}
-      </div>
-
-      <button
-        onClick={() => handlePageChange(pagination.currentPage + 1)}
-        disabled={!pagination.hasNextPage}
-        className="px-4 py-2 border-2 border-[#1B4332]/20 rounded-xl text-[#1B4332] hover:bg-[#1B4332]/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-medium"
-      >
-        Next
-      </button>
-    </div>
-  );
-
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      {/* Header Section */}
-      <div className="bg-gradient-hero py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <span className="inline-block px-4 py-1.5 bg-white/10 text-white text-sm font-medium rounded-full mb-4 backdrop-blur-sm border border-white/20">
-            500+ Verified Businesses
-          </span>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 heading-display">
-            Business Directory
-          </h1>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto">
-            Discover amazing local businesses in Thika and connect with them instantly
-          </p>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 lg:px-8 -mt-8">
-        {/* Search Card */}
-        <div className="glass-card rounded-2xl p-6 mb-8 shadow-xl">
-          <SearchFilter
-            onSearch={(query: string) => {
-              setSearchQuery(query);
-              setPagination(prev => ({ ...prev, currentPage: 1 }));
-            }}
-            onCategoryFilter={(category: string) => {
-              setSelectedCategory(category);
-              setPagination(prev => ({ ...prev, currentPage: 1 }));
-            }}
-            onLocationFilter={(county: string) => {
-              setSelectedCounty(county);
-              setPagination(prev => ({ ...prev, currentPage: 1 }));
-            }}
-            categories={categories}
-            locations={counties}
-          />
-        </div>
-
-        {/* Results Header */}
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-[#525252]">
-            Showing <span className="font-semibold text-[#1B4332]">{businesses.length}</span> businesses
-            {searchQuery && <span> for "<span className="font-medium">{searchQuery}</span>"</span>}
-            {selectedCategory !== 'All Categories' && <span> in <span className="font-medium">{selectedCategory}</span></span>}
-          </p>
-
-          <div className="flex items-center gap-1 p-1 bg-[#1B4332]/5 rounded-xl">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-[#1B4332] text-white shadow' : 'text-[#525252] hover:text-[#1B4332]'}`}
-            >
-              <Grid className="h-5 w-5" />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-[#1B4332] text-white shadow' : 'text-[#525252] hover:text-[#1B4332]'}`}
-            >
-              <List className="h-5 w-5" />
-            </button>
+    <div className="min-h-screen bg-[#FAFAF8] py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-[#1A1A1A] mb-4">Business Directory</h1>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search businesses, categories, or locations..."
+                className="w-full pl-12 pr-4 py-4 rounded-2xl border-none shadow-lg focus:ring-2 focus:ring-[#1B4332] outline-none text-[#1A1A1A] text-lg bg-white"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setPagination(prev => ({ ...prev, currentPage: 1 }));
+                }}
+              />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#737373] h-6 w-6" />
+            </div>
           </div>
+          <button 
+            onClick={() => setShowAlertModal(true)}
+            className="flex items-center justify-center gap-2 bg-white text-[#1B4332] border border-[#1B4332]/20 px-6 py-4 rounded-2xl font-bold hover:bg-[#1B4332]/5 transition-colors shadow-sm whitespace-nowrap h-[60px]"
+          >
+            <Bell className="h-5 w-5" />
+            Alert Me
+          </button>
         </div>
 
-        {/* Business Grid/List */}
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl h-[420px] animate-pulse overflow-hidden">
-                <div className="h-48 bg-gradient-to-br from-[#1B4332]/10 to-[#2D6A4F]/5"></div>
-                <div className="p-6 space-y-4">
-                  <div className="h-5 bg-[#1B4332]/10 rounded w-3/4"></div>
-                  <div className="h-4 bg-[#1B4332]/5 rounded w-full"></div>
-                  <div className="h-4 bg-[#1B4332]/5 rounded w-2/3"></div>
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Filters Sidebar */}
+          <div className="w-full lg:w-64 flex-shrink-0">
+            <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
+              <div className="flex items-center gap-2 mb-6 pb-4 border-b border-[#E5E5E5]">
+                <Filter className="h-5 w-5 text-[#1B4332]" />
+                <h2 className="font-bold text-[#1A1A1A]">Filters</h2>
+              </div>
+              
+              <SearchFilter 
+                onSortChange={(sort) => {
+                  setSortBy(sort);
+                  setPagination(prev => ({ ...prev, currentPage: 1 }));
+                }}
+                onRatingFilter={(rating) => {
+                  setMinRating(rating);
+                  setPagination(prev => ({ ...prev, currentPage: 1 }));
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1">
+            
+            {/* Results Header */}
+            <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
+              <p className="text-[#525252]">
+                Showing <span className="font-semibold text-[#1B4332]">{filteredBusinesses.length}</span> businesses
+                {searchQuery && <span> for "<span className="font-medium">{searchQuery}</span>"</span>}
+                {openNowOnly && <span className="text-green-600 font-medium"> (open now)</span>}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Open Now Toggle */}
+                <button
+                  onClick={() => setOpenNowOnly(!openNowOnly)}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                    openNowOnly
+                      ? 'bg-green-500 text-white shadow-md'
+                      : 'bg-[#1B4332]/5 text-[#525252] hover:bg-[#1B4332]/10'
+                  }`}
+                >
+                  <Clock className="h-3.5 w-3.5" />
+                  Open Now
+                </button>
+
+                {/* View Mode Toggle */}
+                <div className="flex items-center gap-1 p-1 bg-[#1B4332]/5 rounded-xl">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-white text-[#1B4332] shadow-sm' : 'text-[#737373] hover:text-[#1B4332]'}`}
+                    title="Grid View"
+                  >
+                    <Grid className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-white text-[#1B4332] shadow-sm' : 'text-[#737373] hover:text-[#1B4332]'}`}
+                    title="List View"
+                  >
+                    <List className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('map')}
+                    className={`p-2 rounded-lg transition-colors ${viewMode === 'map' ? 'bg-white text-[#1B4332] shadow-sm' : 'text-[#737373] hover:text-[#1B4332]'}`}
+                    title="Map View"
+                  >
+                    <Map className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        ) : businesses.length > 0 ? (
-          <div className={
-            viewMode === 'grid'
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-              : 'space-y-4'
-          }>
-            {businesses.map((business) => (
-              viewMode === 'grid' ? (
-                <BusinessCard key={business.id} business={business} />
-              ) : (
-                <BusinessListItem key={business.id} business={business} />
-              )
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#1B4332]/10 flex items-center justify-center">
-              <Search className="h-8 w-8 text-[#1B4332]/50" />
             </div>
-            <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">No businesses found</h3>
-            <p className="text-[#525252] mb-6">
-              Try adjusting your search criteria or{' '}
-              <Link href="/directory/add" className="text-[#1B4332] hover:text-[#D4AF37] font-medium">
-                add a new business
-              </Link>
-            </p>
-          </div>
-        )}
 
-        {/* Pagination */}
-        {businesses.length > 0 && <Pagination />}
+            {/* Business Content */}
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="bg-white rounded-2xl h-96 animate-pulse border border-[#E5E5E5]">
+                    <div className="h-48 bg-[#E5E5E5] rounded-t-2xl" />
+                    <div className="p-6 space-y-4">
+                      <div className="h-6 bg-[#E5E5E5] rounded w-3/4" />
+                      <div className="h-4 bg-[#E5E5E5] rounded w-full" />
+                      <div className="h-4 bg-[#E5E5E5] rounded w-5/6" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredBusinesses.length === 0 ? (
+              <div className="bg-white rounded-2xl shadow-lg p-12 text-center border border-[#E5E5E5]">
+                <Search className="h-12 w-12 text-[#D4D4D4] mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">No businesses found</h3>
+                <p className="text-[#525252]">
+                  We couldn't find any businesses matching your search criteria. 
+                  Try adjusting your filters or search terms.
+                </p>
+                <button 
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedCategory('All Categories');
+                    setSelectedCounty('All Counties');
+                    setOpenNowOnly(false);
+                  }}
+                  className="mt-6 bg-[#1B4332] text-white px-6 py-3 rounded-xl hover:bg-[#2D6A4F] transition-colors font-semibold"
+                >
+                  Clear All Filters
+                </button>
+              </div>
+            ) : viewMode === 'map' ? (
+              <MapView businesses={mapBusinesses} />
+            ) : (
+              <div>
+                <div className={
+                  viewMode === 'grid' 
+                    ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6' 
+                    : 'space-y-4'
+                }>
+                  {filteredBusinesses.map((business) => (
+                    <BusinessCard key={business.id} business={business} />
+                  ))}
+                </div>
 
-        {/* Add Business CTA */}
-        <div className="mt-16 mb-8 relative overflow-hidden rounded-2xl bg-gradient-hero p-10 md:p-12">
-          <div className="absolute inset-0 pattern-dots opacity-20"></div>
-          <div className="relative text-center max-w-2xl mx-auto">
-            <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-              Don't see your business?
-            </h3>
-            <p className="text-white/70 mb-8">
-              Join our directory and connect with thousands of local customers in Thika
-            </p>
-            <Link
-              href="/directory/add"
-              className="btn btn-gold btn-lg btn-pill font-bold shadow-xl"
-            >
-              Add Your Business Free
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </Link>
+                {/* Pagination */}
+                {pagination.totalPages > 1 && (
+                  <div className="mt-12 flex justify-center items-center gap-2">
+                    <button
+                      onClick={() => handlePageChange(pagination.currentPage - 1)}
+                      disabled={!pagination.hasPrevPage}
+                      className="px-4 py-2 rounded-xl border border-[#E5E5E5] bg-white text-[#525252] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#F5F5F5] transition-colors"
+                    >
+                      Previous
+                    </button>
+                    
+                    <div className="flex items-center gap-1 mx-4">
+                      {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => handlePageChange(page)}
+                          className={`w-10 h-10 rounded-xl font-semibold transition-colors flex items-center justify-center ${
+                            pagination.currentPage === page
+                              ? 'bg-[#1B4332] text-white shadow-md'
+                              : 'text-[#525252] hover:bg-[#1B4332]/10'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={() => handlePageChange(pagination.currentPage + 1)}
+                      disabled={!pagination.hasNextPage}
+                      className="px-4 py-2 rounded-xl border border-[#E5E5E5] bg-white text-[#525252] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#F5F5F5] transition-colors"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {compareList.length > 0 && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <button
+            onClick={() => setShowCompare(true)}
+            className="bg-[#D4AF37] text-[#1B4332] px-6 py-3 rounded-full font-bold shadow-xl hover:bg-[#E4C767] hover:scale-105 transition-all flex items-center gap-2"
+          >
+            <GitCompareArrows className="h-5 w-5" />
+            Compare Businesses ({compareList.length})
+          </button>
+        </div>
+      )}
+
+      {showCompare && (
+        <BusinessCompare
+          businesses={compareList}
+          onClose={() => setShowCompare(false)}
+          onRemove={(id) => setCompareList(prev => prev.filter(b => b.id !== id))}
+        />
+      )}
+
+      <SmartAlertsModal
+        isOpen={showAlertModal}
+        onClose={() => setShowAlertModal(false)}
+        currentSearch={searchQuery}
+        currentCategory={selectedCategory}
+        currentCounty={selectedCounty}
+      />
     </div>
   );
 }

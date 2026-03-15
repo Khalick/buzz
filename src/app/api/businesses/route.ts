@@ -13,12 +13,13 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category');
     const county = searchParams.get('county');
     const search = searchParams.get('search');
+    const sort = searchParams.get('sort') || 'newest';
+    const minRating = parseFloat(searchParams.get('minRating') || '0');
 
     let query = supabaseClient
       .from('businesses')
       .select('*', { count: 'exact' })
-      .eq('approved', true)
-      .order('created_at', { ascending: false });
+      .eq('approved', true);
 
     // Apply filters
     if (category && category !== 'all') {
@@ -31,6 +32,27 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%,category.ilike.%${search}%`);
+    }
+
+    if (minRating > 0) {
+      query = query.gte('rating', minRating);
+    }
+
+    // Apply sorting
+    switch (sort) {
+      case 'rating':
+        query = query.order('rating', { ascending: false }).order('review_count', { ascending: false });
+        break;
+      case 'views':
+        query = query.order('views', { ascending: false });
+        break;
+      case 'name':
+        query = query.order('name', { ascending: true });
+        break;
+      case 'newest':
+      default:
+        query = query.order('created_at', { ascending: false });
+        break;
     }
 
     // Apply pagination

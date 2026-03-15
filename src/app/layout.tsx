@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { NotificationProvider } from "@/components/ui/NotificationSystem";
+import AskBizHub from "@/components/ui/AskBizHub";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -50,6 +51,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <AskBizHub />
         </NotificationProvider>
       </body>
     </html>
