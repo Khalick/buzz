@@ -20,9 +20,10 @@ interface Business {
 interface BusinessCompareProps {
   businesses: Business[];
   onClose: () => void;
+  onRemove?: (id: string) => void;
 }
 
-export default function BusinessCompare({ businesses, onClose }: BusinessCompareProps) {
+export default function BusinessCompare({ businesses, onClose, onRemove }: BusinessCompareProps) {
   if (businesses.length < 2) return null;
 
   const fields = [

@@ -4,13 +4,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { Search, SlidersHorizontal, Star, X, ChevronDown } from 'lucide-react';
 
 interface SearchFilterProps {
-  onSearch: (query: string) => void;
-  onCategoryFilter: (category: string) => void;
-  onLocationFilter: (location: string) => void;
+  onSearch?: (query: string) => void;
+  onCategoryFilter?: (category: string) => void;
+  onLocationFilter?: (location: string) => void;
   onSortChange?: (sort: string) => void;
   onRatingFilter?: (minRating: number) => void;
-  categories: string[];
-  locations: string[];
+  categories?: string[];
+  locations?: string[];
   className?: string;
 }
 
@@ -27,8 +27,8 @@ const SearchFilter = ({
   onLocationFilter,
   onSortChange,
   onRatingFilter,
-  categories,
-  locations,
+  categories = [],
+  locations = [],
   className = ""
 }: SearchFilterProps) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,11 +39,11 @@ const SearchFilter = ({
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
   // Stable callback refs
-  const onSearchRef = useCallback(onSearch, [onSearch]);
+  const onSearchRef = useCallback(onSearch ?? (() => {}), [onSearch]);
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
-      onSearchRef(searchQuery);
+      onSearchRef?.(searchQuery);
     }, 300);
 
     return () => clearTimeout(debounceTimer);
@@ -51,12 +51,12 @@ const SearchFilter = ({
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    onCategoryFilter(category);
+    onCategoryFilter?.(category);
   };
 
   const handleLocationChange = (location: string) => {
     setSelectedLocation(location);
-    onLocationFilter(location);
+    onLocationFilter?.(location);
   };
 
   const handleSortChange = (sort: string) => {
@@ -76,9 +76,9 @@ const SearchFilter = ({
     setSelectedLocation('');
     setSelectedSort('newest');
     setSelectedRating(0);
-    onSearch('');
-    onCategoryFilter('');
-    onLocationFilter('');
+    onSearch?.('');
+    onCategoryFilter?.('');
+    onLocationFilter?.('');
     onSortChange?.('newest');
     onRatingFilter?.(0);
   };
