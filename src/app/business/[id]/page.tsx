@@ -15,10 +15,15 @@ import {
   Share2,
   Navigation,
   Mail,
+  ChevronLeft,
+  ChevronRight,
+  Settings,
+  ShieldCheck,
 } from 'lucide-react';
 import ReviewForm from '@/components/ui/ReviewForm';
 import ReviewList from '@/components/ui/ReviewList';
 import FavoriteButton from '@/components/ui/FavoriteButton';
+import ContactForm from '@/components/ui/ContactForm';
 
 interface Business {
   id: string;
@@ -52,6 +57,8 @@ interface Business {
   is_premium: boolean;
   views: number;
   created_at: string;
+  owner_id?: string | null;
+  submitted_by?: string | null;
 }
 
 export default function BusinessDetailPage() {
@@ -63,6 +70,7 @@ export default function BusinessDetailPage() {
   const [currentUserId, setCurrentUserId] = useState<string | undefined>();
   const [reviewRefresh, setReviewRefresh] = useState(0);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [claiming, setClaiming] = useState(false);
 
   useEffect(() => {
     fetchBusiness();
@@ -194,6 +202,17 @@ export default function BusinessDetailPage() {
               </div>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Owner actions */}
+              {currentUserId && (business.owner_id === currentUserId || business.submitted_by === currentUserId) && (
+                <Link
+                  href={`/dashboard/edit/${business.id}`}
+                  className="p-2.5 bg-[#D4AF37] hover:bg-[#C9A431] rounded-xl transition-colors flex items-center gap-1.5"
+                  title="Manage Business"
+                >
+                  <Settings className="h-4 w-4 text-[#1B4332]" />
+                  <span className="text-xs font-bold text-[#1B4332] hidden sm:inline">Manage</span>
+                </Link>
+              )}
               <FavoriteButton businessId={business.id} />
               <button
                 onClick={handleShare}
@@ -217,19 +236,39 @@ export default function BusinessDetailPage() {
                 className="w-full h-full object-cover"
               />
               {business.images.length > 1 && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                  {business.images.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentImageIndex(i)}
-                      className={`w-2.5 h-2.5 rounded-full transition-all ${
-                        i === currentImageIndex
-                          ? 'bg-white scale-125'
-                          : 'bg-white/50 hover:bg-white/80'
-                      }`}
-                    />
-                  ))}
-                </div>
+                <>
+                  {/* Prev/Next Arrows */}
+                  <button
+                    onClick={() => setCurrentImageIndex(i => i === 0 ? business.images.length - 1 : i - 1)}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/30 hover:bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-all"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => setCurrentImageIndex(i => i === business.images.length - 1 ? 0 : i + 1)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/30 hover:bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-all"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                  {/* Counter */}
+                  <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+                    {currentImageIndex + 1} / {business.images.length}
+                  </div>
+                  {/* Dots */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {business.images.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setCurrentImageIndex(i)}
+                        className={`w-2.5 h-2.5 rounded-full transition-all ${
+                          i === currentImageIndex
+                            ? 'bg-white scale-125'
+                            : 'bg-white/50 hover:bg-white/80'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -359,6 +398,33 @@ export default function BusinessDetailPage() {
                 </a>
               )}
             </div>
+
+            {/* Claim Business Button */}
+            {currentUserId && !business.owner_id && business.submitted_by !== currentUserId && (
+              <button
+                onClick={async () => {
+                  setClaiming(true);
+                  try {
+                    const { supabase } = await import('@/lib/supabase');
+                    await supabase.from('businesses').update({ owner_id: currentUserId }).eq('id', business.id);
+                    setBusiness(prev => prev ? { ...prev, owner_id: currentUserId } : null);
+                  } catch (e) { console.error(e); }
+                  setClaiming(false);
+                }}
+                disabled={claiming}
+                className="w-full bg-[#D4AF37]/10 text-[#856404] border-2 border-[#D4AF37]/20 py-3 rounded-xl font-semibold text-sm hover:bg-[#D4AF37]/20 transition-colors flex items-center justify-center gap-2"
+              >
+                <ShieldCheck className="h-4 w-4" />
+                {claiming ? 'Claiming...' : 'Claim This Business'}
+              </button>
+            )}
+
+            {/* Contact Form */}
+            <ContactForm
+              businessId={business.id}
+              businessName={business.name}
+              ownerId={business.owner_id}
+            />
           </div>
         </div>
       </div>

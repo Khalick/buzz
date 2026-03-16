@@ -139,6 +139,31 @@ export type Tables = {
     description: string | null;
     created_at: string;
   };
+  broadcast_requests: {
+    id: string;
+    user_id: string;
+    category: string;
+    description: string;
+    budget: string | null;
+    status: 'open' | 'closed';
+    created_at: string;
+    updated_at: string;
+  };
+  broadcast_responses: {
+    id: string;
+    request_id: string;
+    business_id: string;
+    message: string;
+    quote_amount: string | null;
+    created_at: string;
+  };
+  business_partnerships: {
+    id: string;
+    business_a_id: string;
+    business_b_id: string;
+    status: 'pending' | 'active' | 'declined';
+    created_at: string;
+  };
 };
 
 // Auth helper functions

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from './useAuth';
 
@@ -17,14 +16,13 @@ export const useAdminAuth = (): AdminAuthResult => {
   const { user, loading: authLoading } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     const checkAdmin = async () => {
       if (authLoading) return;
 
       if (!user) {
-        router.push('/login');
+        setIsLoading(false);
         return;
       }
 
@@ -39,19 +37,16 @@ export const useAdminAuth = (): AdminAuthResult => {
 
         if (data?.role === 'admin') {
           setIsAdmin(true);
-        } else {
-          router.push('/');
         }
       } catch (error) {
         console.error('Error checking admin status:', error);
-        router.push('/');
       } finally {
         setIsLoading(false);
       }
     };
 
     checkAdmin();
-  }, [user, authLoading, router]);
+  }, [user, authLoading]);
 
   return { isAdmin, isLoading, loading: isLoading, isAdminLoading: isLoading, user };
 };

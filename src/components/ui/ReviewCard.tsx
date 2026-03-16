@@ -10,6 +10,8 @@ interface ReviewCardProps {
     comment: string | null;
     created_at: string;
     user_name?: string;
+    response?: string | null;
+    response_at?: string | null;
   };
   currentUserId?: string;
   onDelete?: (reviewId: string) => void;
@@ -71,6 +73,14 @@ export default function ReviewCard({ review, currentUserId, onDelete }: ReviewCa
 
       {review.comment && (
         <p className="mt-3 text-sm text-[#525252] leading-relaxed">{review.comment}</p>
+      )}
+
+      {/* Owner Response */}
+      {review.response && (
+        <div className="mt-3 bg-[#1B4332]/5 rounded-xl p-4 border-l-4 border-[#1B4332]">
+          <p className="text-xs font-semibold text-[#1B4332] mb-1">💼 Business Owner Response</p>
+          <p className="text-sm text-[#525252]">{review.response}</p>
+        </div>
       )}
     </div>
   );

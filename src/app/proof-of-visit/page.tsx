@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { supabase, uploadFile } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import Image from 'next/image';
-import { Camera, Upload, MapPin, User, Building2 } from 'lucide-react';
+import { Camera, Upload, MapPin, User, Building2, Share2, Check } from 'lucide-react';
 
 interface Proof {
   id: string;
@@ -12,10 +13,14 @@ interface Proof {
   business_name: string;
   image_url: string;
   created_at?: string;
+  referral_views?: number;
 }
 
-const ProofOfVisitPage = () => {
+const ProofOfVisitContent = () => {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const refId = searchParams.get('ref');
+
   const [name, setName] = useState('');
   const [businessName, setBusinessName] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -24,13 +29,47 @@ const ProofOfVisitPage = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Track referral if refId is present
+  useEffect(() => {
+    if (!refId) return;
+    
+    // We run this once per session for the ref to avoid spamming
+    const trackReferral = async () => {
+      const storageKey = `tracked_ref_${refId}`;
+      if (sessionStorage.getItem(storageKey)) return;
+      sessionStorage.setItem(storageKey, 'true');
+
+      try {
+        // Fetch current views
+        const { data: proof } = await supabase
+          .from('proofs')
+          .select('referral_views')
+          .eq('id', refId)
+          .single();
+
+        if (proof) {
+          await supabase
+            .from('proofs')
+            .update({ referral_views: (proof.referral_views || 0) + 1 })
+            .eq('id', refId);
+        }
+      } catch (e) {
+        console.error('Error tracking referral', e);
+      }
+    };
+    
+    trackReferral();
+  }, [refId]);
 
   useEffect(() => {
     const fetchProofs = async () => {
       try {
         const { data, error } = await supabase
           .from('proofs')
-          .select('id, name, business_name, image_url, created_at')
+          .select('id, name, business_name, image_url, created_at, referral_views')
           .eq('approved', true)
           .order('created_at', { ascending: false });
 
@@ -45,6 +84,13 @@ const ProofOfVisitPage = () => {
 
     fetchProofs();
   }, []);
+
+  const handleCopyLink = (id: string) => {
+    const url = `${window.location.origin}/proof-of-visit?ref=${id}`;
+    navigator.clipboard.writeText(url);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -277,16 +323,34 @@ const ProofOfVisitPage = () => {
                     </div>
                   </div>
                   <div className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1B4332] to-[#2D6A4F] flex items-center justify-center">
-                        <span className="text-white font-semibold">
-                          {proof.name.charAt(0).toUpperCase()}
-                        </span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1B4332] to-[#2D6A4F] flex items-center justify-center">
+                          <span className="text-white font-semibold">
+                            {proof.name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-[#1A1A1A]">{proof.name}</p>
+                          <div className="flex items-center gap-2 text-xs text-[#737373]">
+                            <span>Verified Visit</span>
+                            {proof.referral_views ? (
+                              <>
+                                <span>•</span>
+                                <span className="font-semibold text-[#1B4332]">{proof.referral_views} impact</span>
+                              </>
+                            ) : null}
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium text-[#1A1A1A]">{proof.name}</p>
-                        <p className="text-xs text-[#737373]">Verified Visit</p>
-                      </div>
+                      
+                      <button 
+                        onClick={() => handleCopyLink(proof.id)}
+                        className={`p-2 rounded-full transition-colors flex items-center justify-center ${copiedId === proof.id ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500 hover:bg-[#1B4332]/10 hover:text-[#1B4332]'}`}
+                        title="Copy Share Link"
+                      >
+                        {copiedId === proof.id ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -314,4 +378,10 @@ const ProofOfVisitPage = () => {
   );
 };
 
-export default ProofOfVisitPage;
+export default function ProofOfVisitPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-subtle py-20" />}>
+      <ProofOfVisitContent />
+    </Suspense>
+  );
+}

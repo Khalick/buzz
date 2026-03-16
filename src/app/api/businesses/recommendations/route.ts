@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { supabase } from '@/lib/supabase';
 
 export async function GET() {
   try {
-    const supabase = getSupabaseAdmin();
 
     // In a real app with user tracking, we would fetch the user's top categories
     // For this implementation, we simulate "For You" by fetching highest rated

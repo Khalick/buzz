@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { signOut } from '@/lib/supabase';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import NotificationBell from '@/components/ui/NotificationBell';
 
 const Header = () => {
   const { user, loading } = useAuth();
@@ -41,6 +42,7 @@ const Header = () => {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/directory', label: 'Directory' },
+    { href: '/requests/new', label: 'Get Quotes' },
     { href: '/deals', label: 'Deals' },
     { href: '/events', label: 'Events' },
     { href: '/proof-of-visit', label: 'Proof of Visit' },
@@ -111,7 +113,18 @@ const Header = () => {
                 <div className="w-5 h-5 border-2 border-[#1B4332]/20 border-t-[#1B4332] rounded-full animate-spin"></div>
               </div>
             ) : user ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                {/* Dashboard Link */}
+                <Link
+                  href="/dashboard"
+                  className="px-3 py-2 text-sm font-medium text-[#525252] hover:text-[#1B4332] hover:bg-[#1B4332]/5 rounded-lg transition-all duration-200"
+                  title="My Dashboard"
+                >
+                  Dashboard
+                </Link>
+                {/* Notification Bell */}
+                <NotificationBell />
+                {/* Favorites */}
                 <Link
                   href="/favorites"
                   className="p-2 text-[#525252] hover:text-[#1B4332] hover:bg-[#1B4332]/5 rounded-lg transition-all duration-200"
@@ -121,6 +134,7 @@ const Header = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                 </Link>
+                {/* Profile */}
                 <Link
                   href="/profile"
                   className="flex items-center gap-2 px-3 py-1.5 bg-[#1B4332]/5 hover:bg-[#1B4332]/10 rounded-full transition-all duration-200"
@@ -172,7 +186,7 @@ const Header = () => {
         </div>
 
         {/* Mobile Menu */}
-        <div className={`lg:hidden overflow-hidden transition-all duration-300 ${isMobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className={`lg:hidden overflow-hidden transition-all duration-300 ${isMobileMenuOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'}`}>
           <nav className="py-4 border-t border-[#1B4332]/10">
             <div className="flex flex-col gap-1">
               {navLinks.map((link) => (
@@ -223,6 +237,20 @@ const Header = () => {
                       <p className="font-medium text-[#1B4332]">{user.user_metadata?.full_name || 'Your Profile'}</p>
                       <p className="text-sm text-[#737373]">{user.email}</p>
                     </div>
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    className="px-4 py-3 text-base font-medium text-[#525252] hover:text-[#1B4332] hover:bg-[#1B4332]/5 rounded-lg transition-all duration-200"
+                    onClick={closeMobileMenu}
+                  >
+                    📊 Dashboard
+                  </Link>
+                  <Link
+                    href="/notifications"
+                    className="px-4 py-3 text-base font-medium text-[#525252] hover:text-[#1B4332] hover:bg-[#1B4332]/5 rounded-lg transition-all duration-200"
+                    onClick={closeMobileMenu}
+                  >
+                    🔔 Notifications
                   </Link>
                   <Link
                     href="/favorites"

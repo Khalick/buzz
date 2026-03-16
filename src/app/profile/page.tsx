@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase, signOut } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import { User, MapPin, Phone, FileText, Calendar, Edit3, Save, X, LogOut, Briefcase, Camera, Award } from 'lucide-react';
 
 interface UserProfile {
   id: string;
@@ -37,6 +38,7 @@ const ProfilePage = () => {
   });
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -85,7 +87,6 @@ const ProfilePage = () => {
     try {
       const activities: UserActivity[] = [];
 
-      // Fetch businesses submitted by user
       const { data: businesses } = await supabase
         .from('businesses')
         .select('id, name, approved, created_at')
@@ -104,7 +105,6 @@ const ProfilePage = () => {
         });
       }
 
-      // Fetch proof of visits submitted by user
       const { data: proofs } = await supabase
         .from('proofs')
         .select('id, business_name, approved, created_at')
@@ -123,7 +123,6 @@ const ProfilePage = () => {
         });
       }
 
-      // Sort by date
       activities.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       setActivities(activities);
     } catch (error) {
@@ -136,12 +135,10 @@ const ProfilePage = () => {
 
     setSaving(true);
     try {
-      // Update Supabase user metadata
       await supabase.auth.updateUser({
         data: { full_name: editForm.display_name }
       });
 
-      // Update users table
       const { error } = await supabase
         .from('users')
         .update({
@@ -164,10 +161,10 @@ const ProfilePage = () => {
       } : null);
 
       setIsEditing(false);
-      alert('Profile updated successfully!');
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('Error updating profile. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -175,11 +172,24 @@ const ProfilePage = () => {
 
   if (loading || loadingProfile) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading profile...</p>
+      <div className="min-h-screen bg-gradient-subtle">
+        <div className="bg-gradient-hero py-16 px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="animate-pulse space-y-4">
+              <div className="h-8 bg-white/20 rounded w-1/3"></div>
+              <div className="h-4 bg-white/10 rounded w-1/2"></div>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-4xl mx-auto px-4 -mt-8">
+          <div className="bg-white rounded-2xl shadow-lg p-8 animate-pulse">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-20 h-20 rounded-full bg-[#1B4332]/10"></div>
+              <div className="space-y-2 flex-1">
+                <div className="h-6 bg-[#1B4332]/10 rounded w-1/3"></div>
+                <div className="h-4 bg-[#1B4332]/5 rounded w-1/2"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -188,175 +198,256 @@ const ProfilePage = () => {
 
   if (!user || !profile) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Profile Not Found</h1>
-          <p className="text-gray-600">Please log in to view your profile.</p>
+          <h1 className="text-2xl font-bold text-[#1A1A1A] mb-4">Profile Not Found</h1>
+          <p className="text-[#525252]">Please log in to view your profile.</p>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">My Profile</h1>
+  const initials = profile.display_name
+    ? profile.display_name.charAt(0).toUpperCase()
+    : profile.email.charAt(0).toUpperCase();
 
+  const activityIcon = (type: string) => {
+    switch (type) {
+      case 'business': return <Briefcase className="h-4 w-4" />;
+      case 'proof': return <Camera className="h-4 w-4" />;
+      case 'deal': return <Award className="h-4 w-4" />;
+      default: return <FileText className="h-4 w-4" />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-subtle">
+      {/* Hero Section */}
+      <div className="bg-gradient-hero py-16 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 pattern-dots opacity-30"></div>
+        <div className="relative max-w-4xl mx-auto">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 text-white text-sm font-medium rounded-full mb-4 backdrop-blur-sm border border-white/20">
+            <User className="h-4 w-4" />
+            My Profile
+          </span>
+          <h1 className="text-3xl md:text-4xl font-bold text-white heading-display mb-2">
+            {profile.display_name || 'Your Profile'}
+          </h1>
+          <p className="text-white/70">
+            Manage your account and see your activity on ThikaBizHub
+          </p>
+        </div>
+      </div>
+
+      {/* Save Success Toast */}
+      {saveSuccess && (
+        <div className="fixed top-20 right-4 z-50 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 animate-fade-in">
+          <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Profile updated successfully!
+        </div>
+      )}
+
+      <div className="max-w-4xl mx-auto px-4 py-8 -mt-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
           {/* Profile Card */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <div className="text-center mb-6">
-                <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-3xl font-bold text-purple-600">
-                    {profile.display_name ? profile.display_name.charAt(0).toUpperCase() : profile.email.charAt(0).toUpperCase()}
-                  </span>
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              {/* Profile Header */}
+              <div className="bg-gradient-to-br from-[#1B4332] to-[#2D6A4F] p-6 text-center">
+                <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-3 ring-4 ring-white/30">
+                  <span className="text-2xl font-bold text-white">{initials}</span>
                 </div>
-                <h2 className="text-xl font-bold">{profile.display_name || 'No name set'}</h2>
-                <p className="text-gray-600">{profile.email}</p>
-                <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-2 ${profile.role === 'admin'
-                    ? 'bg-purple-100 text-purple-800'
-                    : 'bg-blue-100 text-blue-800'
-                  }`}>
-                  {profile.role === 'admin' ? 'Administrator' : 'User'}
+                <h2 className="text-xl font-bold text-white">{profile.display_name || 'No name set'}</h2>
+                <p className="text-white/70 text-sm mt-1">{profile.email}</p>
+                <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold mt-3 ${
+                  profile.role === 'admin'
+                    ? 'bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30'
+                    : 'bg-white/10 text-white/90 border border-white/20'
+                }`}>
+                  {profile.role === 'admin' ? '⭐ Administrator' : '👤 Member'}
                 </span>
               </div>
 
-              {!isEditing ? (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                    <p className="text-gray-900">{profile.phone || 'Not provided'}</p>
+              {/* Profile Details */}
+              <div className="p-6">
+                {!isEditing ? (
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <Phone className="h-4 w-4 text-[#1B4332] mt-0.5 flex-shrink-0" />
+                      <div>
+                        <label className="block text-xs font-semibold text-[#737373] uppercase tracking-wider">Phone</label>
+                        <p className="text-[#1A1A1A] text-sm">{profile.phone || 'Not provided'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <MapPin className="h-4 w-4 text-[#1B4332] mt-0.5 flex-shrink-0" />
+                      <div>
+                        <label className="block text-xs font-semibold text-[#737373] uppercase tracking-wider">Location</label>
+                        <p className="text-[#1A1A1A] text-sm">{profile.location || 'Not provided'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <FileText className="h-4 w-4 text-[#1B4332] mt-0.5 flex-shrink-0" />
+                      <div>
+                        <label className="block text-xs font-semibold text-[#737373] uppercase tracking-wider">Bio</label>
+                        <p className="text-[#1A1A1A] text-sm">{profile.bio || 'No bio provided'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Calendar className="h-4 w-4 text-[#1B4332] mt-0.5 flex-shrink-0" />
+                      <div>
+                        <label className="block text-xs font-semibold text-[#737373] uppercase tracking-wider">Member Since</label>
+                        <p className="text-[#1A1A1A] text-sm">{new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-[#E5E5E5] space-y-2">
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="w-full bg-[#1B4332] text-white font-semibold py-2.5 px-4 rounded-xl hover:bg-[#2D6A4F] transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Edit3 className="h-4 w-4" />
+                        Edit Profile
+                      </button>
+                      <button
+                        onClick={async () => { await signOut(); router.push('/'); }}
+                        className="w-full bg-red-50 text-red-600 font-medium py-2.5 px-4 rounded-xl hover:bg-red-100 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Sign Out
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                    <p className="text-gray-900">{profile.location || 'Not provided'}</p>
+                ) : (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-[#1A1A1A] mb-1.5">Display Name</label>
+                      <input
+                        type="text"
+                        value={editForm.display_name}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, display_name: e.target.value }))}
+                        className="w-full px-3 py-2.5 border-2 border-[#1B4332]/10 rounded-xl focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]/30 outline-none transition-all text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-[#1A1A1A] mb-1.5">Phone</label>
+                      <input
+                        type="tel"
+                        value={editForm.phone}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, phone: e.target.value }))}
+                        className="w-full px-3 py-2.5 border-2 border-[#1B4332]/10 rounded-xl focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]/30 outline-none transition-all text-sm"
+                        placeholder="+254..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-[#1A1A1A] mb-1.5">Location</label>
+                      <input
+                        type="text"
+                        value={editForm.location}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, location: e.target.value }))}
+                        className="w-full px-3 py-2.5 border-2 border-[#1B4332]/10 rounded-xl focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]/30 outline-none transition-all text-sm"
+                        placeholder="e.g., Thika, Kiambu"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-[#1A1A1A] mb-1.5">Bio</label>
+                      <textarea
+                        value={editForm.bio}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
+                        rows={3}
+                        className="w-full px-3 py-2.5 border-2 border-[#1B4332]/10 rounded-xl focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]/30 outline-none transition-all text-sm resize-none"
+                        placeholder="Tell us about yourself..."
+                      />
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <button
+                        onClick={handleSaveProfile}
+                        disabled={saving}
+                        className="flex-1 bg-[#1B4332] text-white font-semibold py-2.5 px-4 rounded-xl hover:bg-[#2D6A4F] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        <Save className="h-4 w-4" />
+                        {saving ? 'Saving...' : 'Save'}
+                      </button>
+                      <button
+                        onClick={() => setIsEditing(false)}
+                        disabled={saving}
+                        className="flex-1 bg-[#1B4332]/5 text-[#1B4332] font-medium py-2.5 px-4 rounded-xl hover:bg-[#1B4332]/10 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <X className="h-4 w-4" />
+                        Cancel
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-                    <p className="text-gray-900">{profile.bio || 'No bio provided'}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Member Since</label>
-                    <p className="text-gray-900">{new Date(profile.created_at).toLocaleDateString()}</p>
-                  </div>
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="w-full bg-purple-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors duration-300"
-                  >
-                    Edit Profile
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
-                    <input
-                      type="text"
-                      value={editForm.display_name}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, display_name: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                    <input
-                      type="tel"
-                      value={editForm.phone}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, phone: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                    <input
-                      type="text"
-                      value={editForm.location}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, location: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-                    <textarea
-                      value={editForm.bio}
-                      onChange={(e) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
-                    />
-                  </div>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={handleSaveProfile}
-                      disabled={saving}
-                      className="flex-1 bg-purple-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors duration-300 disabled:opacity-50"
-                    >
-                      {saving ? 'Saving...' : 'Save'}
-                    </button>
-                    <button
-                      onClick={() => setIsEditing(false)}
-                      disabled={saving}
-                      className="flex-1 bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors duration-300"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
 
           {/* Activity Feed */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="text-xl font-bold mb-6">My Activity</h3>
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="px-6 py-4 border-b border-[#E5E5E5] flex items-center justify-between">
+                <h3 className="text-lg font-bold text-[#1A1A1A]">My Activity</h3>
+                <span className="text-sm text-[#737373]">{activities.length} {activities.length === 1 ? 'item' : 'items'}</span>
+              </div>
 
               {activities.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-600 mb-4">No activity yet</p>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="text-center py-16 px-6">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#1B4332]/10 flex items-center justify-center">
+                    <FileText className="h-8 w-8 text-[#1B4332]/40" />
+                  </div>
+                  <h4 className="text-lg font-bold text-[#1A1A1A] mb-2">No activity yet</h4>
+                  <p className="text-[#525252] text-sm mb-6">Start by adding a business or sharing your visit experience</p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <a
                       href="/directory/add"
-                      className="bg-purple-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors duration-300"
+                      className="bg-[#1B4332] text-white font-semibold py-2.5 px-6 rounded-xl hover:bg-[#2D6A4F] transition-colors inline-flex items-center justify-center gap-2"
                     >
+                      <Briefcase className="h-4 w-4" />
                       Add Business
                     </a>
                     <a
                       href="/proof-of-visit"
-                      className="border-2 border-purple-600 text-purple-600 font-medium py-2 px-4 rounded-lg hover:bg-purple-600 hover:text-white transition-colors duration-300"
+                      className="bg-white text-[#1B4332] border-2 border-[#1B4332]/20 font-semibold py-2.5 px-6 rounded-xl hover:bg-[#1B4332]/5 transition-colors inline-flex items-center justify-center gap-2"
                     >
+                      <Camera className="h-4 w-4" />
                       Share Experience
                     </a>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="divide-y divide-[#E5E5E5]">
                   {activities.map(activity => (
-                    <div key={activity.id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <span className={`w-3 h-3 rounded-full ${activity.type === 'business'
-                                ? 'bg-blue-500'
-                                : activity.type === 'deal'
-                                  ? 'bg-green-500'
-                                  : 'bg-purple-500'
-                              }`}></span>
-                            <h4 className="font-medium text-gray-900">{activity.title}</h4>
-                          </div>
-                          <p className="text-sm text-gray-600">
-                            {activity.type === 'business' && 'Business submission'}
-                            {activity.type === 'deal' && 'Deal posted'}
-                            {activity.type === 'proof' && 'Proof of visit shared'}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {new Date(activity.created_at).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${activity.status === 'Approved'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-yellow-100 text-yellow-800'
+                    <div key={activity.id} className="px-6 py-4 hover:bg-[#FAFAF8] transition-colors">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-3 flex-1 min-w-0">
+                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                            activity.type === 'business' ? 'bg-[#1B4332]/10 text-[#1B4332]' :
+                            activity.type === 'proof' ? 'bg-[#D4AF37]/10 text-[#D4AF37]' :
+                            'bg-[#2D6A4F]/10 text-[#2D6A4F]'
                           }`}>
+                            {activityIcon(activity.type)}
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="font-semibold text-[#1A1A1A] text-sm truncate">{activity.title}</h4>
+                            <p className="text-xs text-[#737373] mt-0.5">
+                              {activity.type === 'business' && 'Business submission'}
+                              {activity.type === 'deal' && 'Deal posted'}
+                              {activity.type === 'proof' && 'Proof of visit shared'}
+                            </p>
+                            <p className="text-xs text-[#A3A3A3] mt-1">
+                              {new Date(activity.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </p>
+                          </div>
+                        </div>
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
+                          activity.status === 'Approved'
+                            ? 'bg-green-50 text-green-700 border border-green-200'
+                            : 'bg-[#D4AF37]/10 text-[#856404] border border-[#D4AF37]/20'
+                        }`}>
                           {activity.status}
                         </span>
                       </div>

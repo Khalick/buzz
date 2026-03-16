@@ -10,6 +10,7 @@ interface Deal {
   description: string;
   business_name: string;
   expiry_date?: string;
+  is_flash_deal?: boolean;
 }
 
 const DealsPage = () => {
@@ -22,6 +23,7 @@ const DealsPage = () => {
         const { data, error } = await supabase
           .from('deals')
           .select('*')
+          .order('is_flash_deal', { ascending: false })
           .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -97,15 +99,23 @@ const DealsPage = () => {
                 >
                   {/* Deal Badge */}
                   <div className="flex items-center justify-between mb-4">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#D4AF37]/10 text-[#D4AF37] text-xs font-bold rounded-full">
-                      🏷️ DEAL
-                    </span>
+                    {deal.is_flash_deal ? (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-100/80 text-red-600 text-xs font-black rounded-full border border-red-200 shadow-sm animate-pulse">
+                        <span className="w-2 h-2 bg-red-600 rounded-full"></span>
+                        LIVE PULSE
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#D4AF37]/10 text-[#D4AF37] text-xs font-bold rounded-full">
+                        🏷️ DEAL
+                      </span>
+                    )}
+
                     {daysRemaining !== null && (
-                      <span className={`text-xs font-medium px-2 py-1 rounded-full ${isUrgent
+                      <span className={`text-xs font-medium px-2 py-1 rounded-full ${isUrgent || deal.is_flash_deal
                           ? 'bg-red-100 text-red-600'
                           : 'bg-[#1B4332]/10 text-[#1B4332]'
                         }`}>
-                        {isUrgent ? '⚡ ' : ''}{daysRemaining} days left
+                        {isUrgent || deal.is_flash_deal ? '⚡ ' : ''}{daysRemaining} days left
                       </span>
                     )}
                   </div>
@@ -114,7 +124,7 @@ const DealsPage = () => {
                   <h2 className="text-xl font-bold text-[#1A1A1A] mb-3 group-hover:text-[#1B4332] transition-colors">
                     {deal.title}
                   </h2>
-                  <p className="text-[#525252] text-sm mb-4 line-clamp-3 leading-relaxed">
+                  <p className="text-[#525252] text-sm mb-4 line-clamp-3 leading-relaxed whitespace-pre-wrap">
                     {deal.description}
                   </p>
 
