@@ -61,7 +61,7 @@ const ProfilePage = () => {
         .from('users')
         .select('*')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -73,9 +73,40 @@ const ProfilePage = () => {
           location: data.location || '',
           bio: data.bio || ''
         });
+      } else {
+        // Auto-create user record on first visit
+        const newProfile: UserProfile = {
+          id: user.id,
+          email: user.email || '',
+          display_name: user.user_metadata?.full_name || user.email?.split('@')[0] || '',
+          role: 'user',
+          created_at: new Date().toISOString(),
+        };
+
+        // Try to insert into users table (may fail if table/RLS not set up)
+        await supabase.from('users').insert(newProfile).single();
+
+        // Always set the profile from auth data so the page renders
+        setProfile(newProfile);
+        setEditForm({
+          display_name: newProfile.display_name,
+          phone: '',
+          location: '',
+          bio: ''
+        });
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
+      // Fallback: build profile from auth user so page always renders
+      if (user && !profile) {
+        setProfile({
+          id: user.id,
+          email: user.email || '',
+          display_name: user.user_metadata?.full_name || user.email?.split('@')[0] || '',
+          role: 'user',
+          created_at: new Date().toISOString(),
+        });
+      }
     } finally {
       setLoadingProfile(false);
     }

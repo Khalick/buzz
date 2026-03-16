@@ -31,7 +31,7 @@ export const useAdminAuth = (): AdminAuthResult => {
           .from('users')
           .select('role')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
 
