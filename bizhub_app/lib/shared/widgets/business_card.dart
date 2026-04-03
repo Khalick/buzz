@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/models/business.dart';
+import '../../core/theme/app_theme.dart';
 
 class BusinessCardWidget extends StatelessWidget {
   final Business business;
@@ -14,21 +15,10 @@ class BusinessCardWidget extends StatelessWidget {
     final isOpen = business.isOpen;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.grey.shade200,
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(5),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: SpotifyColors.surface,
+        borderRadius: BorderRadius.circular(8),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -44,7 +34,7 @@ class BusinessCardWidget extends StatelessWidget {
                   child: Container(
                     height: 160,
                     width: double.infinity,
-                    color: Colors.grey[200],
+                    color: SpotifyColors.highlight,
                     child: business.images.isNotEmpty
                         ? CachedNetworkImage(
                             imageUrl: business.images.first,
@@ -52,14 +42,14 @@ class BusinessCardWidget extends StatelessWidget {
                             placeholder: (context, url) => const Icon(
                                 Icons.image,
                                 size: 50,
-                                color: Colors.grey),
+                                color: SpotifyColors.textTertiary),
                             errorWidget: (context, url, error) => const Icon(
                                 Icons.image,
                                 size: 50,
-                                color: Colors.grey),
+                                color: SpotifyColors.textTertiary),
                           )
                         : const Icon(Icons.storefront,
-                            size: 50, color: Colors.grey),
+                            size: 50, color: SpotifyColors.textTertiary),
                   ),
                 ),
 
@@ -74,15 +64,15 @@ class BusinessCardWidget extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(230),
-                          borderRadius: BorderRadius.circular(12),
+                          color: SpotifyColors.background.withAlpha(200),
+                          borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           business.category,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.primary,
+                            color: SpotifyColors.green,
                           ),
                         ),
                       ),
@@ -92,27 +82,24 @@ class BusinessCardWidget extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: isOpen ? Colors.green : Colors.red,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withAlpha(30),
-                                blurRadius: 4,
-                              )
-                            ],
+                            color: isOpen
+                                ? SpotifyColors.green
+                                : SpotifyColors.error,
+                            borderRadius: BorderRadius.circular(4),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.access_time,
-                                  size: 10, color: Colors.white),
+                              Icon(Icons.access_time,
+                                  size: 10,
+                                  color: isOpen ? Colors.black : Colors.white),
                               const SizedBox(width: 4),
                               Text(
                                 isOpen ? 'Open Now' : 'Closed',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: isOpen ? Colors.black : Colors.white,
                                 ),
                               ),
                             ],
@@ -127,16 +114,13 @@ class BusinessCardWidget extends StatelessWidget {
 
             // Content
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     business.name,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1A1A1A),
-                    ),
+                    style: theme.textTheme.titleMedium,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -144,8 +128,8 @@ class BusinessCardWidget extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       business.description!,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: const Color(0xFF525252),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: SpotifyColors.textSecondary,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -155,14 +139,14 @@ class BusinessCardWidget extends StatelessWidget {
                   Row(
                     children: [
                       if (business.town != null) ...[
-                        Icon(Icons.location_on,
-                            size: 14, color: theme.colorScheme.primary),
+                        const Icon(Icons.location_on,
+                            size: 14, color: SpotifyColors.green),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             '${business.town}, ${business.county}',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: const Color(0xFF525252),
+                              color: SpotifyColors.textSecondary,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -172,7 +156,7 @@ class BusinessCardWidget extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  const Divider(height: 1, color: Color(0xFFE5E5E5)),
+                  Divider(height: 1, color: SpotifyColors.highlight),
                   const SizedBox(height: 12),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -180,7 +164,7 @@ class BusinessCardWidget extends StatelessWidget {
                       Row(
                         children: [
                           const Icon(Icons.star,
-                              size: 16, color: Color(0xFFD4AF37)),
+                              size: 16, color: SpotifyColors.green),
                           const SizedBox(width: 4),
                           Text(
                             business.rating > 0
@@ -188,7 +172,7 @@ class BusinessCardWidget extends StatelessWidget {
                                 : 'New',
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontWeight: FontWeight.w600,
-                              color: const Color(0xFF525252),
+                              color: SpotifyColors.textSecondary,
                             ),
                           ),
                         ],
@@ -197,15 +181,15 @@ class BusinessCardWidget extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withAlpha(20),
-                          borderRadius: BorderRadius.circular(8),
+                          color: SpotifyColors.green,
+                          borderRadius: BorderRadius.circular(500),
                         ),
-                        child: Text(
-                          'View Details',
+                        child: const Text(
+                          'View',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.primary,
+                            color: Colors.black,
                           ),
                         ),
                       ),

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/repositories/business_repository.dart';
 import '../../core/models/business.dart';
 import '../../core/services/location_service.dart';
+import '../../core/theme/app_theme.dart';
 import '../../shared/widgets/business_card.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/shimmer_loading.dart';
@@ -182,9 +183,9 @@ class _DirectoryScreenState extends ConsumerState<DirectoryScreen> {
                       )
                     : null,
                 filled: true,
-                fillColor: Colors.grey.shade50,
+                fillColor: SpotifyColors.highlight,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
                 ),
               ),
@@ -216,10 +217,10 @@ class _DirectoryScreenState extends ConsumerState<DirectoryScreen> {
                           });
                           _resetAndLoad();
                         },
-                        selectedColor: theme.colorScheme.primary.withAlpha(30),
-                        checkmarkColor: theme.colorScheme.primary,
+                        selectedColor: SpotifyColors.green.withAlpha(40),
+                        checkmarkColor: SpotifyColors.green,
                         labelStyle: TextStyle(
-                          color: selected ? theme.colorScheme.primary : Colors.grey.shade700,
+                          color: selected ? SpotifyColors.green : SpotifyColors.textSecondary,
                           fontWeight: selected ? FontWeight.bold : FontWeight.normal,
                           fontSize: 13,
                         ),
@@ -241,7 +242,7 @@ class _DirectoryScreenState extends ConsumerState<DirectoryScreen> {
               children: [
                 Text(
                   '${_businesses.length} businesses',
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                  style: TextStyle(color: SpotifyColors.textSecondary, fontSize: 13),
                 ),
                 DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
@@ -332,7 +333,7 @@ class _DirectoryScreenState extends ConsumerState<DirectoryScreen> {
                                         ),
                                         Text(
                                           ' away',
-                                          style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                                          style: TextStyle(color: SpotifyColors.textSecondary, fontSize: 12),
                                         ),
                                       ],
                                     ),

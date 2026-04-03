@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/repositories/deals_repository.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/shimmer_loading.dart';
+import '../../core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 
 class DealsScreen extends ConsumerWidget {
@@ -47,16 +48,8 @@ class DealsScreen extends ConsumerWidget {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey.shade200),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(5),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                    color: SpotifyColors.surface,
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -119,13 +112,13 @@ class DealsScreen extends ConsumerWidget {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: isUrgent ? Colors.red.shade50 : theme.colorScheme.primary.withAlpha(20),
+                                  color: isUrgent ? SpotifyColors.error.withAlpha(40) : SpotifyColors.green.withAlpha(20),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
                                   '${isUrgent || deal.isFlashDeal ? '⚡ ' : ''}${deal.daysRemaining} days left',
                                   style: TextStyle(
-                                    color: isUrgent ? Colors.red.shade600 : theme.colorScheme.primary,
+                                    color: isUrgent ? SpotifyColors.error : SpotifyColors.green,
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -140,7 +133,7 @@ class DealsScreen extends ConsumerWidget {
                           deal.title,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF1A1A1A),
+                            color: SpotifyColors.textPrimary,
                           ),
                         ),
                         if (deal.description != null) ...[
@@ -148,12 +141,12 @@ class DealsScreen extends ConsumerWidget {
                           Text(
                             deal.description!,
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: const Color(0xFF525252),
+                              color: SpotifyColors.textSecondary,
                             ),
                           ),
                         ],
                         const SizedBox(height: 16),
-                        const Divider(height: 1, color: Color(0xFFE5E5E5)),
+                        const Divider(height: 1, color: SpotifyColors.highlight),
                         const SizedBox(height: 12),
 
                         // Business Info
@@ -162,10 +155,8 @@ class DealsScreen extends ConsumerWidget {
                             Container(
                               width: 32,
                               height: 32,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [theme.colorScheme.primary, theme.colorScheme.secondary],
-                                ),
+                              decoration: const BoxDecoration(
+                                color: SpotifyColors.highlight,
                                 shape: BoxShape.circle,
                               ),
                               child: Center(
@@ -183,7 +174,7 @@ class DealsScreen extends ConsumerWidget {
                               child: Text(
                                 deal.businessName,
                                 style: TextStyle(
-                                  color: theme.colorScheme.primary,
+                                  color: SpotifyColors.textPrimary,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
                                 ),

@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/repositories/events_repository.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/shimmer_loading.dart';
+import '../../core/theme/app_theme.dart';
 
 class EventFilterNotifier extends Notifier<String> {
   @override
@@ -85,16 +86,8 @@ class EventsScreen extends ConsumerWidget {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.grey.shade200),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withAlpha(5),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                          color: SpotifyColors.surface,
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         clipBehavior: Clip.antiAlias,
                         child: Column(
@@ -108,8 +101,8 @@ class EventsScreen extends ConsumerWidget {
                                 width: double.infinity,
                                 fit: BoxFit.cover,
                                 placeholder: (_, __) => Container(
-                                  height: 150, color: Colors.grey.shade200,
-                                  child: const Center(child: Icon(Icons.image, color: Colors.grey)),
+                                  height: 150, color: SpotifyColors.highlight,
+                                  child: const Center(child: Icon(Icons.image, color: SpotifyColors.textTertiary)),
                                 ),
                                 errorWidget: (_, __, ___) => const SizedBox.shrink(),
                               ),
@@ -124,10 +117,10 @@ class EventsScreen extends ConsumerWidget {
                                     width: 60,
                                     height: 70,
                                     decoration: BoxDecoration(
-                                      color: isUpcoming ? theme.colorScheme.primary.withAlpha(20) : Colors.grey.shade100,
-                                      borderRadius: BorderRadius.circular(12),
+                                      color: isUpcoming ? SpotifyColors.green.withAlpha(20) : SpotifyColors.highlight,
+                                      borderRadius: BorderRadius.circular(8),
                                       border: Border.all(
-                                        color: isUpcoming ? theme.colorScheme.primary.withAlpha(50) : Colors.grey.shade300,
+                                        color: isUpcoming ? SpotifyColors.green.withAlpha(50) : SpotifyColors.highlight,
                                       ),
                                     ),
                                     child: Column(
@@ -136,7 +129,7 @@ class EventsScreen extends ConsumerWidget {
                                         Text(
                                           event.monthShort.toUpperCase(),
                                           style: TextStyle(
-                                            color: isUpcoming ? theme.colorScheme.primary : Colors.grey.shade600,
+                                            color: isUpcoming ? SpotifyColors.green : SpotifyColors.textSecondary,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 12,
                                           ),
@@ -144,7 +137,7 @@ class EventsScreen extends ConsumerWidget {
                                         Text(
                                           '${event.day}',
                                           style: TextStyle(
-                                            color: isUpcoming ? theme.colorScheme.primary : Colors.grey.shade800,
+                                            color: isUpcoming ? SpotifyColors.green : SpotifyColors.textSecondary,
                                             fontWeight: FontWeight.w900,
                                             fontSize: 24,
                                           ),
@@ -163,17 +156,17 @@ class EventsScreen extends ConsumerWidget {
                                           event.title,
                                           style: theme.textTheme.titleMedium?.copyWith(
                                             fontWeight: FontWeight.bold,
-                                            color: const Color(0xFF1A1A1A),
+                                            color: SpotifyColors.textPrimary,
                                           ),
                                         ),
                                         const SizedBox(height: 8),
                                         Row(
                                           children: [
-                                            Icon(Icons.access_time, size: 14, color: Colors.grey.shade600),
+                                            Icon(Icons.access_time, size: 14, color: SpotifyColors.green),
                                             const SizedBox(width: 6),
                                             Text(
                                               event.timeRange,
-                                              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                                              style: const TextStyle(color: SpotifyColors.textSecondary, fontSize: 13),
                                             ),
                                           ],
                                         ),
@@ -181,12 +174,12 @@ class EventsScreen extends ConsumerWidget {
                                           const SizedBox(height: 4),
                                           Row(
                                             children: [
-                                              Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
+                                              Icon(Icons.location_on_outlined, size: 14, color: SpotifyColors.green),
                                               const SizedBox(width: 6),
                                               Expanded(
                                                 child: Text(
                                                   event.location!,
-                                                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                                                  style: const TextStyle(color: SpotifyColors.textSecondary, fontSize: 13),
                                                   maxLines: 1,
                                                   overflow: TextOverflow.ellipsis,
                                                 ),
@@ -204,9 +197,9 @@ class EventsScreen extends ConsumerWidget {
                             // Bottom Action Bar
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade50,
-                                border: Border(top: BorderSide(color: Colors.grey.shade100)),
+                              decoration: const BoxDecoration(
+                                color: SpotifyColors.surface,
+                                border: Border(top: BorderSide(color: SpotifyColors.highlight)),
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -239,13 +232,13 @@ class EventsScreen extends ConsumerWidget {
                                           Text(
                                             'By ${event.businessName}',
                                             style: TextStyle(
-                                              color: theme.colorScheme.primary,
+                                              color: SpotifyColors.textPrimary,
                                               fontSize: 13,
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
                                           const SizedBox(width: 4),
-                                          Icon(Icons.chevron_right, size: 16, color: theme.colorScheme.primary),
+                                          const Icon(Icons.chevron_right, size: 16, color: SpotifyColors.textPrimary),
                                         ],
                                       ),
                                     ),

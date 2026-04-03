@@ -5,6 +5,7 @@ import '../../core/providers/auth_provider.dart';
 import '../../core/repositories/business_repository.dart';
 import '../../core/repositories/user_repository.dart';
 import '../../core/repositories/deals_repository.dart';
+import '../../core/theme/app_theme.dart';
 
 // Provider for owner's businesses
 final ownerBusinessesProvider = FutureProvider((ref) async {
@@ -141,13 +142,13 @@ class DashboardScreen extends ConsumerWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: approved ? Colors.green.shade50 : Colors.orange.shade50,
+                              color: approved ? SpotifyColors.green.withAlpha(20) : SpotifyColors.error.withAlpha(20),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               approved ? 'Approved' : 'Pending',
                               style: TextStyle(
-                                color: approved ? Colors.green.shade700 : Colors.orange.shade700,
+                                color: approved ? SpotifyColors.green : SpotifyColors.error,
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -196,9 +197,8 @@ class _StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withAlpha(15),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withAlpha(40)),
+          color: SpotifyColors.surface,
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Column(
           children: [
@@ -229,16 +229,15 @@ class _QuickAction extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         decoration: BoxDecoration(
-          color: theme.colorScheme.primary.withAlpha(15),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: theme.colorScheme.primary.withAlpha(40)),
+          color: SpotifyColors.green,
+          borderRadius: BorderRadius.circular(500),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: theme.colorScheme.primary, size: 20),
+            Icon(icon, color: Colors.black, size: 20),
             const SizedBox(width: 8),
-            Text(label, style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)),
+            Text(label, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
           ],
         ),
       ),

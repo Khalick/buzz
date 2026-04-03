@@ -9,6 +9,7 @@ import '../../core/repositories/business_repository.dart';
 import '../../core/repositories/user_repository.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/services/location_service.dart';
+import '../../core/theme/app_theme.dart';
 import '../favorites/favorites_screen.dart';
 
 final businessDetailProvider = FutureProvider.family<Map<String, dynamic>, String>((ref, id) async {
@@ -92,7 +93,7 @@ class BusinessDetailScreen extends ConsumerWidget {
                               itemBuilder: (context, index) => CachedNetworkImage(
                                 imageUrl: business.images[index],
                                 fit: BoxFit.cover,
-                                errorWidget: (_, __, ___) => Container(color: Colors.grey.shade300),
+                                errorWidget: (_, __, ___) => Container(color: SpotifyColors.highlight),
                               ),
                             ),
                           ),
@@ -107,9 +108,9 @@ class BusinessDetailScreen extends ConsumerWidget {
                                   errorWidget: (context, url, err) => Container(color: Colors.grey.shade300),
                                 )
                               : Container(
-                                  color: theme.colorScheme.primary,
+                                  color: SpotifyColors.surface,
                                   child: const Center(
-                                    child: Icon(Icons.storefront, size: 80, color: Colors.white24),
+                                    child: Icon(Icons.storefront, size: 80, color: SpotifyColors.textTertiary),
                                   ),
                                 ),
                         ),
@@ -164,7 +165,7 @@ class BusinessDetailScreen extends ConsumerWidget {
                                 width: 10,
                                 height: 10,
                                 decoration: BoxDecoration(
-                                  color: isOpen ? Colors.green : Colors.red,
+                                  color: isOpen ? SpotifyColors.green : SpotifyColors.error,
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -177,12 +178,12 @@ class BusinessDetailScreen extends ConsumerWidget {
                                 ),
                               ),
                               const SizedBox(width: 16),
-                              Text(business.category, style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.w600)),
+                              Text(business.category, style: const TextStyle(color: SpotifyColors.green, fontWeight: FontWeight.w600)),
                             ],
                           ),
                           Row(
                             children: [
-                              const Icon(Icons.star, color: Color(0xFFD4AF37), size: 20),
+                              const Icon(Icons.star, color: SpotifyColors.green, size: 20),
                               const SizedBox(width: 4),
                               Text(
                                 business.rating > 0 ? '${business.rating.toStringAsFixed(1)}' : 'New',
@@ -190,7 +191,7 @@ class BusinessDetailScreen extends ConsumerWidget {
                               ),
                               Text(
                                 ' (${business.reviewCount} reviews)',
-                                style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                                style: const TextStyle(color: SpotifyColors.textSecondary, fontSize: 14),
                               ),
                             ],
                           ),
@@ -251,7 +252,7 @@ class BusinessDetailScreen extends ConsumerWidget {
                             Expanded(
                               child: Text(
                                 '${business.address ?? ''}${business.address != null && business.town != null ? ', ' : ''}${business.town ?? ''}',
-                                style: TextStyle(color: Colors.grey.shade700),
+                                style: const TextStyle(color: SpotifyColors.textSecondary),
                               ),
                             ),
                           ],
@@ -284,7 +285,7 @@ class BusinessDetailScreen extends ConsumerWidget {
                                     '${entry.value['open'] ?? '?'} - ${entry.value['close'] ?? '?'}',
                                     style: TextStyle(
                                       fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                                      color: isToday ? theme.colorScheme.primary : Colors.grey.shade700,
+                                      color: isToday ? SpotifyColors.green : SpotifyColors.textSecondary,
                                     ),
                                   ),
                                 ],
@@ -335,9 +336,8 @@ class BusinessDetailScreen extends ConsumerWidget {
                               margin: const EdgeInsets.only(bottom: 16),
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade50,
+                                color: SpotifyColors.surface,
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.grey.shade200),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -354,20 +354,20 @@ class BusinessDetailScreen extends ConsumerWidget {
                                       ),
                                       Text(
                                         review['created_at'].toString().split('T')[0],
-                                        style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+                                        style: const TextStyle(color: SpotifyColors.textSecondary, fontSize: 12),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
                                     review['content'] ?? '',
-                                    style: TextStyle(color: Colors.grey.shade800),
+                                    style: const TextStyle(color: SpotifyColors.textPrimary),
                                   ),
                                   if (review['user_name'] != null) ...[
                                     const SizedBox(height: 8),
                                     Text(
                                       '- ${review['user_name']}',
-                                      style: TextStyle(color: Colors.grey.shade600, fontSize: 12, fontWeight: FontWeight.bold),
+                                      style: const TextStyle(color: SpotifyColors.textSecondary, fontSize: 12, fontWeight: FontWeight.bold),
                                     ),
                                   ]
                                 ],
@@ -407,11 +407,11 @@ class _ActionButton extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withAlpha(20),
+              decoration: const BoxDecoration(
+                color: SpotifyColors.highlight,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: Theme.of(context).colorScheme.primary),
+              child: Icon(icon, color: SpotifyColors.green),
             ),
             const SizedBox(height: 8),
             Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),

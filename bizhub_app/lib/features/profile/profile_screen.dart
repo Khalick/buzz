@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/repositories/user_repository.dart';
+import '../../core/theme/app_theme.dart';
 
 // Profile data provider
 final profileProvider = FutureProvider((ref) async {
@@ -163,14 +164,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         child: Container(
                           width: 100,
                           height: 100,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [theme.colorScheme.primary, theme.colorScheme.secondary],
-                          ),
+                        decoration: const BoxDecoration(
+                          color: SpotifyColors.highlight,
                           shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(color: theme.colorScheme.primary.withAlpha(50), blurRadius: 20)
-                          ],
                         ),
                         child: profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
                             ? ClipOval(
@@ -204,7 +200,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         const SizedBox(height: 4),
                         Text(
                           profile.email,
-                          style: TextStyle(color: Colors.grey.shade600),
+                          style: const TextStyle(color: SpotifyColors.textSecondary),
                         ),
                         if (profile.isAdmin)
                           Container(
@@ -304,26 +300,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        color: SpotifyColors.surface,
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withAlpha(20),
+            decoration: const BoxDecoration(
+              color: SpotifyColors.highlight,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: theme.colorScheme.primary, size: 20),
+            child: Icon(icon, color: SpotifyColors.green, size: 20),
           ),
           const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
-              Text(value, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+              Text(title, style: const TextStyle(color: SpotifyColors.textSecondary, fontSize: 12)),
+              Text(value, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: SpotifyColors.textPrimary)),
             ],
           ),
         ],
@@ -343,7 +338,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: Text(
                 'No activity yet.\nSubmit a business or proof to see it here.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: SpotifyColors.textSecondary),
               ),
             ),
           );
@@ -359,7 +354,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
               child: ListTile(
-                leading: Icon(Icons.storefront, color: theme.colorScheme.primary),
+                leading: const Icon(Icons.storefront, color: SpotifyColors.green),
                 title: Text(b['name']),
                 subtitle: Text(
                   approved ? 'Approved' : 'Pending Review',
@@ -372,10 +367,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 trailing: const Icon(Icons.chevron_right),
                 onTap: approved ? () => context.push('/business/${b['id']}') : null,
                 shape: RoundedRectangleBorder(
-                  side: BorderSide(color: Colors.grey.shade200),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                tileColor: Colors.white,
+                tileColor: SpotifyColors.surface,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               ),
             );
@@ -394,19 +388,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: theme.colorScheme.primary.withAlpha(15),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: theme.colorScheme.primary.withAlpha(40)),
+          color: SpotifyColors.surface,
+          borderRadius: BorderRadius.circular(500),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: theme.colorScheme.primary, size: 18),
+            Icon(icon, color: SpotifyColors.green, size: 18),
             const SizedBox(width: 8),
             Text(
               label,
-              style: TextStyle(
-                color: theme.colorScheme.primary,
+              style: const TextStyle(
+                color: SpotifyColors.textPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
               ),
