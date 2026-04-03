@@ -30,7 +30,9 @@ class AuthService {
   Future<bool> signInWithGoogle() async {
     return await _client.auth.signInWithOAuth(
       OAuthProvider.google,
-      redirectTo: 'io.supabase.bizhub://login-callback/',
+      redirectTo: const bool.fromEnvironment('dart.library.js_util') 
+          ? null 
+          : 'io.supabase.bizhub://login-callback/',
     );
   }
 
