@@ -33,6 +33,9 @@ class AuthService {
     return await _client.auth.signUp(
       email: email,
       password: password,
+      emailRedirectTo: const bool.fromEnvironment('dart.library.js_util') 
+          ? Uri.base.origin 
+          : 'io.supabase.bizhub://login-callback/',
     );
   }
 
@@ -41,7 +44,7 @@ class AuthService {
     return await _client.auth.signInWithOAuth(
       OAuthProvider.google,
       redirectTo: const bool.fromEnvironment('dart.library.js_util') 
-          ? null 
+          ? Uri.base.origin 
           : 'io.supabase.bizhub://login-callback/',
     );
   }
