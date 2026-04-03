@@ -3,14 +3,22 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/auth/login_screen.dart';
+import '../../features/auth/onboarding_screen.dart';
+import '../../features/auth/forgot_password_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/directory/directory_screen.dart';
+import '../../features/directory/add_business_screen.dart';
+import '../../features/directory/map_screen.dart';
 import '../../features/deals/deals_screen.dart';
 import '../../features/events/events_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/favorites/favorites_screen.dart';
 import '../../features/notifications/notifications_screen.dart';
 import '../../features/business_detail/business_detail_screen.dart';
+import '../../features/business_detail/add_review_screen.dart';
+import '../../features/dashboard/dashboard_screen.dart';
+import '../../features/dashboard/manage_deals_screen.dart';
+import '../../features/proof/proof_of_visit_screen.dart';
 import '../services/supabase_service.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -23,8 +31,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final isLoggedIn = SupabaseService.client.auth.currentUser != null;
       final isLoginRoute = state.uri.path == '/login';
+      final isOnboarding = state.uri.path == '/onboarding';
+      final isForgotPassword = state.uri.path == '/forgot-password';
 
-      if (!isLoggedIn && !isLoginRoute) {
+      if (!isLoggedIn && !isLoginRoute && !isForgotPassword) {
         return '/login';
       }
       if (isLoggedIn && isLoginRoute) {
@@ -36,6 +46,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding',
+        builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
       ShellRoute(
         navigatorKey: shellNavigatorKey,
@@ -49,7 +67,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/directory',
-            builder: (context, state) => const DirectoryScreen(),
+            builder: (context, state) {
+              final category = state.uri.queryParameters['category'];
+              return DirectoryScreen(initialCategory: category);
+            },
           ),
           GoRoute(
             path: '/deals',
@@ -71,6 +92,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/notifications',
             builder: (context, state) => const NotificationsScreen(),
           ),
+          GoRoute(
+            path: '/dashboard',
+            builder: (context, state) => const DashboardScreen(),
+          ),
         ],
       ),
       GoRoute(
@@ -79,6 +104,30 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final id = state.pathParameters['id'] ?? '1';
           return BusinessDetailScreen(id: id);
         },
+      ),
+      GoRoute(
+        path: '/business/:id/review',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final name = state.uri.queryParameters['name'] ?? 'Business';
+          return AddReviewScreen(businessId: id, businessName: name);
+        },
+      ),
+      GoRoute(
+        path: '/directory/add',
+        builder: (context, state) => const AddBusinessScreen(),
+      ),
+      GoRoute(
+        path: '/map',
+        builder: (context, state) => const MapScreen(),
+      ),
+      GoRoute(
+        path: '/dashboard/deals',
+        builder: (context, state) => const ManageDealsScreen(),
+      ),
+      GoRoute(
+        path: '/proof-of-visit',
+        builder: (context, state) => const ProofOfVisitScreen(),
       ),
     ],
   );
@@ -101,28 +150,28 @@ class MainScaffold extends StatelessWidget {
         onDestinationSelected: (int idx) => _onItemTapped(idx, context),
         backgroundColor: theme.colorScheme.surface,
         indicatorColor: theme.colorScheme.primary.withAlpha(25),
-        destinations: [
-          const NavigationDestination(
+        destinations: const [
+          NavigationDestination(
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home),
             label: 'Home',
           ),
-          const NavigationDestination(
+          NavigationDestination(
             icon: Icon(Icons.search_outlined),
             selectedIcon: Icon(Icons.search),
             label: 'Directory',
           ),
-          const NavigationDestination(
+          NavigationDestination(
             icon: Icon(Icons.local_offer_outlined),
             selectedIcon: Icon(Icons.local_offer),
             label: 'Deals',
           ),
-          const NavigationDestination(
+          NavigationDestination(
             icon: Icon(Icons.event_outlined),
             selectedIcon: Icon(Icons.event),
             label: 'Events',
           ),
-          const NavigationDestination(
+          NavigationDestination(
             icon: Icon(Icons.person_outline),
             selectedIcon: Icon(Icons.person),
             label: 'Profile',
@@ -139,6 +188,7 @@ class MainScaffold extends StatelessWidget {
     if (location.startsWith('/deals')) return 2;
     if (location.startsWith('/events')) return 3;
     if (location.startsWith('/profile')) return 4;
+    if (location.startsWith('/dashboard')) return 4;
     if (location.startsWith('/favorites')) return 4;
     if (location.startsWith('/notifications')) return 0;
     return 0;

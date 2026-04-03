@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/repositories/notification_repository.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../shared/widgets/empty_state.dart';
@@ -107,6 +108,20 @@ class NotificationsScreen extends ConsumerWidget {
                       final repo = ref.read(notificationRepositoryProvider);
                       await repo.markAsRead(note.id);
                       ref.refresh(notificationsProvider);
+                    }
+                    // Deep link based on type
+                    if (context.mounted) {
+                      switch (note.type) {
+                        case 'approval':
+                        case 'rejection':
+                          context.push('/dashboard');
+                          break;
+                        case 'deal':
+                          context.push('/deals');
+                          break;
+                        default:
+                          break;
+                      }
                     }
                   },
                 );

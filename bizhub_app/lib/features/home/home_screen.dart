@@ -3,12 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bizhub_app/core/theme/town_theme_provider.dart';
-import 'package:bizhub_app/shared/widgets/app_input.dart';
 import 'package:bizhub_app/shared/widgets/animated_list_item.dart';
 import 'package:bizhub_app/shared/widgets/business_card.dart';
 import 'package:bizhub_app/shared/widgets/shimmer_loading.dart';
 import '../../core/repositories/business_repository.dart';
+import '../../core/models/business.dart';
 import 'widgets/town_selector.dart';
+
+/// Featured businesses filtered by selected town
+final homeFeaturedProvider = FutureProvider<List<Business>>((ref) {
+  final repo = ref.watch(businessRepositoryProvider);
+  final town = ref.watch(townThemeProvider);
+  return repo.getFeaturedBusinesses(limit: 5, town: town);
+});
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -19,7 +26,7 @@ class HomeScreen extends ConsumerWidget {
     final currentPalette = ref.watch(currentTownPaletteProvider);
 
     // Watch data providers
-    final featuredAsync = ref.watch(featuredBusinessesProvider);
+    final featuredAsync = ref.watch(homeFeaturedProvider);
     final categoriesAsync = ref.watch(categoriesProvider);
 
     return Scaffold(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/repositories/user_repository.dart';
 
@@ -142,9 +144,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Center(
                   child: Column(
                     children: [
-                      Container(
-                        width: 100,
-                        height: 100,
+                      GestureDetector(
+                        onTap: profile.id != user.id ? null : () async {
+                          final ImagePicker picker = ImagePicker();
+                          final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+                          if (image != null && context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uploading photo...')));
+                            final repo = ref.read(userRepositoryProvider);
+                            final url = await repo.uploadAvatar(user.id, image);
+                            if (url != null && context.mounted) {
+                              ref.refresh(profileProvider);
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Photo updated successfully!')));
+                            } else if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to upload photo')));
+                            }
+                          }
+                        },
+                        child: Container(
+                          width: 100,
+                          height: 100,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [theme.colorScheme.primary, theme.colorScheme.secondary],
@@ -154,12 +172,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             BoxShadow(color: theme.colorScheme.primary.withAlpha(50), blurRadius: 20)
                           ],
                         ),
-                        child: Center(
-                          child: Text(
-                            profile.initials,
-                            style: const TextStyle(fontSize: 36, color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                        ),
+                        child: profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
+                            ? ClipOval(
+                                child: CachedNetworkImage(
+                                  imageUrl: profile.avatarUrl!,
+                                  fit: BoxFit.cover,
+                                  width: 100,
+                                  height: 100,
+                                  errorWidget: (_, __, ___) => Center(
+                                    child: Text(
+                                      profile.initials,
+                                      style: const TextStyle(fontSize: 36, color: Colors.white, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Center(
+                                child: Text(
+                                  profile.initials,
+                                  style: const TextStyle(fontSize: 36, color: Colors.white, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                      ),
                       ),
                       const SizedBox(height: 16),
                       if (!_isEditing) ...[
@@ -220,7 +254,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     theme,
                   ),
                 ],
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
+
+                // Quick Actions
+                if (!_isEditing) ...[
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: [
+                      _buildQuickAction(Icons.dashboard, 'Dashboard', () => context.push('/dashboard'), theme),
+                      _buildQuickAction(Icons.verified, 'Proof of Visit', () => context.push('/proof-of-visit'), theme),
+                      _buildQuickAction(Icons.favorite, 'Favorites', () => context.push('/favorites'), theme),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                ],
 
                 // Activity Tabs (Businesses / Proofs)
                 if (!_isEditing) ...[
@@ -336,6 +384,36 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildQuickAction(IconData icon, String label, VoidCallback onTap, ThemeData theme) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.primary.withAlpha(15),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: theme.colorScheme.primary.withAlpha(40)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: theme.colorScheme.primary, size: 18),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

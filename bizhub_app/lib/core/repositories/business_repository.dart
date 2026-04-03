@@ -5,10 +5,11 @@ import '../services/supabase_service.dart';
 class BusinessRepository {
   final _client = SupabaseService.client;
 
-  /// Fetch paginated businesses with search, category, and sort
+  /// Fetch paginated businesses with search, category, town, and sort
   Future<List<Business>> getBusinesses({
     String? search,
     String? category,
+    String? town,
     String sortBy = 'newest',
     int page = 1,
     int limit = 12,
@@ -24,6 +25,10 @@ class BusinessRepository {
 
     if (category != null && category != 'All Categories') {
       query = query.eq('category', category);
+    }
+
+    if (town != null && town.isNotEmpty) {
+      query = query.eq('location->>town', town);
     }
 
     // Sort
@@ -61,15 +66,20 @@ class BusinessRepository {
     return Business.fromJson(data);
   }
 
-  /// Fetch featured businesses (highest rated)
-  Future<List<Business>> getFeaturedBusinesses({int limit = 5}) async {
-    final data = await _client
+  /// Fetch featured businesses (highest rated), optionally by town
+  Future<List<Business>> getFeaturedBusinesses({int limit = 5, String? town}) async {
+    dynamic query = _client
         .from('businesses')
         .select()
-        .eq('approved', true)
-        .order('rating', ascending: false)
-        .limit(limit);
+        .eq('approved', true);
 
+    if (town != null && town.isNotEmpty) {
+      query = query.eq('location->>town', town);
+    }
+
+    query = query.order('rating', ascending: false).limit(limit);
+
+    final data = await query;
     return (data as List).map((e) => Business.fromJson(e)).toList();
   }
 
@@ -109,6 +119,77 @@ class BusinessRepository {
     return List<Map<String, dynamic>>.from(data);
   }
 
+  /// Submit a review
+  Future<void> submitReview({
+    required String businessId,
+    required String userId,
+    required String userName,
+    required int rating,
+    required String content,
+  }) async {
+    await _client.from('reviews').insert({
+      'business_id': businessId,
+      'user_id': userId,
+      'user_name': userName,
+      'rating': rating,
+      'content': content,
+      'created_at': DateTime.now().toIso8601String(),
+    });
+  }
+
+  /// Submit a new business for approval
+  Future<void> submitBusiness({
+    required String name,
+    required String description,
+    required String category,
+    String? phone,
+    String? whatsapp,
+    String? email,
+    String? website,
+    String? address,
+    String? town,
+    String? county,
+    double? latitude,
+    double? longitude,
+    required String submittedBy,
+  }) async {
+    final Map<String, dynamic> row = {
+      'name': name,
+      'category': category,
+      'approved': false,
+      'submitted_by': submittedBy,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+
+    if (description.isNotEmpty) row['description'] = description;
+    if (website != null && website.isNotEmpty) row['website'] = website;
+    if (whatsapp != null && whatsapp.isNotEmpty) row['whatsapp'] = whatsapp;
+    if (address != null && address.isNotEmpty) row['address'] = address;
+
+    if (phone != null && phone.isNotEmpty || email != null && email.isNotEmpty) {
+      row['contact'] = {
+        if (phone != null && phone.isNotEmpty) 'phone': phone,
+        if (email != null && email.isNotEmpty) 'email': email,
+      };
+    }
+
+    if (town != null && town.isNotEmpty || county != null && county.isNotEmpty) {
+      row['location'] = {
+        if (town != null && town.isNotEmpty) 'town': town,
+        if (county != null && county.isNotEmpty) 'county': county,
+      };
+    }
+
+    if (latitude != null && longitude != null) {
+      row['coordinates'] = {
+        'latitude': latitude,
+        'longitude': longitude,
+      };
+    }
+
+    await _client.from('businesses').insert(row);
+  }
+
   /// Fetch businesses by IDs (for favorites)
   Future<List<Business>> getBusinessesByIds(List<String> ids) async {
     if (ids.isEmpty) return [];
@@ -119,6 +200,26 @@ class BusinessRepository {
         .inFilter('id', ids);
 
     return (data as List).map((e) => Business.fromJson(e)).toList();
+  }
+
+  /// Increment view count
+  Future<void> incrementViewCount(String businessId) async {
+    try {
+      await _client.rpc('increment_views', params: {'business_id_param': businessId});
+    } catch (_) {
+      // Silently fail — RPC may not exist yet
+      try {
+        final current = await _client
+            .from('businesses')
+            .select('views')
+            .eq('id', businessId)
+            .maybeSingle();
+        if (current != null) {
+          final views = (current['views'] as num?)?.toInt() ?? 0;
+          await _client.from('businesses').update({'views': views + 1}).eq('id', businessId);
+        }
+      } catch (_) {}
+    }
   }
 }
 

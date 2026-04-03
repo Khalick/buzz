@@ -46,6 +46,11 @@ class AuthService {
     );
   }
 
+  /// Reset password
+  Future<void> resetPassword(String email) async {
+    await _client.auth.resetPasswordForEmail(email);
+  }
+
   /// Sign out
   Future<void> signOut() async {
     await _client.auth.signOut();
@@ -76,6 +81,29 @@ class AuthService {
       }
     } catch (e) {
       // Silently handle - RLS may prevent insert, profile page will retry
+    }
+  }
+
+  /// Check if user has completed onboarding (has display_name set)
+  Future<bool> hasCompletedOnboarding() async {
+    final user = currentUser;
+    if (user == null) return false;
+
+    try {
+      final data = await _client
+          .from('users')
+          .select('display_name, location')
+          .eq('id', user.id)
+          .maybeSingle();
+
+      if (data == null) return false;
+      // If display_name is still empty or matches email prefix, hasn't onboarded
+      final name = data['display_name'] as String?;
+      if (name == null || name.isEmpty) return false;
+      if (name == user.email?.split('@').first) return false;
+      return true;
+    } catch (_) {
+      return true; // Assume complete if we can't check
     }
   }
 }

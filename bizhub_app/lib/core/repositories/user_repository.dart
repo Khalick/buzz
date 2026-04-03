@@ -1,4 +1,6 @@
+import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/user_profile.dart';
 import '../services/supabase_service.dart';
 
@@ -32,6 +34,28 @@ class UserRepository {
       'bio': bio,
       'updated_at': DateTime.now().toIso8601String(),
     }).eq('id', userId);
+  }
+
+  /// Upload avatar to storage and update profile
+  Future<String?> uploadAvatar(String userId, XFile file) async {
+    try {
+      final bytes = await file.readAsBytes();
+      final ext = file.name.contains('.') ? '.${file.name.split('.').last}' : '.jpg';
+      final fileName = '$userId-${DateTime.now().millisecondsSinceEpoch}$ext';
+      final path = '$userId/$fileName';
+      
+      await _client.storage.from('images').uploadBinary(path, bytes);
+      final url = _client.storage.from('images').getPublicUrl(path);
+      
+      await _client.from('users').update({
+        'avatar_url': url,
+        'updated_at': DateTime.now().toIso8601String(),
+      }).eq('id', userId);
+      
+      return url;
+    } catch (e) {
+      return null;
+    }
   }
 
   /// Toggle a business in favorites

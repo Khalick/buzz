@@ -25,12 +25,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  String? _validateEmail(String email) {
+    if (email.isEmpty) return 'Email is required';
+    final emailRegex = RegExp(r'^[\w.-]+@[\w.-]+\.\w{2,}$');
+    if (!emailRegex.hasMatch(email)) return 'Please enter a valid email';
+    return null;
+  }
+
+  String? _validatePassword(String password) {
+    if (password.isEmpty) return 'Password is required';
+    if (password.length < 6) return 'Password must be at least 6 characters';
+    return null;
+  }
+
   Future<void> _handleSubmit() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
-      setState(() => _error = 'Please fill in all fields');
+    final emailError = _validateEmail(email);
+    if (emailError != null) {
+      setState(() => _error = emailError);
+      return;
+    }
+    final passwordError = _validatePassword(password);
+    if (passwordError != null) {
+      setState(() => _error = passwordError);
       return;
     }
 
@@ -51,6 +70,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           });
           return;
         }
+        // New sign-up — ensure DB record and go to onboarding
+        await authService.ensureUserRecord();
+        if (mounted) context.go('/onboarding');
+        return;
       } else {
         await authService.signInWithEmail(email, password);
       }
@@ -310,7 +333,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      if (!_isSignUp) ...[
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: GestureDetector(
+                            onTap: () => context.push('/forgot-password'),
+                            child: Text(
+                              'Forgot Password?',
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
 
                       // Submit Button
                       SizedBox(

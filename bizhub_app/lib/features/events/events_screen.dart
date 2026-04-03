@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/repositories/events_repository.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/shimmer_loading.dart';
@@ -66,7 +67,7 @@ class EventsScreen extends ConsumerWidget {
                         EmptyState(
                           icon: Icons.event_busy,
                           title: 'No Events Found',
-                          subtitle: 'There are no events matching your filter.',
+                          subtitle: 'Check back later for upcoming events in your area.',
                           buttonText: 'Browse Directory',
                           onButtonTap: () => context.push('/directory'),
                         ),
@@ -99,6 +100,19 @@ class EventsScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Event Image
+                            if (event.imageUrl != null)
+                              CachedNetworkImage(
+                                imageUrl: event.imageUrl!,
+                                height: 150,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                placeholder: (_, __) => Container(
+                                  height: 150, color: Colors.grey.shade200,
+                                  child: const Center(child: Icon(Icons.image, color: Colors.grey)),
+                                ),
+                                errorWidget: (_, __, ___) => const SizedBox.shrink(),
+                              ),
                             // Header Row (Date Block + Info)
                             Padding(
                               padding: const EdgeInsets.all(16.0),

@@ -8,6 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/repositories/business_repository.dart';
 import '../../core/repositories/user_repository.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/services/location_service.dart';
 import '../favorites/favorites_screen.dart';
 
 final businessDetailProvider = FutureProvider.family<Map<String, dynamic>, String>((ref, id) async {
@@ -39,6 +40,11 @@ class BusinessDetailScreen extends ConsumerWidget {
             return const Center(child: Text('Business not found.'));
           }
 
+          // Increment view count once
+          Future.microtask(() {
+            ref.read(businessRepositoryProvider).incrementViewCount(id);
+          });
+
           final reviews = data['reviews'] as List<dynamic>;
           final isFavorite = favoriteIdsAsync.value?.contains(business.id) ?? false;
           final isOpen = business.isOpen;
@@ -67,7 +73,7 @@ class BusinessDetailScreen extends ConsumerWidget {
                   IconButton(
                     icon: const Icon(Icons.share, color: Colors.white),
                     onPressed: () {
-                      Share.share('Check out ${business.name} on BizHub: https://thikabizhub.com/business/${business.id}');
+                      SharePlus.instance.share(ShareParams(text: 'Check out ${business.name} on BizHub: https://thikabizhub.com/business/${business.id}'));
                     },
                   ),
                 ],
@@ -75,21 +81,38 @@ class BusinessDetailScreen extends ConsumerWidget {
                   background: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Hero(
-                        tag: 'business_image_${business.id}',
-                        child: business.images.isNotEmpty
-                            ? CachedNetworkImage(
-                                imageUrl: business.images.first,
+                      // Image Gallery
+                      if (business.images.length > 1)
+                        Hero(
+                          tag: 'business_image_${business.id}',
+                          child: SizedBox(
+                            height: 250,
+                            child: PageView.builder(
+                              itemCount: business.images.length,
+                              itemBuilder: (context, index) => CachedNetworkImage(
+                                imageUrl: business.images[index],
                                 fit: BoxFit.cover,
-                                errorWidget: (context, url, err) => Container(color: Colors.grey.shade300),
-                              )
-                            : Container(
-                                color: theme.colorScheme.primary,
-                                child: const Center(
-                                  child: Icon(Icons.storefront, size: 80, color: Colors.white24),
-                                ),
+                                errorWidget: (_, __, ___) => Container(color: Colors.grey.shade300),
                               ),
-                      ),
+                            ),
+                          ),
+                        )
+                      else
+                        Hero(
+                          tag: 'business_image_${business.id}',
+                          child: business.images.isNotEmpty
+                              ? CachedNetworkImage(
+                                  imageUrl: business.images.first,
+                                  fit: BoxFit.cover,
+                                  errorWidget: (context, url, err) => Container(color: Colors.grey.shade300),
+                                )
+                              : Container(
+                                  color: theme.colorScheme.primary,
+                                  child: const Center(
+                                    child: Icon(Icons.storefront, size: 80, color: Colors.white24),
+                                  ),
+                                ),
+                        ),
                       // Gradient overlay for text readability
                       DecoratedBox(
                         decoration: BoxDecoration(
@@ -236,19 +259,60 @@ class BusinessDetailScreen extends ConsumerWidget {
                         const SizedBox(height: 24),
                       ],
 
+                      // Business Hours
+                      if (business.businessHours != null && business.businessHours!.isNotEmpty) ...[
+                        ExpansionTile(
+                          tilePadding: EdgeInsets.zero,
+                          title: Text('Business Hours', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                          initiallyExpanded: false,
+                          children: business.businessHours!.entries.map((entry) {
+                            final today = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'][DateTime.now().weekday - 1];
+                            final isToday = entry.key.toLowerCase() == today;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    entry.key[0].toUpperCase() + entry.key.substring(1),
+                                    style: TextStyle(
+                                      fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                                      color: isToday ? theme.colorScheme.primary : null,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${entry.value['open'] ?? '?'} - ${entry.value['close'] ?? '?'}',
+                                    style: TextStyle(
+                                      fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                                      color: isToday ? theme.colorScheme.primary : Colors.grey.shade700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+
                       // Reviews
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('Reviews', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                           TextButton(
-                            onPressed: () {
+                            onPressed: () async {
                               final user = ref.read(currentUserProvider);
                               if (user == null) {
                                 context.push('/login');
                                 return;
                               }
-                              // TODO: Navigate to add review screen
+                              final result = await context.push<bool>(
+                                '/business/${business.id}/review?name=${Uri.encodeComponent(business.name)}',
+                              );
+                              if (result == true) {
+                                ref.refresh(businessDetailProvider(id));
+                              }
                             },
                             child: const Text('Write a Review'),
                           )

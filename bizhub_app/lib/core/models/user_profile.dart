@@ -6,6 +6,7 @@ class UserProfile {
   final String? phone;
   final String? location;
   final String? bio;
+  final String? avatarUrl;
   final List<String> favorites;
   final String createdAt;
   final String? updatedAt;
@@ -18,6 +19,7 @@ class UserProfile {
     this.phone,
     this.location,
     this.bio,
+    this.avatarUrl,
     this.favorites = const [],
     required this.createdAt,
     this.updatedAt,
@@ -32,6 +34,7 @@ class UserProfile {
       phone: json['phone'] as String?,
       location: json['location'] as String?,
       bio: json['bio'] as String?,
+      avatarUrl: json['avatar_url'] as String?,
       favorites: (json['favorites'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??

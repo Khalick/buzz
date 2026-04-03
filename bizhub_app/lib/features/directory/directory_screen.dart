@@ -1,13 +1,18 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:bizhub_app/shared/widgets/business_card.dart';
-import 'package:bizhub_app/shared/widgets/shimmer_loading.dart';
-import 'package:bizhub_app/shared/widgets/empty_state.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/repositories/business_repository.dart';
 import '../../core/models/business.dart';
+import '../../core/services/location_service.dart';
+import '../../shared/widgets/business_card.dart';
+import '../../shared/widgets/empty_state.dart';
+import '../../shared/widgets/shimmer_loading.dart';
 
 class DirectoryScreen extends ConsumerStatefulWidget {
-  const DirectoryScreen({super.key});
+  final String? initialCategory;
+
+  const DirectoryScreen({super.key, this.initialCategory});
 
   @override
   ConsumerState<DirectoryScreen> createState() => _DirectoryScreenState();
@@ -15,69 +20,123 @@ class DirectoryScreen extends ConsumerStatefulWidget {
 
 class _DirectoryScreenState extends ConsumerState<DirectoryScreen> {
   final _searchController = TextEditingController();
-  
-  String _searchQuery = '';
-  String _selectedCategory = 'All Categories';
+  final _scrollController = ScrollController();
+  Timer? _debounce;
+  String? _selectedCategory;
   String _sortBy = 'newest';
-  int _page = 1;
-  static const int _limit = 12;
-
   List<Business> _businesses = [];
-  bool _isLoading = true;
+  bool _isLoading = false;
   bool _hasMore = true;
+  int _page = 1;
+  bool _initialLoad = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchBusinesses(refresh: true);
+    _selectedCategory = widget.initialCategory;
+    _scrollController.addListener(_onScroll);
+    _loadBusinesses();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
-  Future<void> _fetchBusinesses({bool refresh = false}) async {
-    if (refresh) {
-      setState(() {
-        _page = 1;
-        _isLoading = true;
-      });
+  void _onSearchChanged(String query) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      _resetAndLoad();
+    });
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      if (!_isLoading && _hasMore) {
+        _loadMoreBusinesses();
+      }
     }
+  }
+
+  void _resetAndLoad() {
+    setState(() {
+      _page = 1;
+      _businesses.clear();
+      _hasMore = true;
+    });
+    _loadBusinesses();
+  }
+
+  Future<void> _loadBusinesses() async {
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
 
     try {
       final repo = ref.read(businessRepositoryProvider);
-      final newBusinesses = await repo.getBusinesses(
-        search: _searchQuery,
+      final results = await repo.getBusinesses(
+        search: _searchController.text.trim().isNotEmpty
+            ? _searchController.text.trim()
+            : null,
         category: _selectedCategory,
         sortBy: _sortBy,
         page: _page,
-        limit: _limit,
       );
 
+      // Add distance info if user position available
+      final userPos = ref.read(userPositionProvider).value;
+
       setState(() {
-        if (refresh) {
-          _businesses = newBusinesses;
-        } else {
-          _businesses.addAll(newBusinesses);
-        }
-        _hasMore = newBusinesses.length == _limit;
+        _businesses = results;
+        _hasMore = results.length >= 12;
         _isLoading = false;
+        _initialLoad = false;
       });
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _hasMore = false;
+        _initialLoad = false;
       });
     }
   }
 
-  void _onSearchChanged(String query) {
-    if (_searchQuery != query) {
-      _searchQuery = query;
-      _fetchBusinesses(refresh: true);
+  Future<void> _loadMoreBusinesses() async {
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
+
+    try {
+      _page++;
+      final repo = ref.read(businessRepositoryProvider);
+      final results = await repo.getBusinesses(
+        search: _searchController.text.trim().isNotEmpty
+            ? _searchController.text.trim()
+            : null,
+        category: _selectedCategory,
+        sortBy: _sortBy,
+        page: _page,
+      );
+
+      setState(() {
+        _businesses.addAll(results);
+        _hasMore = results.length >= 12;
+        _isLoading = false;
+      });
+    } catch (e) {
+      _page--;
+      setState(() => _isLoading = false);
     }
+  }
+
+  double? _distanceForBusiness(Business b) {
+    final userPos = ref.read(userPositionProvider).value;
+    if (userPos == null || b.latitude == null || b.longitude == null) return null;
+    return LocationService.distanceKm(
+      userPos.latitude, userPos.longitude,
+      b.latitude!, b.longitude!,
+    );
   }
 
   @override
@@ -89,176 +148,200 @@ class _DirectoryScreenState extends ConsumerState<DirectoryScreen> {
       appBar: AppBar(
         title: const Text('Directory'),
         centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.map_outlined),
+            tooltip: 'Map View',
+            onPressed: () => context.push('/map'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add_business),
+            tooltip: 'Add Business',
+            onPressed: () => context.push('/directory/add'),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Search bar
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
             child: TextField(
               controller: _searchController,
               onChanged: _onSearchChanged,
               decoration: InputDecoration(
-                hintText: 'Search businesses, categories...',
+                hintText: 'Search businesses...',
                 prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchQuery.isNotEmpty
+                suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.close),
+                        icon: const Icon(Icons.clear),
                         onPressed: () {
                           _searchController.clear();
-                          _onSearchChanged('');
+                          _resetAndLoad();
                         },
                       )
                     : null,
                 filled: true,
-                fillColor: theme.colorScheme.surface,
+                fillColor: Colors.grey.shade50,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
               ),
             ),
           ),
-        ),
-      ),
-      body: Column(
-        children: [
-          // Filters Bar
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  // Sort Dropdown
-                  Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withAlpha(20),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _sortBy,
-                        icon: const Icon(Icons.sort, size: 16),
-                        style: TextStyle(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                        onChanged: (String? newValue) {
-                          if (newValue != null) {
-                            setState(() => _sortBy = newValue);
-                            _fetchBusinesses(refresh: true);
-                          }
-                        },
-                        items: const [
-                          DropdownMenuItem(value: 'newest', child: Text('Newest')),
-                          DropdownMenuItem(value: 'rating', child: Text('Top Rated')),
-                          DropdownMenuItem(value: 'trending', child: Text('Trending')),
-                          DropdownMenuItem(value: 'name', child: Text('A-Z')),
-                        ],
-                      ),
-                    ),
-                  ),
+          const SizedBox(height: 8),
 
-                  // Categories Filter
-                  categoriesAsync.when(
-                    data: (categories) {
-                      final allCategories = ['All Categories', ...categories];
-                      return Row(
-                        children: allCategories.map((cat) {
-                          final isSelected = _selectedCategory == cat;
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: FilterChip(
-                              label: Text(
-                                cat,
-                                style: TextStyle(
-                                  color: isSelected ? Colors.white : theme.colorScheme.onSurface,
-                                  fontSize: 12,
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                ),
-                              ),
-                              selected: isSelected,
-                              onSelected: (_) {
-                                setState(() => _selectedCategory = cat);
-                                _fetchBusinesses(refresh: true);
-                              },
-                              backgroundColor: theme.colorScheme.surface,
-                              selectedColor: theme.colorScheme.primary,
-                              checkmarkColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      );
+          // Category Chips
+          SizedBox(
+            height: 42,
+            child: categoriesAsync.when(
+              data: (categories) {
+                final allCategories = ['All Categories', ...categories];
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: allCategories.length,
+                  itemBuilder: (context, index) {
+                    final cat = allCategories[index];
+                    final selected = cat == (_selectedCategory ?? 'All Categories');
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: FilterChip(
+                        label: Text(cat),
+                        selected: selected,
+                        onSelected: (_) {
+                          setState(() {
+                            _selectedCategory = cat == 'All Categories' ? null : cat;
+                          });
+                          _resetAndLoad();
+                        },
+                        selectedColor: theme.colorScheme.primary.withAlpha(30),
+                        checkmarkColor: theme.colorScheme.primary,
+                        labelStyle: TextStyle(
+                          color: selected ? theme.colorScheme.primary : Colors.grey.shade700,
+                          fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                          fontSize: 13,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+            ),
+          ),
+
+          // Sort dropdown
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${_businesses.length} businesses',
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                ),
+                DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _sortBy,
+                    icon: const Icon(Icons.sort, size: 18),
+                    isDense: true,
+                    items: const [
+                      DropdownMenuItem(value: 'newest', child: Text('Newest', style: TextStyle(fontSize: 13))),
+                      DropdownMenuItem(value: 'rating', child: Text('Top Rated', style: TextStyle(fontSize: 13))),
+                      DropdownMenuItem(value: 'trending', child: Text('Trending', style: TextStyle(fontSize: 13))),
+                      DropdownMenuItem(value: 'name', child: Text('A-Z', style: TextStyle(fontSize: 13))),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) {
+                        setState(() => _sortBy = v);
+                        _resetAndLoad();
+                      }
                     },
-                    loading: () => const ShimmerLoading(width: 80, height: 32, borderRadius: 16),
-                    error: (_, __) => const SizedBox.shrink(),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
 
           // Business List
           Expanded(
-            child: RefreshIndicator(
-              onRefresh: () => _fetchBusinesses(refresh: true),
-              child: _isLoading
-                  ? ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: 4,
-                      itemBuilder: (context, index) => const BusinessCardSkeleton(),
-                    )
-                  : _businesses.isEmpty
-                      ? ListView(
-                          children: [
-                            SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-                            EmptyState(
-                              icon: Icons.search_off,
-                              title: 'No businesses found',
-                              subtitle: 'Try adjusting your search terms or filters',
-                              buttonText: 'Clear Filters',
-                              onButtonTap: () {
-                                _searchController.clear();
-                                setState(() {
-                                  _searchQuery = '';
-                                  _selectedCategory = 'All Categories';
-                                  _sortBy = 'newest';
-                                });
-                                _fetchBusinesses(refresh: true);
-                              },
-                            ),
-                          ],
-                        )
-                      : ListView.builder(
+            child: _initialLoad
+                ? ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: 3,
+                    itemBuilder: (_, __) => const BusinessCardSkeleton(),
+                  )
+                : _businesses.isEmpty
+                    ? ListView(
+                        children: [
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                          EmptyState(
+                            icon: Icons.search_off,
+                            title: 'No Businesses Found',
+                            subtitle: 'Try adjusting your search or filters.',
+                            buttonText: 'Clear Filters',
+                            onButtonTap: () {
+                              _searchController.clear();
+                              setState(() {
+                                _selectedCategory = null;
+                                _sortBy = 'newest';
+                              });
+                              _resetAndLoad();
+                            },
+                          ),
+                        ],
+                      )
+                    : RefreshIndicator(
+                        onRefresh: () async => _resetAndLoad(),
+                        child: ListView.builder(
+                          controller: _scrollController,
                           padding: const EdgeInsets.all(16),
                           itemCount: _businesses.length + (_hasMore ? 1 : 0),
                           itemBuilder: (context, index) {
                             if (index == _businesses.length) {
-                              // Reached end, fetch more
-                              if (!_isLoading) {
-                                Future.microtask(() {
-                                  setState(() => _page++);
-                                  _fetchBusinesses(refresh: false);
-                                });
-                              }
-                              return const Center(
-                                child: Padding(
-                                  padding: EdgeInsets.all(16.0),
-                                  child: CircularProgressIndicator(),
-                                ),
+                              return const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Center(child: CircularProgressIndicator()),
                               );
                             }
-                            return BusinessCardWidget(business: _businesses[index]);
+
+                            final business = _businesses[index];
+                            final distance = _distanceForBusiness(business);
+
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                BusinessCardWidget(business: business),
+                                if (distance != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 16, bottom: 8),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.navigation, size: 14, color: theme.colorScheme.primary),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          LocationService.formatDistance(distance),
+                                          style: TextStyle(
+                                            color: theme.colorScheme.primary,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          ' away',
+                                          style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            );
                           },
                         ),
-            ),
+                      ),
           ),
         ],
       ),
