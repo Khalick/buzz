@@ -4,6 +4,16 @@ import 'supabase_service.dart';
 class AuthService {
   final SupabaseClient _client = SupabaseService.client;
 
+  AuthService() {
+    _client.auth.onAuthStateChange.listen((data) {
+      if (data.event == AuthChangeEvent.signedIn || data.event == AuthChangeEvent.initialSession) {
+        if (currentUser != null) {
+          ensureUserRecord();
+        }
+      }
+    });
+  }
+
   /// Current authenticated user (null if not signed in)
   User? get currentUser => _client.auth.currentUser;
 
