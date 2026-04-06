@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Download Flutter SDK if missing
-if [ ! -d "flutter" ]; then
+if [ ! -f "flutter/bin/flutter" ]; then
+    rm -rf flutter
     git clone https://github.com/flutter/flutter.git -b stable
 fi
 
