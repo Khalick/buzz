@@ -108,13 +108,97 @@ class BusinessRepository {
     }
   }
 
-  /// Fetch reviews for a business
+  /// Get user's submitted businesses (basic)
+  Future<List<Map<String, dynamic>>> getUserBusinesses(String userId) async {
+    final data = await _client
+        .from('businesses')
+        .select('id, name, approved, created_at')
+        .eq('submitted_by', userId)
+        .order('created_at', ascending: false);
+
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  /// Get owner's businesses with full stats (views, rating, review_count)
+  Future<List<Map<String, dynamic>>> getUserBusinessesWithStats(String userId) async {
+    final data = await _client
+        .from('businesses')
+        .select('id, name, category, approved, views, rating, review_count, images, is_premium, owner_id, submitted_by, location')
+        .or('submitted_by.eq.$userId,owner_id.eq.$userId')
+        .order('created_at', ascending: false);
+
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  /// Simple public reviews (for business detail page)
   Future<List<Map<String, dynamic>>> getReviews(String businessId) async {
     final data = await _client
         .from('reviews')
-        .select()
+        .select('id, rating, comment, content, created_at, user_id, user_name')
         .eq('business_id', businessId)
         .order('created_at', ascending: false);
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  /// Get reviews for a business, enriched with user names + owner response
+  Future<List<Map<String, dynamic>>> getReviewsWithOwnerInfo(String businessId) async {
+    final data = await _client
+        .from('reviews')
+        .select('id, rating, comment, created_at, user_id, response, response_at')
+        .eq('business_id', businessId)
+        .order('created_at', ascending: false);
+
+    final result = List<Map<String, dynamic>>.from(data);
+    for (int i = 0; i < result.length; i++) {
+      final userId = result[i]['user_id'];
+      String userName = 'Anonymous';
+      if (userId != null) {
+        try {
+          final u = await _client
+              .from('users')
+              .select('display_name, email')
+              .eq('id', userId)
+              .maybeSingle();
+          if (u != null) {
+            userName = u['display_name'] as String? ??
+                (u['email'] as String?)?.split('@').first ??
+                'Anonymous';
+          }
+        } catch (_) {}
+      }
+      result[i] = {...result[i], 'user_name': userName};
+    }
+    return result;
+  }
+
+  /// Owner responds to a review
+  Future<void> respondToReview({
+    required String reviewId,
+    required String response,
+  }) async {
+    await _client.from('reviews').update({
+      'response': response,
+      'response_at': DateTime.now().toIso8601String(),
+    }).eq('id', reviewId);
+  }
+
+  /// Full business update (edit page)
+  Future<void> updateBusiness({
+    required String businessId,
+    required Map<String, dynamic> data,
+  }) async {
+    await _client.from('businesses').update(data).eq('id', businessId);
+  }
+
+  /// Fetch top promoters for a list of business names
+  Future<List<Map<String, dynamic>>> getPromoters(List<String> businessNames) async {
+    if (businessNames.isEmpty) return [];
+    final data = await _client
+        .from('proofs')
+        .select('id, name, business_name, image_url, referral_views, created_at')
+        .inFilter('business_name', businessNames)
+        .gt('referral_views', 0)
+        .order('referral_views', ascending: false);
 
     return List<Map<String, dynamic>>.from(data);
   }

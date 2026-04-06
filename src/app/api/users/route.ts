@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { createErrorResponse } from '@/lib/validation';
 
 // Helper function to verify the token and check for admin role
 async function verifyTokenAndAdmin(req: NextRequest) {
@@ -60,7 +61,6 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json(formattedUsers, { status: 200 });
     } catch (error) {
-        console.error('Error listing users:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        return createErrorResponse(error, 'Internal Server Error');
     }
 }

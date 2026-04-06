@@ -18,6 +18,16 @@ import '../../features/business_detail/business_detail_screen.dart';
 import '../../features/business_detail/add_review_screen.dart';
 import '../../features/dashboard/dashboard_screen.dart';
 import '../../features/dashboard/manage_deals_screen.dart';
+import '../../features/dashboard/edit_business_screen.dart';
+import '../../features/dashboard/reviews_dashboard_screen.dart';
+import '../../features/dashboard/insights_screen.dart';
+import '../../features/dashboard/leads_inbox_screen.dart';
+import '../../features/dashboard/partnerships_screen.dart';
+import '../../features/dashboard/top_promoters_screen.dart';
+import '../../features/requests/broadcast_request_screen.dart';
+import '../../features/invitations/invitations_screen.dart';
+import '../../features/admin/analytics_screen.dart';
+import '../../features/admin/competitor_insights_screen.dart';
 import '../../features/proof/proof_of_visit_screen.dart';
 import '../services/supabase_service.dart';
 
@@ -128,6 +138,58 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/proof-of-visit',
         builder: (context, state) => const ProofOfVisitScreen(),
+      ),
+      // --- New Feature Routes ---
+      GoRoute(
+        path: '/dashboard/edit/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return EditBusinessScreen(businessId: id);
+        },
+      ),
+      GoRoute(
+        path: '/dashboard/reviews/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final name = state.uri.queryParameters['name'] ?? 'Business';
+          return ReviewsDashboardScreen(businessId: id, businessName: name);
+        },
+      ),
+      GoRoute(
+        path: '/dashboard/insights/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final name = state.uri.queryParameters['name'] ?? 'Business';
+          return InsightsScreen(businessId: id, businessName: name);
+        },
+      ),
+      GoRoute(
+        path: '/dashboard/leads',
+        builder: (context, state) => const LeadsInboxScreen(),
+      ),
+      GoRoute(
+        path: '/dashboard/partnerships',
+        builder: (context, state) => const PartnershipsScreen(),
+      ),
+      GoRoute(
+        path: '/dashboard/promoters',
+        builder: (context, state) => const TopPromotersScreen(),
+      ),
+      GoRoute(
+        path: '/requests/new',
+        builder: (context, state) => const BroadcastRequestScreen(),
+      ),
+      GoRoute(
+        path: '/invitations',
+        builder: (context, state) => const InvitationsScreen(),
+      ),
+      GoRoute(
+        path: '/admin/analytics',
+        builder: (context, state) => const AnalyticsScreen(),
+      ),
+      GoRoute(
+        path: '/admin/insights',
+        builder: (context, state) => const CompetitorInsightsScreen(),
       ),
     ],
   );

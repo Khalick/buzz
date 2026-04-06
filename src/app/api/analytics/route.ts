@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { cache } from '@/lib/cache';
+import { createErrorResponse } from '@/lib/validation';
 
 
 export async function GET(request: NextRequest) {
@@ -137,10 +138,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(analytics);
 
   } catch (error) {
-    console.error('Error fetching analytics:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch analytics' },
-      { status: 500 }
-    );
+    return createErrorResponse(error, 'Failed to fetch analytics');
   }
 }

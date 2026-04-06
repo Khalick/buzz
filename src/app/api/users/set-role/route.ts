@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { 
+  validateUuid, 
+  validateText, 
+  validateOrigin, 
+  createErrorResponse 
+} from '@/lib/validation';
 
 // Helper function to verify the token and check for admin role
 async function verifyTokenAndAdmin(req: NextRequest) {
@@ -35,18 +41,32 @@ async function verifyTokenAndAdmin(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-    const { error, status } = await verifyTokenAndAdmin(req);
-    if (error) {
-        return NextResponse.json({ error }, { status });
-    }
-
-    const { uid, role } = await req.json();
-
-    if (!uid || !role) {
-        return NextResponse.json({ error: 'Bad Request: Missing uid or role' }, { status: 400 });
-    }
-
     try {
+        const origin = req.headers.get('origin');
+        const referer = req.headers.get('referer');
+        if (!validateOrigin(origin, referer)) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+
+        const { error, status } = await verifyTokenAndAdmin(req);
+        if (error) {
+            return NextResponse.json({ error }, { status });
+        }
+
+        let body: Record<string, unknown>;
+        try {
+            body = await req.json();
+        } catch {
+            return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+        }
+
+        if (!body.uid || !body.role) {
+            return NextResponse.json({ error: 'Bad Request: Missing uid or role' }, { status: 400 });
+        }
+
+        const uid = validateUuid(body.uid, 'uid');
+        const role = validateText(body.role, 'role', { maxLength: 20 });
+
         const supabaseAdmin = getSupabaseAdmin();
         const { error: updateError } = await supabaseAdmin
             .from('users')
@@ -57,7 +77,6 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ message: `Successfully set role '${role}' for user ${uid}` }, { status: 200 });
     } catch (error) {
-        console.error('Error setting role:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        return createErrorResponse(error, 'Internal Server Error');
     }
 }

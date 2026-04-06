@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { validateUuid, createErrorResponse } from '@/lib/validation';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const businessId = searchParams.get('businessId');
+    const rawBusinessId = searchParams.get('businessId');
 
-    if (!businessId) {
+    if (!rawBusinessId) {
       return NextResponse.json({ error: 'Business ID is required' }, { status: 400 });
     }
+    const businessId = validateUuid(rawBusinessId, 'businessId');
 
     const openaiKey = process.env.OPENAI_API_KEY;
     if (!openaiKey) {
@@ -85,12 +87,10 @@ Ensure the output is pure JSON without markdown code blocks or extra text.`
         tags: result.tags || [],
       });
     } catch (parseError) {
-      console.error('Failed to parse AI response:', rawContent);
-       return NextResponse.json({ error: 'Failed to process AI summary' }, { status: 500 });
+      return createErrorResponse(parseError, 'Failed to process AI summary', 500);
     }
 
   } catch (error) {
-    console.error('AI summary error:', error);
-    return NextResponse.json({ error: 'Failed to process AI summary' }, { status: 500 });
+    return createErrorResponse(error, 'Failed to process AI summary');
   }
 }

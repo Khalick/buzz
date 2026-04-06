@@ -1,14 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { 
+  validateUuid, 
+  validateEmail, 
+  validateText, 
+  validateOrigin, 
+  createErrorResponse 
+} from '@/lib/validation';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const rawUserId = searchParams.get('userId');
 
-    if (!userId) {
+    if (!rawUserId) {
       return NextResponse.json({ error: 'User ID required' }, { status: 400 });
     }
+    const userId = validateUuid(rawUserId, 'userId');
 
     // Attempt to fetch alerts from the database. 
     // Usually there would be an 'alerts' table, but as a simulated feature,
@@ -29,19 +37,35 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ alerts: alerts || [] });
   } catch (err) {
-    console.error('Error fetching alerts:', err);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return createErrorResponse(err, 'Internal Server Error');
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { userId, type, category, county, searchQuery, email } = body;
+    const origin = request.headers.get('origin');
+    const referer = request.headers.get('referer');
+    if (!validateOrigin(origin, referer)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-    if (!userId || !email) {
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+
+    if (!body.userId || !body.email) {
       return NextResponse.json({ error: 'User ID and Email are required' }, { status: 400 });
     }
+
+    const userId = validateUuid(body.userId, 'userId');
+    const email = validateEmail(body.email, 'email');
+    const type = body.type ? validateText(body.type, 'type', { maxLength: 50 }) : 'new_business';
+    const category = body.category ? validateText(body.category, 'category', { maxLength: 100, required: false }) : null;
+    const county = body.county ? validateText(body.county, 'county', { maxLength: 100, required: false }) : null;
+    const searchQuery = body.searchQuery ? validateText(body.searchQuery, 'searchQuery', { maxLength: 200, required: false }) : null;
 
     const supabaseAdmin = getSupabaseAdmin();
     
@@ -67,19 +91,25 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Alert created successfully' }, { status: 201 });
   } catch (err) {
-    console.error('Error creating alert:', err);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return createErrorResponse(err, 'Internal Server Error');
   }
 }
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const alertId = searchParams.get('id');
+    const origin = request.headers.get('origin');
+    const referer = request.headers.get('referer');
+    if (!validateOrigin(origin, referer)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-    if (!alertId) {
+    const { searchParams } = new URL(request.url);
+    const rawAlertId = searchParams.get('id');
+
+    if (!rawAlertId) {
       return NextResponse.json({ error: 'Alert ID required' }, { status: 400 });
     }
+    const alertId = validateUuid(rawAlertId, 'alertId');
 
     const supabaseAdmin = getSupabaseAdmin();
     const { error } = await supabaseAdmin
@@ -93,7 +123,6 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Alert deleted successfully' });
   } catch (err) {
-    console.error('Error deleting alert:', err);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return createErrorResponse(err, 'Internal Server Error');
   }
 }

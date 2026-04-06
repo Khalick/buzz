@@ -1,15 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import {
+  validateUuid,
+  validateRating,
+  validateText,
+  validateOrigin,
+  createErrorResponse
+} from '@/lib/validation';
 
 export async function GET(request: NextRequest) {
   try {
     const supabaseAdmin = getSupabaseAdmin();
     const { searchParams } = new URL(request.url);
-    const businessId = searchParams.get('businessId');
+    const rawBusinessId = searchParams.get('businessId');
 
-    if (!businessId) {
+    if (!rawBusinessId) {
       return NextResponse.json({ error: 'Business ID required' }, { status: 400 });
     }
+    
+    const businessId = validateUuid(rawBusinessId, 'businessId');
 
     const { data: reviews, error } = await supabaseAdmin
       .from('reviews')
@@ -53,13 +62,18 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Error fetching reviews:', error);
-    return NextResponse.json({ error: 'Failed to fetch reviews' }, { status: 500 });
+    return createErrorResponse(error, 'Failed to fetch reviews');
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
+    const origin = request.headers.get('origin');
+    const referer = request.headers.get('referer');
+    if (!validateOrigin(origin, referer)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const supabaseAdmin = getSupabaseAdmin();
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
@@ -73,16 +87,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { businessId, rating, comment } = body;
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
-    if (!businessId || !rating) {
+    if (!body.businessId || !body.rating) {
       return NextResponse.json({ error: 'Business ID and rating required' }, { status: 400 });
     }
 
-    if (rating < 1 || rating > 5) {
-      return NextResponse.json({ error: 'Rating must be between 1 and 5' }, { status: 400 });
-    }
+    const businessId = validateUuid(body.businessId, 'businessId');
+    const rating = validateRating(body.rating);
+    const comment = body.comment ? validateText(body.comment, 'comment', { maxLength: 1000, required: false }) : '';
 
     // Check if user already reviewed this business
     const { data: existingReview } = await supabaseAdmin
@@ -134,13 +152,18 @@ export async function POST(request: NextRequest) {
       averageRating: averageRating.toFixed(1)
     });
   } catch (error) {
-    console.error('Error creating review:', error);
-    return NextResponse.json({ error: 'Failed to create review' }, { status: 500 });
+    return createErrorResponse(error, 'Failed to create review');
   }
 }
 
 export async function DELETE(request: NextRequest) {
   try {
+    const origin = request.headers.get('origin');
+    const referer = request.headers.get('referer');
+    if (!validateOrigin(origin, referer)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const supabaseAdmin = getSupabaseAdmin();
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
@@ -155,12 +178,15 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const reviewId = searchParams.get('reviewId');
-    const businessId = searchParams.get('businessId');
+    const rawReviewId = searchParams.get('reviewId');
+    const rawBusinessId = searchParams.get('businessId');
 
-    if (!reviewId || !businessId) {
+    if (!rawReviewId || !rawBusinessId) {
       return NextResponse.json({ error: 'Review ID and Business ID required' }, { status: 400 });
     }
+
+    const reviewId = validateUuid(rawReviewId, 'reviewId');
+    const businessId = validateUuid(rawBusinessId, 'businessId');
 
     // Verify the review belongs to the user
     const { data: review } = await supabaseAdmin
@@ -200,7 +226,6 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting review:', error);
-    return NextResponse.json({ error: 'Failed to delete review' }, { status: 500 });
+    return createErrorResponse(error, 'Failed to delete review');
   }
 }

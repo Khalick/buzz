@@ -1,6 +1,12 @@
 import { getURL } from '@/lib/utils';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { 
+  validateEmail, 
+  validateText, 
+  validateOrigin, 
+  createErrorResponse 
+} from '@/lib/validation';
 
 
 
@@ -53,26 +59,40 @@ export async function GET(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error getting invites:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return createErrorResponse(error, 'Internal Server Error');
   }
 }
 
 // POST - Send an invite
 export async function POST(req: NextRequest) {
+  try {
+    const origin = req.headers.get('origin');
+    const referer = req.headers.get('referer');
+    if (!validateOrigin(origin, referer)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
   const authorization = req.headers.get('Authorization');
   if (!authorization?.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized: No token provided' }, { status: 401 });
   }
   const token = authorization.split('Bearer ')[1];
 
-  try {
     const supabaseAdmin = getSupabaseAdmin();
-    const { email, type, message, businessName } = await req.json();
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
-    if (!email || !type) {
+    if (!body.email || !body.type) {
       return NextResponse.json({ error: 'Email and type are required' }, { status: 400 });
     }
+
+    const email = validateEmail(body.email, 'email');
+    const type = validateText(body.type, 'type', { maxLength: 50 });
+    const message = body.message ? validateText(body.message, 'message', { maxLength: 500, required: false }) : '';
+    const businessName = body.businessName ? validateText(body.businessName, 'businessName', { maxLength: 100, required: false }) : '';
 
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
     if (authError || !user) {
@@ -134,7 +154,6 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error sending invite:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return createErrorResponse(error, 'Internal Server Error');
   }
 }

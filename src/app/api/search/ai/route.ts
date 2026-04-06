@@ -1,13 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { validateOrigin, validateText, createErrorResponse } from '@/lib/validation';
 
 export async function POST(request: NextRequest) {
   try {
-    const { query } = await request.json();
+    const origin = request.headers.get('origin');
+    const referer = request.headers.get('referer');
+    if (!validateOrigin(origin, referer)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-    if (!query || typeof query !== 'string') {
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+
+    if (!body.query) {
       return NextResponse.json({ error: 'Query is required' }, { status: 400 });
     }
+    const query = validateText(body.query, 'query', { maxLength: 300 });
 
     const openaiKey = process.env.OPENAI_API_KEY;
     if (!openaiKey) {
@@ -89,7 +102,6 @@ Rules:
       mentionedBusinesses,
     });
   } catch (error) {
-    console.error('AI search error:', error);
-    return NextResponse.json({ error: 'Failed to process AI search' }, { status: 500 });
+    return createErrorResponse(error, 'Failed to process AI search');
   }
 }

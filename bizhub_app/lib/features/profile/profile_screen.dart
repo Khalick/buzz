@@ -261,6 +261,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       _buildQuickAction(Icons.dashboard, 'Dashboard', () => context.push('/dashboard'), theme),
                       _buildQuickAction(Icons.verified, 'Proof of Visit', () => context.push('/proof-of-visit'), theme),
                       _buildQuickAction(Icons.favorite, 'Favorites', () => context.push('/favorites'), theme),
+                      _buildQuickAction(Icons.mail_outline, 'Invitations', () => context.push('/invitations'), theme),
+                      _buildQuickAction(Icons.broadcast_on_personal, 'Request a Service', () => context.push('/requests/new'), theme),
                     ],
                   ),
                   const SizedBox(height: 24),

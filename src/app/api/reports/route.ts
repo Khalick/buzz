@@ -1,8 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { 
+  validateUuid, 
+  validateText, 
+  validateOrigin, 
+  createErrorResponse 
+} from '@/lib/validation';
 
 export async function POST(request: NextRequest) {
   try {
+    const origin = request.headers.get('origin');
+    const referer = request.headers.get('referer');
+    if (!validateOrigin(origin, referer)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const supabaseAdmin = getSupabaseAdmin();
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
@@ -16,12 +28,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { businessId, reason, description } = body;
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
-    if (!businessId || !reason) {
+    if (!body.businessId || !body.reason) {
       return NextResponse.json({ error: 'Business ID and reason required' }, { status: 400 });
     }
+
+    const businessId = validateUuid(body.businessId, 'businessId');
+    const reason = validateText(body.reason, 'reason', { maxLength: 100 });
+    const description = body.description ? validateText(body.description, 'description', { maxLength: 1500, required: false }) : '';
 
     const reportData = {
       business_id: businessId,
@@ -41,7 +61,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Report submitted successfully' });
   } catch (error) {
-    console.error('Error submitting report:', error);
-    return NextResponse.json({ error: 'Failed to submit report' }, { status: 500 });
+    return createErrorResponse(error, 'Failed to submit report');
   }
 }

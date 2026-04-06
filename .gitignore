@@ -50,3 +50,4 @@ next-env.d.ts
 
 # Cache
 .cache/
+tools/jdk17.tar.gz

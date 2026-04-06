@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { 
+  validateText, 
+  validateOrigin, 
+  createErrorResponse 
+} from '@/lib/validation';
 
 // GET - Get invite details by code
 export async function GET(req: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   try {
     const supabaseAdmin = getSupabaseAdmin();
-    const { code } = await params;
+    const rawCode = (await params).code;
+    const code = validateText(rawCode, 'code', { maxLength: 50 });
 
     // Find invite by code
     const { data: invite, error } = await supabaseAdmin
@@ -45,22 +51,28 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
     });
 
   } catch (error) {
-    console.error('Error getting invite:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return createErrorResponse(error, 'Internal Server Error');
   }
 }
 
 // POST - Accept invite
 export async function POST(req: NextRequest, { params }: { params: Promise<{ code: string }> }) {
-  const authorization = req.headers.get('Authorization');
-  if (!authorization?.startsWith('Bearer ')) {
-    return NextResponse.json({ error: 'Unauthorized: No token provided' }, { status: 401 });
-  }
-  const token = authorization.split('Bearer ')[1];
-
   try {
+    const origin = req.headers.get('origin');
+    const referer = req.headers.get('referer');
+    if (!validateOrigin(origin, referer)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const authorization = req.headers.get('Authorization');
+    if (!authorization?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized: No token provided' }, { status: 401 });
+    }
+    const token = authorization.split('Bearer ')[1];
+
     const supabaseAdmin = getSupabaseAdmin();
-    const { code } = await params;
+    const rawCode = (await params).code;
+    const code = validateText(rawCode, 'code', { maxLength: 50 });
 
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
     if (authError || !user) {
@@ -155,7 +167,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ cod
     });
 
   } catch (error) {
-    console.error('Error accepting invite:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return createErrorResponse(error, 'Internal Server Error');
   }
 }

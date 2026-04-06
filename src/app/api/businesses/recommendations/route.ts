@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { createErrorResponse } from '@/lib/validation';
 
 export async function GET() {
   try {
@@ -45,10 +46,6 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('Error in recommendations API:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch recommendations' },
-      { status: 500 }
-    );
+    return createErrorResponse(error, 'Failed to fetch recommendations');
   }
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { createErrorResponse } from '@/lib/validation';
 
 
 
@@ -90,7 +91,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ categoryStats });
   } catch (error) {
-    console.error('Error fetching insights:', error);
-    return NextResponse.json({ error: 'Failed to fetch insights' }, { status: 500 });
+    return createErrorResponse(error, 'Failed to fetch insights');
   }
 }
