@@ -31,7 +31,7 @@ SCRIPT = [
     # 11. Competition
     "Our competitive advantage is distinct and defensible. While giants like Google and Facebook exist, absolutely no platform combines AI search, physical business verification, and hyperlocal network effects like BizHub does.",
     # 12. Team
-    "Behind BizHub is a team that intimately understands both the technology and the streets. Founded by Peter Agak, the Lead Architect, alongside Mike, our Technical Co-Founder driving operations and tech-enabled market expansion.",
+    "Behind BizHub is a founder who intimately understands both the technology and the streets. Peter Agak, the Lead Architect, single-handedly designs and deploys the entire platform, from AI search to physical verification workflows.",
     # 13. Roadmap & Ask
     "We are raising five hundred thousand dollars in our pre-seed round to dominate ten key towns in the next twelve months. Join us as we build the digital infrastructure for Africa's local commerce. Thank you."
 ]
