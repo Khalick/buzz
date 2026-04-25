@@ -31,19 +31,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        checkAdminRole(session.user.id);
-      } else {
+    let isMounted = true;
+
+    // Safety timeout — if Supabase doesn't respond in 5 seconds, show login
+    const timeout = setTimeout(() => {
+      if (isMounted && loading) {
         setLoading(false);
       }
-    });
+    }, 5000);
 
-    // Listen for auth changes
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        if (!isMounted) return;
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          checkAdminRole(session.user.id);
+        } else {
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        // Supabase unreachable or misconfigured — show login page
+        if (isMounted) setLoading(false);
+      });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) return;
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -54,7 +68,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   async function checkAdminRole(userId: string) {
@@ -71,8 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setIsAdmin(data?.role === 'admin');
       }
-    } catch (err) {
-      console.error('Failed to verify admin status:', err);
+    } catch {
       setIsAdmin(false);
     } finally {
       setLoading(false);
@@ -81,11 +98,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function signIn(email: string, password: string) {
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) return { error: error.message };
+
+      // After sign-in, verify admin role
+      if (data.user) {
+        await checkAdminRole(data.user.id);
+      }
       return { error: null };
-    } catch (err) {
-      return { error: 'An unexpected error occurred.' };
+    } catch {
+      return { error: 'Could not connect to the server. Please try again.' };
     }
   }
 
