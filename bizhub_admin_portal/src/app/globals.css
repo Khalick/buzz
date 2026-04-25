@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --color-bizhub-dark: #0D1F16;
+  --color-bizhub-primary: #1B4332;
+  --color-bizhub-secondary: #2D6A4F;
+  --color-bizhub-gold: #D4AF37;
+  --color-bizhub-white: #F0FDF4;
+  --color-bizhub-text: #E0E0E0;
+}
+
+@layer base {
+  :root {
+    --background: #0D1F16;
+    --foreground: #E0E0E0;
+    --card: #1B4332;
+    --card-foreground: #E0E0E0;
+    --popover: #1B4332;
+    --popover-foreground: #E0E0E0;
+    --primary: #D4AF37;
+    --primary-foreground: #0D1F16;
+    --secondary: #2D6A4F;
+    --secondary-foreground: #E0E0E0;
+    --muted: #2D6A4F;
+    --muted-foreground: #A0A0A0;
+    --accent: #D4AF37;
+    --accent-foreground: #0D1F16;
+    --destructive: #ef4444;
+    --destructive-foreground: #FAFAF8;
+    --border: rgba(212, 175, 55, 0.2);
+    --input: rgba(212, 175, 55, 0.2);
+    --ring: #D4AF37;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    border-color: rgba(212, 175, 55, 0.2);
+  }
+  body {
+    color: #E0E0E0;
+    background: linear-gradient(135deg, #0D1F16 0%, #11281c 100%);
+    min-height: 100vh;
+  }
+}
+
+.glass-panel {
+  background: rgba(27, 67, 50, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
