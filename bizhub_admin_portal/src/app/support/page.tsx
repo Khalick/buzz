@@ -1,13 +1,40 @@
 "use client";
 
-import { LifeBuoy, Search, Filter } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { LifeBuoy, Search, Filter, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+
+interface Ticket {
+  id: string;
+  merchant: string;
+  issue: string;
+  priority: string;
+  status: string;
+  date: string;
+  created_at?: string;
+}
 
 export default function SupportCRMPage() {
-  const tickets = [
-    { id: 'TKT-992', merchant: 'Mama Ciku Hardware', issue: 'Flash Deal Refund request', priority: 'High', status: 'Open', date: '2 hrs ago' },
-    { id: 'TKT-991', merchant: 'Nairobi Spares', issue: 'Location pin is wrong', priority: 'Medium', status: 'Open', date: '5 hrs ago' },
-    { id: 'TKT-990', merchant: 'Thika Electricals', issue: 'Cannot upload logo', priority: 'Low', status: 'Resolved', date: 'Yesterday' },
-  ];
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchTickets() {
+      try {
+        const { data, error } = await supabase
+          .from('support_tickets')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        setTickets(data || []);
+      } catch (err) {
+        console.error('Failed to fetch support tickets:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchTickets();
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -37,11 +64,23 @@ export default function SupportCRMPage() {
             </tr>
           </thead>
           <tbody>
-            {tickets.map((tkt, i) => (
-              <tr key={i} className="border-b border-white/5 hover:bg-white/5 cursor-pointer">
+            {loading ? (
+              <tr>
+                <td colSpan={4} className="px-6 py-12 text-center">
+                  <Loader2 size={24} className="animate-spin text-[#D4AF37] mx-auto" />
+                </td>
+              </tr>
+            ) : tickets.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="px-6 py-12 text-center text-[#E0E0E0]/50">
+                  No support tickets open.
+                </td>
+              </tr>
+            ) : tickets.map((tkt, i) => (
+              <tr key={tkt.id || i} className="border-b border-white/5 hover:bg-white/5 cursor-pointer">
                 <td className="px-6 py-4">
                   <div className="font-mono text-xs text-[#D4AF37] font-bold">{tkt.id}</div>
-                  <div className="text-xs text-[#E0E0E0]/60 mt-1">{tkt.date}</div>
+                  <div className="text-xs text-[#E0E0E0]/60 mt-1">{tkt.created_at ? new Date(tkt.created_at).toLocaleString() : tkt.date}</div>
                 </td>
                 <td className="px-6 py-4">
                   <div className="font-bold text-white text-base">{tkt.issue}</div>

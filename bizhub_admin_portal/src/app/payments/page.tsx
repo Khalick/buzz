@@ -1,29 +1,64 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Loader2, ArrowUpRight, ArrowDownLeft, ShieldCheck, DollarSign } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+
+interface Transaction {
+  id: string;
+  type: string;
+  plan: string;
+  amount: number;
+  phone: string;
+  date: string;
+  created_at?: string;
+  status: string;
+  name: string;
+}
 
 export default function PaymentsLedgerPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  
-  // Hardcoded realistic data for the M-Pesa Ledger since the Daraja integration table might not be fully spec'd yet
-  const [transactions, setTransactions] = useState([
-    { id: 'TRX-RG81KJL9A', type: 'subscription', plan: 'Premium', amount: 5000, phone: '254712***890', date: '2025-10-15T09:30:00Z', status: 'success', name: 'James Kariuki' },
-    { id: 'TRX-RG81KXM2P', type: 'boost', plan: 'Flash Deal Boost', amount: 500, phone: '254722***444', date: '2025-10-15T10:15:00Z', status: 'success', name: 'Mama Ciku Salon' },
-    { id: 'TRX-RG81KYZ77', type: 'subscription', plan: 'Premium', amount: 5000, phone: '254799***111', date: '2025-10-14T14:20:00Z', status: 'failed', name: 'AutoSpares Ltd' },
-    { id: 'TRX-RG81KZ001', type: 'lead', plan: 'B2B Lead Match', amount: 200, phone: '254744***222', date: '2025-10-14T16:45:00Z', status: 'success', name: 'Thika Electricals' },
-  ]);
-
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loadingCode, setLoadingCode] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleForceApprove = (id: string) => {
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  async function fetchTransactions() {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('mpesa_ledger')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setTransactions(data || []);
+    } catch (err) {
+      console.error('Failed to load transactions:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleForceApprove = async (id: string) => {
     setLoadingCode(id);
-    setTimeout(() => {
+    try {
+      const { error } = await supabase
+        .from('mpesa_ledger')
+        .update({ status: 'success' })
+        .eq('id', id);
+        
+      if (error) throw error;
       setTransactions(prev => prev.map(t => 
         t.id === id ? { ...t, status: 'success' } : t
       ));
+    } catch (err) {
+      console.error('Failed to override status:', err);
+    } finally {
       setLoadingCode(null);
-    }, 1000);
+    }
   };
 
   return (
@@ -95,7 +130,19 @@ export default function PaymentsLedgerPage() {
             </tr>
           </thead>
           <tbody>
-            {transactions.map(trx => (
+            {loading ? (
+              <tr>
+                <td colSpan={6} className="px-6 py-12 text-center">
+                  <Loader2 size={24} className="animate-spin text-[#D4AF37] mx-auto" />
+                </td>
+              </tr>
+            ) : transactions.filter(t => t.id.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-6 py-12 text-center text-[#E0E0E0]/50">
+                  No transactions found.
+                </td>
+              </tr>
+            ) : transactions.filter(t => t.id.toLowerCase().includes(searchTerm.toLowerCase())).map(trx => (
               <tr key={trx.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                 <td className="px-6 py-4 font-mono text-xs tracking-wider text-[#D4AF37]">{trx.id}</td>
                 <td className="px-6 py-4">

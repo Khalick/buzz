@@ -1,13 +1,38 @@
 "use client";
 
-import { Tag, Plus, Activity } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Tag, Plus, Activity, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+
+interface Promotion {
+  code: string;
+  discount: string;
+  type: string;
+  usage: string;
+  status: string;
+}
 
 export default function PromotionsPage() {
-  const promos = [
-    { code: 'THIKA-50', discount: '50% OFF', type: 'Percentage', usage: '45 / 100', status: 'Active' },
-    { code: 'LAUNCH-FREE', discount: '1 Mo Free', type: 'Subscription', usage: '12 / Unlimited', status: 'Active' },
-    { code: 'KIAMBU-VIP', discount: 'KES 200 OFF', type: 'Fixed Fee', usage: '500 / 500', status: 'Depleted' }
-  ];
+  const [promos, setPromos] = useState<Promotion[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchPromos() {
+      try {
+        const { data, error } = await supabase
+          .from('promotions')
+          .select('*')
+          .order('code');
+        if (error) throw error;
+        setPromos(data || []);
+      } catch (err) {
+        console.error('Failed to fetch promotions:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPromos();
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -33,7 +58,19 @@ export default function PromotionsPage() {
             </tr>
           </thead>
           <tbody>
-            {promos.map((promo, i) => (
+            {loading ? (
+              <tr>
+                <td colSpan={5} className="px-6 py-12 text-center">
+                  <Loader2 size={24} className="animate-spin text-[#D4AF37] mx-auto" />
+                </td>
+              </tr>
+            ) : promos.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-6 py-12 text-center text-[#E0E0E0]/50">
+                  No promotions available.
+                </td>
+              </tr>
+            ) : promos.map((promo, i) => (
               <tr key={i} className="border-b border-white/5 hover:bg-white/5">
                 <td className="px-6 py-4 font-mono font-bold text-[#D4AF37] text-lg bg-black/20 w-max px-2">{promo.code}</td>
                 <td className="px-6 py-4 font-bold text-white"><span className="text-xs opacity-50 px-2">{promo.type}</span>{promo.discount}</td>

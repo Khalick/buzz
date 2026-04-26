@@ -1,14 +1,40 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, Users, Target, Activity, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+
+interface Agent {
+  id: string;
+  name: string;
+  zone: string;
+  verifications: number;
+  active: boolean;
+  lastSeen: string;
+  last_seen_at?: string;
+}
 
 export default function AgentTrackerPage() {
-  const [agents] = useState([
-    { id: '1', name: 'James Makau', zone: 'Makongeni', verifications: 42, active: true, lastSeen: '10 mins ago' },
-    { id: '2', name: 'Sarah Wanjiru', zone: 'Section 9', verifications: 28, active: true, lastSeen: '2 mins ago' },
-    { id: '3', name: 'Kennedy Ochieng', zone: 'Ngoingwa', verifications: 15, active: false, lastSeen: '3 days ago' },
-  ]);
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchAgents() {
+      try {
+        const { data, error } = await supabase
+          .from('field_agents')
+          .select('*')
+          .order('verifications', { ascending: false });
+        if (error) throw error;
+        setAgents(data || []);
+      } catch (err) {
+        console.error('Failed to fetch field agents:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAgents();
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -62,15 +88,19 @@ export default function AgentTrackerPage() {
           <div className="p-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
             <h3 className="font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>Top Performers</h3>
           </div>
-          <div className="divide-y divide-white/5">
-            {agents.map(agent => (
+          <div className="divide-y divide-white/5 min-h-[150px]">
+            {loading ? (
+              <div className="flex justify-center p-8"><Loader2 className="animate-spin text-[#D4AF37]" size={24} /></div>
+            ) : agents.length === 0 ? (
+              <div className="text-center p-8 text-[#E0E0E0]/50 text-sm">No agents found.</div>
+            ) : agents.map(agent => (
                <div key={agent.id} className="p-4 hover:bg-white/5 transition-colors">
                  <div className="flex justify-between items-start mb-1">
                    <h4 className="font-bold text-sm text-white">{agent.name}</h4>
                    <span className={`w-2 h-2 rounded-full mt-1.5 ${agent.active ? 'bg-green-400' : 'bg-red-400'}`}></span>
                  </div>
                  <div className="text-xs text-[#E0E0E0]/60">{agent.zone} • {agent.verifications} Shops</div>
-                 <div className="text-[10px] text-[#E0E0E0]/40 mt-2 text-right">Seen: {agent.lastSeen}</div>
+                 <div className="text-[10px] text-[#E0E0E0]/40 mt-2 text-right">Seen: {agent.last_seen_at ? new Date(agent.last_seen_at).toLocaleString() : agent.lastSeen || 'Unknown'}</div>
                </div>
             ))}
           </div>

@@ -1,15 +1,37 @@
 "use client";
 
-import { useState } from 'react';
-import { Search, Info, Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Info, Plus, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+
+interface SearchRule {
+  id: number;
+  term: string;
+  maps_to: string;
+  hits: number;
+}
 
 export default function SearchTuningPage() {
-  const [rules, setRules] = useState([
-    { id: 1, term: 'mbao', mapsTo: 'hardware', hits: 1420 },
-    { id: 2, term: 'mtumba', mapsTo: 'fashion', hits: 890 },
-    { id: 3, term: 'simu', mapsTo: 'electronics', hits: 3400 },
-    { id: 4, term: 'kuku', mapsTo: 'food', hits: 512 },
-  ]);
+  const [rules, setRules] = useState<SearchRule[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchRules() {
+      try {
+        const { data, error } = await supabase
+          .from('search_tuning_rules')
+          .select('*')
+          .order('hits', { ascending: false });
+        if (error) throw error;
+        setRules(data || []);
+      } catch (err) {
+        console.error('Failed to fetch search rules:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchRules();
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -47,10 +69,22 @@ export default function SearchTuningPage() {
               </tr>
             </thead>
             <tbody>
-              {rules.map(rule => (
+              {loading ? (
+                <tr>
+                  <td colSpan={3} className="px-6 py-12 text-center">
+                    <Loader2 size={24} className="animate-spin text-[#D4AF37] mx-auto" />
+                  </td>
+                </tr>
+              ) : rules.length === 0 ? (
+                <tr>
+                  <td colSpan={3} className="px-6 py-12 text-center text-[#E0E0E0]/50">
+                    No active routing rules found.
+                  </td>
+                </tr>
+              ) : rules.map(rule => (
                 <tr key={rule.id} className="border-b border-white/5 hover:bg-white/5 disabled">
                   <td className="px-6 py-4 font-mono font-bold text-white">"{rule.term}"</td>
-                  <td className="px-6 py-4"><span className="bg-white/10 px-2 py-1 rounded text-xs">{rule.mapsTo}</span></td>
+                  <td className="px-6 py-4"><span className="bg-white/10 px-2 py-1 rounded text-xs">{rule.maps_to}</span></td>
                   <td className="px-6 py-4 text-right text-[#D4AF37] font-bold">{rule.hits.toLocaleString()}</td>
                 </tr>
               ))}

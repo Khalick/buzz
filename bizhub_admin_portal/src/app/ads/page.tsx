@@ -1,27 +1,107 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 import { Star, Plus, UploadCloud, Calendar, Clock, Loader2, Play, Square, Store } from 'lucide-react';
 
-// Hardcoded for UI visualization, this would normally connect to a 'featured_placements' Supabase table
-const MOCK_ADS = [
-  { id: 'ad-1', merchant: 'Thika Electricals', slot: 'Homepage Carousel', status: 'active', startDate: '2025-10-10', endDate: '2025-10-17', views: 4200, clicks: 310 },
-  { id: 'ad-2', merchant: 'Mama Ciku Hardware', slot: 'Category Top-Spot', status: 'active', startDate: '2025-10-12', endDate: '2025-10-19', views: 1500, clicks: 89 },
-  { id: 'ad-3', merchant: 'Nairobi Auto Spares', slot: 'Search Results Banner', status: 'scheduled', startDate: '2025-10-20', endDate: '2025-10-27', views: 0, clicks: 0 },
-  { id: 'ad-4', merchant: 'Fashion Hub', slot: 'Homepage Carousel', status: 'expired', startDate: '2025-09-01', endDate: '2025-09-08', views: 12000, clicks: 840 },
-];
+interface AdPlacement {
+  id: string;
+  merchant: string;
+  slot: string;
+  status: 'active' | 'scheduled' | 'expired';
+  start_date: string;
+  end_date: string;
+  views: number;
+  clicks: number;
+}
 
 export default function FeaturedAdsPage() {
-  const [ads, setAds] = useState(MOCK_ADS);
+  const [ads, setAds] = useState<AdPlacement[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const handleStopAd = (id: string) => {
-    setAds(prev => prev.map(ad => ad.id === id ? { ...ad, status: 'expired' } : ad));
+  const [formData, setFormData] = useState({
+    merchantId: '',
+    slot: 'Homepage Carousel',
+    startDate: '',
+    endDate: ''
+  });
+
+  useEffect(() => {
+    fetchAds();
+  }, []);
+
+  async function fetchAds() {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('featured_placements')
+        .select('*');
+      if (error) throw error;
+      setAds(data || []);
+    } catch (err) {
+      console.error('Failed to fetch ads:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleStopAd = async (id: string) => {
+    setActionLoading(id);
+    try {
+      const { error } = await supabase
+        .from('featured_placements')
+        .update({ status: 'expired' })
+        .eq('id', id);
+      if (error) throw error;
+      setAds(prev => prev.map(ad => ad.id === id ? { ...ad, status: 'expired' } : ad));
+    } catch (err) {
+      console.error('Error stopping ad:', err);
+    } finally {
+      setActionLoading(null);
+    }
   };
 
-  const handleActivateAd = (id: string) => {
-    setAds(prev => prev.map(ad => ad.id === id ? { ...ad, status: 'active' } : ad));
+  const handleActivateAd = async (id: string) => {
+    setActionLoading(id);
+    try {
+      const { error } = await supabase
+        .from('featured_placements')
+        .update({ status: 'active' })
+        .eq('id', id);
+      if (error) throw error;
+      setAds(prev => prev.map(ad => ad.id === id ? { ...ad, status: 'active' } : ad));
+    } catch (err) {
+      console.error('Error activating ad:', err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleLaunchCampaign = async () => {
+    if (!formData.merchantId || !formData.startDate || !formData.endDate) return;
+    setActionLoading('launch');
+    try {
+      // Create new ad with defaults
+      const newAd = {
+        merchant: formData.merchantId, // simplified, usually would map ID to name
+        slot: formData.slot,
+        status: 'scheduled',
+        start_date: formData.startDate,
+        end_date: formData.endDate,
+        views: 0,
+        clicks: 0
+      };
+      const { data, error } = await supabase.from('featured_placements').insert([newAd]).select().single();
+      if (error) throw error;
+      if (data) setAds(prev => [data, ...prev]);
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error('Error launching campaign:', err);
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   return (
@@ -99,7 +179,7 @@ export default function FeaturedAdsPage() {
                   {ad.status === 'expired' && <span className="bg-gray-500/10 text-gray-400 px-2 py-1 rounded font-bold text-xs">Expired</span>}
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-xs">{ad.startDate} <span className="text-[#E0E0E0]/30 mx-1">to</span> {ad.endDate}</div>
+                  <div className="text-xs">{ad.start_date} <span className="text-[#E0E0E0]/30 mx-1">to</span> {ad.end_date}</div>
                 </td>
                 <td className="px-6 py-4">
                   <div className="text-xs text-white font-bold">{ad.views.toLocaleString()} Views</div>
@@ -107,12 +187,12 @@ export default function FeaturedAdsPage() {
                 </td>
                 <td className="px-6 py-4 text-right">
                   {ad.status === 'active' ? (
-                    <button onClick={() => handleStopAd(ad.id)} className="text-red-400 hover:bg-red-500/10 p-2 rounded-lg transition-colors" title="Stop Campaign">
-                      <Square size={16} />
+                    <button onClick={() => handleStopAd(ad.id)} disabled={actionLoading === ad.id} className="text-red-400 hover:bg-red-500/10 p-2 rounded-lg transition-colors disabled:opacity-50" title="Stop Campaign">
+                      {actionLoading === ad.id ? <Loader2 size={16} className="animate-spin" /> : <Square size={16} />}
                     </button>
                   ) : ad.status === 'scheduled' ? (
-                    <button onClick={() => handleActivateAd(ad.id)} className="text-green-400 hover:bg-green-500/10 p-2 rounded-lg transition-colors" title="Force Start Campaign">
-                      <Play size={16} />
+                    <button onClick={() => handleActivateAd(ad.id)} disabled={actionLoading === ad.id} className="text-green-400 hover:bg-green-500/10 p-2 rounded-lg transition-colors disabled:opacity-50" title="Force Start Campaign">
+                      {actionLoading === ad.id ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} />}
                     </button>
                   ) : null}
                 </td>
@@ -135,15 +215,15 @@ export default function FeaturedAdsPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#E0E0E0]/70">Target Merchant DB ID</label>
-                <input type="text" placeholder="UUID from Database..." className="w-full px-4 py-3 rounded-xl text-white outline-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                <input type="text" value={formData.merchantId} onChange={(e) => setFormData({...formData, merchantId: e.target.value})} placeholder="UUID from Database..." className="w-full px-4 py-3 rounded-xl text-white outline-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
               </div>
               
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#E0E0E0]/70">Placement Slot</label>
-                <select className="w-full px-4 py-3 rounded-xl text-white outline-none appearance-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  <option>Homepage Carousel (Top)</option>
-                  <option>Category Sticky Banner</option>
-                  <option>Search Results Priority</option>
+                <select value={formData.slot} onChange={(e) => setFormData({...formData, slot: e.target.value})} className="w-full px-4 py-3 rounded-xl text-white outline-none appearance-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <option value="Homepage Carousel">Homepage Carousel (Top)</option>
+                  <option value="Category Sticky Banner">Category Sticky Banner</option>
+                  <option value="Search Results Priority">Search Results Priority</option>
                 </select>
               </div>
 
@@ -159,21 +239,23 @@ export default function FeaturedAdsPage() {
               <div className="grid grid-cols-2 gap-4">
                  <div>
                     <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#E0E0E0]/70">Start Date</label>
-                    <input type="date" className="w-full px-4 py-3 rounded-xl text-white outline-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                    <input type="date" value={formData.startDate} onChange={(e) => setFormData({...formData, startDate: e.target.value})} className="w-full px-4 py-3 rounded-xl text-white outline-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
                  </div>
                  <div>
                     <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#E0E0E0]/70">End Date</label>
-                    <input type="date" className="w-full px-4 py-3 rounded-xl text-white outline-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                    <input type="date" value={formData.endDate} onChange={(e) => setFormData({...formData, endDate: e.target.value})} className="w-full px-4 py-3 rounded-xl text-white outline-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
                  </div>
               </div>
 
               <div className="pt-4 mt-4 flex gap-4">
                 <button onClick={() => setIsModalOpen(false)} className="flex-1 py-3 rounded-xl font-bold text-white border border-white/10 hover:bg-white/5 transition-colors">Cancel</button>
                 <button 
-                  className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2"
+                  onClick={handleLaunchCampaign}
+                  disabled={actionLoading === 'launch'}
+                  className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
                   style={{ background: '#D4AF37', color: '#0D1F16' }}
                 >
-                  <Star size={18} /> Launch Campaign
+                  {actionLoading === 'launch' ? <Loader2 size={18} className="animate-spin" /> : <Star size={18} />} Launch Campaign
                 </button>
               </div>
             </div>

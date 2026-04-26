@@ -1,13 +1,38 @@
 "use client";
 
-import { Printer, Download, Plus, FileText, Send } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Printer, Download, Plus, FileText, Send, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+
+interface Invoice {
+  id: string;
+  company: string;
+  amount: number;
+  date: string;
+  status: string;
+}
 
 export default function InvoicesPage() {
-  const invoices = [
-    { id: 'INV-2025-001', company: 'Nakumatt Holdings', amount: 150000, date: '2025-10-10', status: 'paid' },
-    { id: 'INV-2025-002', company: 'Thika Private Hospital', amount: 50000, date: '2025-10-12', status: 'pending' },
-    { id: 'INV-2025-003', company: 'Mega Hardware Wholesale', amount: 75000, date: '2025-09-28', status: 'overdue' }
-  ];
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchInvoices() {
+      try {
+        const { data, error } = await supabase
+          .from('invoices')
+          .select('*')
+          .order('date', { ascending: false });
+        if (error) throw error;
+        setInvoices(data || []);
+      } catch (err) {
+        console.error('Failed to fetch invoices:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchInvoices();
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -33,7 +58,19 @@ export default function InvoicesPage() {
             </tr>
           </thead>
           <tbody>
-            {invoices.map(inv => (
+            {loading ? (
+              <tr>
+                <td colSpan={5} className="px-6 py-12 text-center">
+                  <Loader2 size={24} className="animate-spin text-[#D4AF37] mx-auto" />
+                </td>
+              </tr>
+            ) : invoices.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-6 py-12 text-center text-[#E0E0E0]/50">
+                  No invoices generated yet.
+                </td>
+              </tr>
+            ) : invoices.map(inv => (
               <tr key={inv.id} className="border-b border-white/5 hover:bg-white/5">
                 <td className="px-6 py-4 font-mono font-bold text-white">{inv.id}</td>
                 <td className="px-6 py-4">{inv.company}</td>

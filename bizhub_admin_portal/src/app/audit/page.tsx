@@ -1,16 +1,42 @@
 "use client";
 
-import { useState } from 'react';
-import { Shield, Clock, AlertTriangle, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Shield, Clock, AlertTriangle, User, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+
+interface AuditLog {
+  id: number;
+  action: string;
+  target: string;
+  user: string;
+  time: string;
+  severity: 'high' | 'medium' | 'low';
+  created_at?: string;
+}
 
 export default function AuditLogPage() {
-  const [logs] = useState([
-    { id: 1, action: 'DELETED_DEAL', target: 'Deal #8492 (Mama Ciku Hardware)', user: 'admin@bizhub.co.ke', time: '10 mins ago', severity: 'high' },
-    { id: 2, action: 'FORCE_SUBSCRIBED', target: 'M-Pesa TRX-RG81KJL9A', user: 'admin@bizhub.co.ke', time: '1 hour ago', severity: 'medium' },
-    { id: 3, action: 'UPDATED_SEO_SLUG', target: 'Business #110 (Nairobi Auto)', user: 'peter@bizhub.co.ke', time: '2 hours ago', severity: 'low' },
-    { id: 4, action: 'SENT_BROADCAST', target: 'Audience: All Hardware Shops', user: 'admin@bizhub.co.ke', time: '1 day ago', severity: 'high' },
-    { id: 5, action: 'MANUAL_BUSINESS_ADD', target: 'Business #4092 (Thika Electricals)', user: 'admin@bizhub.co.ke', time: '2 days ago', severity: 'medium' },
-  ]);
+  const [logs, setLogs] = useState<AuditLog[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchLogs() {
+      try {
+        const { data, error } = await supabase
+          .from('audit_logs')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(50);
+          
+        if (error) throw error;
+        setLogs(data || []);
+      } catch (err) {
+        console.error('Failed to fetch audit logs:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchLogs();
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -42,11 +68,23 @@ export default function AuditLogPage() {
               </tr>
             </thead>
             <tbody>
-              {logs.map(log => (
+              {loading ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-12 text-center">
+                    <Loader2 size={24} className="animate-spin text-[#D4AF37] mx-auto" />
+                  </td>
+                </tr>
+              ) : logs.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-12 text-center text-[#E0E0E0]/50">
+                    No audit logs recorded yet.
+                  </td>
+                </tr>
+              ) : logs.map(log => (
                 <tr key={log.id} className="border-b border-white/5 disabled">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2 text-xs text-[#E0E0E0]/60">
-                      <Clock size={14} /> {log.time}
+                      <Clock size={14} /> {log.created_at ? new Date(log.created_at).toLocaleString() : log.time}
                     </div>
                   </td>
                   <td className="px-6 py-4">

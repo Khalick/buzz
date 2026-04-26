@@ -1,11 +1,25 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Megaphone, Users, MessageSquare, Send, Loader2, Search, Smartphone, ListFilter } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+
+interface BroadcastLog {
+  id: string;
+  title: string;
+  target: string;
+  channel: string;
+  sentAt: string;
+  created_at?: string;
+  status: string;
+  reach: number;
+}
 
 export default function BroadcastsPage() {
   const [loading, setLoading] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(true);
   const [success, setSuccess] = useState(false);
+  const [history, setHistory] = useState<BroadcastLog[]>([]);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -14,24 +28,59 @@ export default function BroadcastsPage() {
     channel: 'sms',
   });
 
-  const [history] = useState([
-    { id: 'bcast-1', title: 'System Maintenance', target: 'All Active Merchants', channel: 'sms', sentAt: '2025-10-14 08:00 AM', status: 'Delivered', reach: 2400 },
-    { id: 'bcast-2', title: 'New Flash Deal Pricing', target: 'Premium Subscribers', channel: 'push', sentAt: '2025-10-10 14:30 PM', status: 'Delivered', reach: 180 },
-    { id: 'bcast-3', title: 'Verify Your Location', target: 'Pending Verifications', channel: 'sms', sentAt: '2025-10-05 09:15 AM', status: 'Delivered', reach: 45 },
-  ]);
+  useEffect(() => {
+    fetchHistory();
+  }, []);
 
-  const handleBroadcast = (e: React.FormEvent) => {
+  async function fetchHistory() {
+    setHistoryLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('broadcasts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setHistory(data || []);
+    } catch (err) {
+      console.error('Failed to load broadcasts:', err);
+    } finally {
+      setHistoryLoading(false);
+    }
+  }
+
+  const handleBroadcast = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setSuccess(false);
 
-    // Simulate API call to Twilio or Africa's Talking
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const newBroadcast = {
+        title: formData.title,
+        message: formData.message,
+        target: formData.target,
+        channel: formData.channel,
+        status: 'Delivered',
+        reach: 0
+      };
+      
+      const { data, error } = await supabase
+        .from('broadcasts')
+        .insert([newBroadcast])
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      if (data) setHistory(prev => [data, ...prev]);
+      
       setSuccess(true);
       setFormData({ title: '', message: '', target: 'all', channel: 'sms' });
       setTimeout(() => setSuccess(false), 5000);
-    }, 2000);
+    } catch (err) {
+      console.error('Broadcast failed:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -172,7 +221,11 @@ export default function BroadcastsPage() {
           </h3>
 
           <div className="space-y-4">
-            {history.map((log) => (
+            {historyLoading ? (
+              <div className="flex justify-center p-6"><Loader2 className="animate-spin text-[#D4AF37]" size={24} /></div>
+            ) : history.length === 0 ? (
+              <div className="text-center p-6 text-[#E0E0E0]/50 text-sm">No transmissions sent yet.</div>
+            ) : history.map((log) => (
               <div key={log.id} className="p-4 rounded-xl" style={{ background: 'rgba(13, 31, 22, 0.6)' }}>
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="font-bold text-sm text-white">{log.title}</h4>
@@ -184,7 +237,7 @@ export default function BroadcastsPage() {
                 <div className="flex justify-between items-center pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                   <div className="flex items-center gap-1.5 text-xs text-[#E0E0E0]/40">
                     {log.channel === 'sms' ? <Smartphone size={12} /> : <Megaphone size={12} />}
-                    {log.sentAt}
+                    {log.created_at ? new Date(log.created_at).toLocaleString() : log.sentAt}
                   </div>
                   <div className="text-xs font-bold text-[#D4AF37]">{log.reach.toLocaleString()} Reached</div>
                 </div>
