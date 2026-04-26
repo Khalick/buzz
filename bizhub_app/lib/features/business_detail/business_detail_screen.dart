@@ -11,6 +11,7 @@ import '../../core/providers/auth_provider.dart';
 import '../../core/services/location_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../favorites/favorites_screen.dart';
+import '../../shared/widgets/ai_review_summary_widget.dart';
 
 final businessDetailProvider = FutureProvider.family<Map<String, dynamic>, String>((ref, id) async {
   final repo = ref.watch(businessRepositoryProvider);
@@ -295,6 +296,13 @@ class BusinessDetailScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 24),
                       ],
+
+                      // AI Review Summary
+                      AiReviewSummaryWidget(
+                        businessId: business.id,
+                        reviewCount: business.reviewCount,
+                      ),
+                      const SizedBox(height: 8),
 
                       // Reviews
                       Row(

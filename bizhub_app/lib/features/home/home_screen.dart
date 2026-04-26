@@ -27,6 +27,12 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: SpotifyColors.background,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push('/ask-bizhub'),
+        backgroundColor: const Color(0xFF1B4332),
+        icon: const Icon(Icons.auto_awesome, color: Color(0xFFD4AF37), size: 20),
+        label: const Text('Ask AI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.only(bottom: 24),

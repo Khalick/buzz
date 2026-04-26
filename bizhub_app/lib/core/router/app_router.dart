@@ -29,6 +29,7 @@ import '../../features/invitations/invitations_screen.dart';
 import '../../features/admin/analytics_screen.dart';
 import '../../features/admin/competitor_insights_screen.dart';
 import '../../features/proof/proof_of_visit_screen.dart';
+import '../../features/home/ask_bizhub_screen.dart';
 import '../services/supabase_service.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -190,6 +191,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/admin/insights',
         builder: (context, state) => const CompetitorInsightsScreen(),
+      ),
+      GoRoute(
+        path: '/ask-bizhub',
+        builder: (context, state) => const AskBizHubScreen(),
       ),
     ],
   );
