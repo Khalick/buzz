@@ -100,11 +100,11 @@ function generateNonce(): string {
 function buildSecurityHeaders(nonce: string): Record<string, string> {
   const csp = [
     `default-src 'self'`,
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://cdnjs.cloudflare.com`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://va.vercel-scripts.com https://vitals.vercel-insights.com`,
     `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
     `font-src 'self' https://fonts.gstatic.com`,
     `img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://storage.googleapis.com https://*.vercel.app https://placehold.co`,
-    `connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co`,
+    `connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://vitals.vercel-insights.com https://*.vercel-scripts.com https://*.vercel.app`,
     `frame-ancestors 'none'`,
     `form-action 'self'`,
     `base-uri 'self'`,
@@ -246,16 +246,18 @@ export function middleware(req: NextRequest) {
   }
 
   // ---- Apply Security Headers to All Pages ----
+  const secHeaders = buildSecurityHeaders(nonce);
+  
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set('x-nonce', nonce);
+  requestHeaders.set('Content-Security-Policy', secHeaders['Content-Security-Policy']);
+
   const response = NextResponse.next({
     request: {
-      headers: new Headers({
-        ...Object.fromEntries(req.headers.entries()),
-        'x-nonce': nonce,
-      }),
+      headers: requestHeaders,
     },
   });
 
-  const secHeaders = buildSecurityHeaders(nonce);
   for (const [key, value] of Object.entries(secHeaders)) {
     response.headers.set(key, value);
   }
