@@ -100,7 +100,7 @@ function generateNonce(): string {
 function buildSecurityHeaders(nonce: string): Record<string, string> {
   const csp = [
     `default-src 'self'`,
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://va.vercel-scripts.com https://vitals.vercel-insights.com`,
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://va.vercel-scripts.com https://vitals.vercel-insights.com`,
     `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
     `font-src 'self' https://fonts.gstatic.com`,
     `img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in https://storage.googleapis.com https://*.vercel.app https://placehold.co`,
