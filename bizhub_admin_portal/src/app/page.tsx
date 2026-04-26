@@ -19,6 +19,7 @@ export default function Dashboard() {
     proofs: 0,
     trustScoreAvg: 0
   });
+  const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,11 +42,26 @@ export default function Dashboard() {
           .from('proofs')
           .select('*', { count: 'exact', head: true });
 
+        // Calculate dynamic trust score
+        const total = (merchantsCount || 0) + (pendingCount || 0);
+        const autoScore = total > 0 ? Number(((merchantsCount || 0) / total) * 10).toFixed(1) : '0.0';
+
+        // Fetch recent active logs
+        const { data: recentLogs } = await supabase
+          .from('audit_logs')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        if (recentLogs) {
+          setLogs(recentLogs);
+        }
+
         setStats({
           merchants: merchantsCount || 0,
           pendingVerifications: pendingCount || 0,
           proofs: proofsCount || 0,
-          trustScoreAvg: 9.2, // Will calculate from real trust engine later
+          trustScoreAvg: parseFloat(autoScore as string),
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
@@ -58,10 +74,10 @@ export default function Dashboard() {
   }, []);
 
   const kpis = [
-    { title: 'Total Verified Merchants', value: stats.merchants.toLocaleString(), change: '+12% this month', icon: Store, trend: 'up' },
-    { title: 'Physical Proofs Collected', value: stats.proofs.toLocaleString(), change: '+45 this week', icon: MapPin, trend: 'up' },
+    { title: 'Total Verified Merchants', value: stats.merchants.toLocaleString(), change: 'Live DB Link', icon: Store, trend: 'up' },
+    { title: 'Physical Proofs Collected', value: stats.proofs.toLocaleString(), change: 'Live DB Link', icon: MapPin, trend: 'up' },
     { title: 'Pending Verifications', value: stats.pendingVerifications.toLocaleString(), change: 'Requires Action', icon: ShieldCheck, trend: stats.pendingVerifications > 0 ? 'down' : 'neutral' },
-    { title: 'Network Trust Flywheel', value: stats.trustScoreAvg, change: 'Top 1% in East Africa', icon: Activity, trend: 'up', suffix: '/10' },
+    { title: 'Network Trust Flywheel', value: stats.trustScoreAvg, change: 'Calculated Algorithm', icon: Activity, trend: 'up', suffix: '/10' },
   ];
 
   return (
@@ -127,21 +143,35 @@ export default function Dashboard() {
           backdropFilter: 'blur(12px)',
           border: '1px solid rgba(212, 175, 55, 0.15)',
         }}>
-          <h3 className="text-lg font-bold text-white mb-6" style={{ fontFamily: 'Outfit, sans-serif' }}>System Activity (Coming Soon)</h3>
-          <div className="h-64 w-full flex items-center justify-center border border-dashed rounded-xl" style={{ borderColor: 'rgba(212, 175, 55, 0.2)' }}>
-            <p className="text-sm text-[#E0E0E0]/40 font-medium">Analytics engine initializing map data...</p>
+          <h3 className="text-lg font-bold text-white mb-6" style={{ fontFamily: 'Outfit, sans-serif' }}>System Activity (Live)</h3>
+          <div className="space-y-4">
+             {logs.length === 0 ? (
+                 <div className="h-64 w-full flex items-center justify-center border border-dashed rounded-xl" style={{ borderColor: 'rgba(212, 175, 55, 0.2)' }}>
+                   <p className="text-sm text-[#E0E0E0]/40 font-medium">No recent system activity recorded.</p>
+                 </div>
+             ) : (
+                logs.map((log) => (
+                  <div key={log.id} className="p-3 bg-white/5 rounded-xl border border-white/5 text-sm flex justify-between items-center">
+                     <div>
+                       <span className="font-bold text-white">{log.action}</span>
+                       <p className="text-xs text-[#E0E0E0]/60 mt-1">{log.target}</p>
+                     </div>
+                     <span className="text-xs text-[#D4AF37] opacity-60 font-mono">{log.created_at ? new Date(log.created_at).toLocaleString() : log.time}</span>
+                  </div>
+                ))
+             )}
           </div>
         </div>
 
-        <div className="rounded-2xl p-6" style={{
+        <div className="rounded-2xl p-6 flex flex-col items-center justify-center" style={{
           background: 'rgba(27, 67, 50, 0.4)',
           backdropFilter: 'blur(12px)',
           border: '1px solid rgba(212, 175, 55, 0.15)',
         }}>
-          <h3 className="text-lg font-bold text-white mb-6" style={{ fontFamily: 'Outfit, sans-serif' }}>Recent Registrations</h3>
-          <div className="space-y-4">
-            <p className="text-sm text-[#E0E0E0]/60">Check the Verification Queue to process new businesses.</p>
-          </div>
+          <ShieldCheck size={48} className="text-[#D4AF37] opacity-30 mb-4" />
+          <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>Pending Registration Queue</h3>
+          <p className="text-sm text-[#E0E0E0]/60 text-center mb-6">Check the Verification Queue to manually activate businesses.</p>
+          <a href="/queue" className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all text-[#0D1F16]" style={{ background: 'linear-gradient(135deg, #D4AF37, #c4a030)' }}>Manage Approvals</a>
         </div>
       </div>
     </div>
