@@ -20,26 +20,27 @@ export default function LoginPage() {
     const { error: signInError } = await signIn(email, password);
     if (signInError) {
       setError(signInError);
+      setLoading(false);
     }
-    setLoading(false);
+    // If no error, AuthContext will set isReady=true and AuthGate will show dashboard
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #0D1F16 0%, #11281c 50%, #1B4332 100%)' }}>
       {/* Ambient glow effects */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#D4AF37]/5 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#2D6A4F]/10 rounded-full blur-3xl"></div>
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl" style={{ background: 'rgba(212,175,55,0.05)' }}></div>
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-3xl" style={{ background: 'rgba(45,106,79,0.1)' }}></div>
 
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#D4AF37]/20 border border-[#D4AF37]/30 mb-6">
-            <ShieldCheck size={32} className="text-[#D4AF37]" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6" style={{ background: 'rgba(212,175,55,0.2)', border: '1px solid rgba(212,175,55,0.3)' }}>
+            <ShieldCheck size={32} color="#D4AF37" />
           </div>
           <h1 className="text-3xl font-black tracking-tight text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>
-            Biz<span className="text-[#D4AF37]">Hub</span> Admin
+            Biz<span style={{ color: '#D4AF37' }}>Hub</span> Admin
           </h1>
-          <p className="text-[#E0E0E0]/50 mt-2 text-sm font-medium uppercase tracking-widest">Master Control Portal</p>
+          <p className="mt-2 text-sm font-medium uppercase tracking-widest" style={{ color: 'rgba(212,175,55,0.7)' }}>Master Control Portal</p>
         </div>
 
         {/* Login Card */}
@@ -51,33 +52,34 @@ export default function LoginPage() {
           boxShadow: '0 4px 30px rgba(0, 0, 0, 0.3)',
         }}>
           <h2 className="text-lg font-bold text-white mb-1" style={{ fontFamily: 'Outfit, sans-serif' }}>Welcome Back</h2>
-          <p className="text-sm text-[#E0E0E0]/60 mb-6">Enter your admin credentials to access the portal.</p>
+          <p className="text-sm mb-6" style={{ color: 'rgba(224,224,224,0.6)' }}>Enter your admin credentials to access the portal.</p>
 
           {error && (
-            <div className="mb-4 p-3 rounded-lg bg-red-500/20 border border-red-500/40 text-red-300 text-sm font-medium">
+            <div className="mb-4 p-3 rounded-lg text-sm font-medium" style={{ background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.4)', color: '#fca5a5' }}>
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-xs font-bold text-[#E0E0E0]/70 uppercase tracking-wider mb-2">Email Address</label>
+              <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'rgba(224,224,224,0.7)' }}>Email Address</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@bizhub.co.ke"
                 required
-                className="w-full px-4 py-3 rounded-xl text-white placeholder-[#E0E0E0]/30 outline-none focus:ring-2 focus:ring-[#D4AF37]/50 transition-all"
+                className="w-full px-4 py-3 rounded-xl text-white outline-none transition-all"
                 style={{
                   background: 'rgba(13, 31, 22, 0.6)',
                   border: '1px solid rgba(212, 175, 55, 0.2)',
+                  color: '#ffffff',
                 }}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#E0E0E0]/70 uppercase tracking-wider mb-2">Password</label>
+              <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'rgba(224,224,224,0.7)' }}>Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -85,7 +87,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
                   required
-                  className="w-full px-4 py-3 rounded-xl text-white placeholder-[#E0E0E0]/30 outline-none focus:ring-2 focus:ring-[#D4AF37]/50 transition-all pr-12"
+                  className="w-full px-4 py-3 rounded-xl text-white outline-none transition-all pr-12"
                   style={{
                     background: 'rgba(13, 31, 22, 0.6)',
                     border: '1px solid rgba(212, 175, 55, 0.2)',
@@ -94,7 +96,8 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#E0E0E0]/40 hover:text-[#D4AF37] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: 'rgba(224,224,224,0.4)' }}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -104,9 +107,10 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl font-bold text-[#0D1F16] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-60"
               style={{
                 background: 'linear-gradient(135deg, #D4AF37, #c4a030)',
+                color: '#0D1F16',
                 fontFamily: 'Outfit, sans-serif',
                 boxShadow: '0 0 15px rgba(212, 175, 55, 0.4)',
               }}
@@ -123,7 +127,7 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-[#E0E0E0]/30 text-xs mt-8">
+        <p className="text-center text-xs mt-8" style={{ color: 'rgba(224,224,224,0.3)' }}>
           Authorized personnel only. All access is logged.
         </p>
       </div>
