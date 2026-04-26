@@ -3,15 +3,24 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { LayoutDashboard, Users, ShieldCheck, CreditCard, Search, MapPin, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, ShieldCheck, CreditCard, Search, MapPin, LogOut, Megaphone, Star, ShieldAlert, FileText, Tag, LifeBuoy, Building, DownloadCloud } from 'lucide-react';
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/queue', label: 'Verification Queue', icon: ShieldCheck },
   { href: '/merchants', label: 'All Merchants', icon: Users },
   { href: '/payments', label: 'M-Pesa Ledger', icon: CreditCard },
+  { href: '/ads', label: 'Featured Ads', icon: Star },
+  { href: '/moderation', label: 'Moderation Feed', icon: ShieldCheck },
+  { href: '/broadcasts', label: 'SMS/Push Broadcasts', icon: Megaphone },
   { href: '/search-metrics', label: 'AI Search Tuning', icon: Search },
   { href: '/agents', label: 'Agent Tracking', icon: MapPin },
+  { href: '/audit', label: 'Audit Logs', icon: ShieldAlert },
+  { href: '/invoices', label: 'B2B Invoicing', icon: FileText },
+  { href: '/promotions', label: 'Promo Codes', icon: Tag },
+  { href: '/enterprise', label: 'Franchise Groups', icon: Building },
+  { href: '/reports', label: 'Data Exports', icon: DownloadCloud },
+  { href: '/support', label: 'Support CRM', icon: LifeBuoy },
 ];
 
 export default function Sidebar() {
