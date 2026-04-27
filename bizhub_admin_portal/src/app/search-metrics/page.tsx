@@ -14,6 +14,12 @@ interface SearchRule {
 export default function SearchTuningPage() {
   const [rules, setRules] = useState<SearchRule[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    term: '',
+    maps_to: ''
+  });
 
   useEffect(() => {
     async function fetchRules() {
@@ -33,6 +39,28 @@ export default function SearchTuningPage() {
     fetchRules();
   }, []);
 
+  const handleAddRule = async () => {
+    if (!formData.term || !formData.maps_to) return;
+    setActionLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('search_tuning_rules')
+        .insert([{ term: formData.term.toLowerCase(), maps_to: formData.maps_to, hits: 0 }])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      if (data) setRules(prev => [data, ...prev]);
+      
+      setIsModalOpen(false);
+      setFormData({ term: '', maps_to: '' });
+    } catch (err) {
+      console.error('Failed to create search synonym rule:', err);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -43,7 +71,10 @@ export default function SearchTuningPage() {
           </h1>
           <p className="text-[#E0E0E0]/70 mt-1">Map vernacular slang to standard system categories to fix "0 Results" queries.</p>
         </div>
-        <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10"
+        >
           <Plus size={18} />
           Add Synonym Rule
         </button>
@@ -118,6 +149,38 @@ export default function SearchTuningPage() {
         </div>
 
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-2xl p-8" style={{ background: '#0D1F16', border: '1px solid rgba(212, 175, 55, 0.3)' }}>
+            <h2 className="text-2xl font-bold text-white mb-6" style={{ fontFamily: 'Outfit, sans-serif' }}>Map Search Synonym</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#E0E0E0]/70">Slang / Searched Term</label>
+                <input type="text" value={formData.term} onChange={(e) => setFormData({...formData, term: e.target.value})} placeholder="e.g. fundi" className="w-full px-4 py-3 rounded-xl text-white outline-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+              </div>
+              
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#E0E0E0]/70">Maps To System Category</label>
+                <input type="text" value={formData.maps_to} onChange={(e) => setFormData({...formData, maps_to: e.target.value})} placeholder="e.g. Handyman Search" className="w-full px-4 py-3 rounded-xl text-white outline-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+              </div>
+
+              <div className="pt-4 mt-4 flex gap-4">
+                <button onClick={() => setIsModalOpen(false)} className="flex-1 py-3 rounded-xl font-bold text-white border border-white/10 hover:bg-white/5 transition-colors">Cancel</button>
+                <button 
+                  onClick={handleAddRule}
+                  disabled={actionLoading || !formData.term || !formData.maps_to}
+                  className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+                  style={{ background: '#D4AF37', color: '#0D1F16' }}
+                >
+                  {actionLoading ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />} Map Rule
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

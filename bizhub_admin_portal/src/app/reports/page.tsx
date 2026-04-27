@@ -1,8 +1,60 @@
 "use client";
 
-import { DownloadCloud, ExternalLink, HardDrive } from 'lucide-react';
+import { useState } from 'react';
+import { DownloadCloud, ExternalLink, HardDrive, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function ReportsPage() {
+  const [loadingMerchant, setLoadingMerchant] = useState(false);
+  const [loadingLedger, setLoadingLedger] = useState(false);
+
+  const downloadCSV = (csvContent: string, fileName: string) => {
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportMerchants = async () => {
+    setLoadingMerchant(true);
+    try {
+      const { data, error } = await supabase.from('businesses').select('*');
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        const headers = Object.keys(data[0]).join(',');
+        const rows = data.map(row => Object.values(row).map(val => `"${val}"`).join(',')).join('\n');
+        downloadCSV(`${headers}\n${rows}`, 'verified_merchants_dump.csv');
+      }
+    } catch (err) {
+      console.error('Merchant dump failed', err);
+    } finally {
+      setLoadingMerchant(false);
+    }
+  };
+
+  const handleExportLedger = async () => {
+    setLoadingLedger(true);
+    try {
+      const { data, error } = await supabase.from('mpesa_ledger').select('*');
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        const headers = Object.keys(data[0]).join(',');
+        const rows = data.map(row => Object.values(row).map(val => `"${val}"`).join(',')).join('\n');
+        downloadCSV(`${headers}\n${rows}`, 'mpesa_ledger_export.csv');
+      }
+    } catch (err) {
+      console.error('Ledger export failed', err);
+    } finally {
+      setLoadingLedger(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
        <div className="flex justify-between items-end">
@@ -17,16 +69,27 @@ export default function ReportsPage() {
         <div className="rounded-2xl p-6" style={{ background: 'rgba(27, 67, 50, 0.4)', border: '1px solid rgba(212, 175, 55, 0.15)' }}>
           <h3 className="font-bold text-lg text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>Master Merchant Dump</h3>
           <p className="text-sm text-[#E0E0E0]/60 mb-6">Exports every verified merchant detail including WhatsApp numbers and categories.</p>
-          <button className="w-full py-4 rounded-xl font-bold transition-all text-[#0D1F16] flex items-center justify-center gap-2 hover:scale-[1.02]" style={{ background: 'linear-gradient(135deg, #D4AF37, #c4a030)' }}>
-            <DownloadCloud size={18} /> Export 2.4k Rows (.CSV)
+          <button 
+            onClick={handleExportMerchants}
+            disabled={loadingMerchant}
+            className="w-full py-4 rounded-xl font-bold transition-all text-[#0D1F16] flex items-center justify-center gap-2 hover:scale-[1.02] disabled:opacity-50" 
+            style={{ background: 'linear-gradient(135deg, #D4AF37, #c4a030)' }}
+          >
+            {loadingMerchant ? <Loader2 size={18} className="animate-spin" /> : <DownloadCloud size={18} />}
+            {loadingMerchant ? 'Building File...' : 'Export Verified Merchants (.CSV)'}
           </button>
         </div>
 
         <div className="rounded-2xl p-6" style={{ background: 'rgba(27, 67, 50, 0.4)', border: '1px solid rgba(212, 175, 55, 0.15)' }}>
           <h3 className="font-bold text-lg text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>M-Pesa Ledger Export</h3>
           <p className="text-sm text-[#E0E0E0]/60 mb-6">Exports all raw M-Pesa transaction objects, useful for accountant auditing.</p>
-          <button className="w-full py-4 rounded-xl font-bold transition-all text-[#0D1F16] flex items-center justify-center gap-2 bg-white hover:bg-gray-200">
-            <HardDrive size={18} /> Export Finance Ledger (.XLSX)
+          <button 
+            onClick={handleExportLedger}
+            disabled={loadingLedger}
+            className="w-full py-4 rounded-xl font-bold transition-all text-[#0D1F16] flex items-center justify-center gap-2 bg-white hover:bg-gray-200 disabled:opacity-50"
+          >
+            {loadingLedger ? <Loader2 size={18} className="animate-spin" /> : <HardDrive size={18} />}
+            {loadingLedger ? 'Building File...' : 'Export Finance Ledger (.CSV)'}
           </button>
         </div>
 

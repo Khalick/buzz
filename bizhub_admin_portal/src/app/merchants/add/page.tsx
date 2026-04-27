@@ -15,6 +15,8 @@ export default function AddBusinessPage() {
     category: '',
     description: '',
     whatsapp: '',
+    county: '',
+    town: '',
     address: '',
     latitude: '',
     longitude: '',
@@ -34,12 +36,20 @@ export default function AddBusinessPage() {
           name: formData.name,
           category: formData.category,
           description: formData.description,
-          whatsapp: formData.whatsapp,
-          address: formData.address,
-          coordinates: formData.latitude && formData.longitude ? {
-            latitude: parseFloat(formData.latitude),
-            longitude: parseFloat(formData.longitude)
-          } : null,
+          contact: {
+            whatsapp: formData.whatsapp,
+            phone: formData.whatsapp,
+            email: ''
+          },
+          location: {
+            county: formData.county,
+            town: formData.town,
+            address: formData.address,
+            coordinates: formData.latitude && formData.longitude ? {
+              latitude: parseFloat(formData.latitude),
+              longitude: parseFloat(formData.longitude)
+            } : null
+          },
           approved: formData.approved,
           user_id: (await supabase.auth.getSession()).data.session?.user?.id, // Tie to admin
         })
@@ -54,6 +64,8 @@ export default function AddBusinessPage() {
         category: '',
         description: '',
         whatsapp: '',
+        county: '',
+        town: '',
         address: '',
         latitude: '',
         longitude: '',
@@ -166,6 +178,32 @@ export default function AddBusinessPage() {
                     onChange={(e) => setFormData({...formData, whatsapp: e.target.value})}
                     placeholder="254712345678"
                     className="w-full pl-10 pr-4 py-3 rounded-xl text-white outline-none transition-all placeholder:text-white/20"
+                    style={{ background: 'rgba(13, 31, 22, 0.6)', border: '1px solid rgba(212, 175, 55, 0.2)' }}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#E0E0E0]/70">County *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.county}
+                    onChange={(e) => setFormData({...formData, county: e.target.value})}
+                    placeholder="Kiambu"
+                    className="w-full px-4 py-3 rounded-xl text-white outline-none transition-all placeholder:text-white/20"
+                    style={{ background: 'rgba(13, 31, 22, 0.6)', border: '1px solid rgba(212, 175, 55, 0.2)' }}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#E0E0E0]/70">Town</label>
+                  <input
+                    type="text"
+                    value={formData.town}
+                    onChange={(e) => setFormData({...formData, town: e.target.value})}
+                    placeholder="Thika"
+                    className="w-full px-4 py-3 rounded-xl text-white outline-none transition-all placeholder:text-white/20"
                     style={{ background: 'rgba(13, 31, 22, 0.6)', border: '1px solid rgba(212, 175, 55, 0.2)' }}
                   />
                 </div>

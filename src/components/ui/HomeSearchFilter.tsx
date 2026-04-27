@@ -192,8 +192,7 @@ export default function HomeSearchFilter() {
                         <button
                             key={cat.value}
                             onClick={() => {
-                                setSelectedCategory(cat.value);
-                                setShowFilters(true);
+                                router.push(`/directory?category=${encodeURIComponent(cat.value)}`);
                             }}
                             className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${selectedCategory === cat.value
                                     ? 'bg-[#1B4332] text-white'

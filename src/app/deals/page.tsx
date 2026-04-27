@@ -9,6 +9,7 @@ interface Deal {
   title: string;
   description: string;
   business_name: string;
+  business_id?: string;
   expiry_date?: string;
   is_flash_deal?: boolean;
 }
@@ -92,9 +93,10 @@ const DealsPage = () => {
               const isUrgent = daysRemaining !== null && daysRemaining <= 3;
 
               return (
-                <div
+                <Link
+                  href={deal.business_id ? `/business/${deal.business_id}` : `/directory`}
                   key={deal.id}
-                  className="group card-premium p-6 hover:shadow-2xl"
+                  className="group card-premium p-6 hover:shadow-2xl block cursor-pointer transition-all duration-300"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   {/* Deal Badge */}
@@ -150,7 +152,7 @@ const DealsPage = () => {
                       })}
                     </div>
                   )}
-                </div>
+                </Link>
               );
             })}
           </div>

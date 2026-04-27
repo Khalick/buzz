@@ -36,6 +36,19 @@ export default function SupportCRMPage() {
     fetchTickets();
   }, []);
 
+  const handleResolve = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('support_tickets')
+        .update({ status: 'Resolved' })
+        .eq('id', id);
+      if (error) throw error;
+      setTickets(prev => prev.map(tkt => tkt.id === id ? { ...tkt, status: 'Resolved' } : tkt));
+    } catch (err) {
+      console.error('Failed to resolve ticket:', err);
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-end">
@@ -61,18 +74,19 @@ export default function SupportCRMPage() {
               <th className="px-6 py-4">Subject</th>
               <th className="px-6 py-4">Priority</th>
               <th className="px-6 py-4">Status</th>
+              <th className="px-6 py-4 text-right">Action</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={4} className="px-6 py-12 text-center">
+                <td colSpan={5} className="px-6 py-12 text-center">
                   <Loader2 size={24} className="animate-spin text-[#D4AF37] mx-auto" />
                 </td>
               </tr>
             ) : tickets.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-6 py-12 text-center text-[#E0E0E0]/50">
+                <td colSpan={5} className="px-6 py-12 text-center text-[#E0E0E0]/50">
                   No support tickets open.
                 </td>
               </tr>
@@ -91,6 +105,16 @@ export default function SupportCRMPage() {
                 </td>
                 <td className="px-6 py-4">
                   <span className={`px-2 py-1 rounded text-xs font-bold ${tkt.status === 'Open' ? 'bg-blue-500/10 text-blue-400' : 'bg-green-500/10 text-green-400'}`}>{tkt.status}</span>
+                </td>
+                <td className="px-6 py-4 text-right">
+                  {tkt.status === 'Open' && (
+                    <button 
+                      onClick={() => handleResolve(tkt.id)}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 font-bold transition-all"
+                    >
+                      Resolve
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

@@ -138,9 +138,10 @@ export default function EventsPage() {
               const dateParts = getDateParts(event.event_date);
 
               return (
-                <div
+                <Link
+                  href={`/events/${event.id}`}
                   key={event.id}
-                  className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300"
+                  className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 block cursor-pointer"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   {/* Image or Date Display */}
@@ -209,14 +210,13 @@ export default function EventsPage() {
                       )}
                     </div>
 
-                    <Link
-                      href={`/events/${event.id}`}
-                      className="block w-full bg-[#1B4332] text-white px-4 py-3 rounded-xl hover:bg-[#2D6A4F] transition-colors text-sm font-medium text-center"
+                    <span
+                      className="block w-full bg-[#1B4332] text-white px-4 py-3 rounded-xl hover:bg-[#2D6A4F] transition-colors text-sm font-medium text-center shadow-md"
                     >
                       View Details
-                    </Link>
+                    </span>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>

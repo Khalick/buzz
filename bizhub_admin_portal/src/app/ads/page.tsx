@@ -13,6 +13,7 @@ interface AdPlacement {
   end_date: string;
   views: number;
   clicks: number;
+  image_url?: string;
 }
 
 export default function FeaturedAdsPage() {
@@ -27,6 +28,8 @@ export default function FeaturedAdsPage() {
     startDate: '',
     endDate: ''
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(false);
 
   useEffect(() => {
     fetchAds();
@@ -83,6 +86,28 @@ export default function FeaturedAdsPage() {
     if (!formData.merchantId || !formData.startDate || !formData.endDate) return;
     setActionLoading('launch');
     try {
+      let uploadedUrl = null;
+
+      // Handle raw file upload dynamically if user selected file
+      if (selectedFile) {
+        setUploadProgress(true);
+        const fileExt = selectedFile.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `ads/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('bizhub_assets')
+          .upload(filePath, selectedFile);
+
+        if (uploadError) {
+           console.error("Storage upload failed", uploadError);
+        } else {
+           const { data: publicUrlData } = supabase.storage.from('bizhub_assets').getPublicUrl(filePath);
+           uploadedUrl = publicUrlData.publicUrl;
+        }
+        setUploadProgress(false);
+      }
+
       // Create new ad with defaults
       const newAd = {
         merchant: formData.merchantId, // simplified, usually would map ID to name
@@ -91,16 +116,21 @@ export default function FeaturedAdsPage() {
         start_date: formData.startDate,
         end_date: formData.endDate,
         views: 0,
-        clicks: 0
+        clicks: 0,
+        image_url: uploadedUrl
       };
+      
       const { data, error } = await supabase.from('featured_placements').insert([newAd]).select().single();
       if (error) throw error;
       if (data) setAds(prev => [data, ...prev]);
       setIsModalOpen(false);
+      setSelectedFile(null); // Clear selected file
+      setFormData({merchantId: '', slot: 'Homepage Carousel', startDate: '', endDate: ''});
     } catch (err) {
       console.error('Error launching campaign:', err);
     } finally {
       setActionLoading(null);
+      setUploadProgress(false);
     }
   };
 
@@ -229,11 +259,25 @@ export default function FeaturedAdsPage() {
 
               <div>
                  <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#E0E0E0]/70">Banner Asset Upload</label>
-                 <div className="border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-white/5 transition-colors" style={{ borderColor: 'rgba(212, 175, 55, 0.3)' }}>
+                 <label className="border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-white/5 transition-colors" style={{ borderColor: 'rgba(212, 175, 55, 0.3)' }}>
+                    <input 
+                       type="file" 
+                       accept="image/png, image/jpeg, image/webp"
+                       className="hidden" 
+                       onChange={(e) => {
+                         if (e.target.files && e.target.files[0]) {
+                           setSelectedFile(e.target.files[0]);
+                         }
+                       }} 
+                    />
                     <UploadCloud size={32} className="text-[#D4AF37] mb-3" />
-                    <p className="text-sm font-bold text-white">Click to upload banner image</p>
-                    <p className="text-xs text-[#E0E0E0]/50 mt-1">1080x400px WEBP or PNG</p>
-                 </div>
+                    <p className="text-sm font-bold text-white">
+                      {selectedFile ? selectedFile.name : 'Click to upload banner image'}
+                    </p>
+                    <p className="text-xs text-[#E0E0E0]/50 mt-1">
+                      {selectedFile ? `${Math.round(selectedFile.size / 1024)} KB` : '1080x400px WEBP or PNG'}
+                    </p>
+                 </label>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -251,11 +295,12 @@ export default function FeaturedAdsPage() {
                 <button onClick={() => setIsModalOpen(false)} className="flex-1 py-3 rounded-xl font-bold text-white border border-white/10 hover:bg-white/5 transition-colors">Cancel</button>
                 <button 
                   onClick={handleLaunchCampaign}
-                  disabled={actionLoading === 'launch'}
+                  disabled={actionLoading === 'launch' || uploadProgress}
                   className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
                   style={{ background: '#D4AF37', color: '#0D1F16' }}
                 >
-                  {actionLoading === 'launch' ? <Loader2 size={18} className="animate-spin" /> : <Star size={18} />} Launch Campaign
+                  {(actionLoading === 'launch' || uploadProgress) ? <Loader2 size={18} className="animate-spin" /> : <Star size={18} />} 
+                  {uploadProgress ? 'Uploading...' : 'Launch Campaign'}
                 </button>
               </div>
             </div>

@@ -91,7 +91,7 @@ export default function FavoritesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {businesses.map((business) => (
-            <div key={business.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+            <Link href={`/business/${business.id}`} key={business.id} className="block bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer">
               <div className="h-48 bg-gray-200">
                 {business.images && business.images.length > 0 ? (
                   <img
@@ -110,7 +110,11 @@ export default function FavoritesPage() {
                 <div className="flex items-start justify-between mb-2">
                   <h3 className="text-xl font-bold text-gray-900 flex-1">{business.name}</h3>
                   <button
-                    onClick={() => toggleFavorite(business.id)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleFavorite(business.id);
+                    }}
                     className="text-red-600 hover:text-red-700 transition-colors"
                   >
                     <Trash2 className="h-5 w-5" />
@@ -124,15 +128,14 @@ export default function FavoritesPage() {
                   <div className="text-sm text-gray-600">
                     ⭐ {business.rating ? business.rating.toFixed(1) : '0.0'}
                   </div>
-                  <a
-                    href={`/business/${business.id}`}
+                  <span
                     className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
                   >
                     View Details
-                  </a>
+                  </span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

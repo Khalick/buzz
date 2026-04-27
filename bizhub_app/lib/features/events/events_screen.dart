@@ -90,11 +90,15 @@ class EventsScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         clipBehavior: Clip.antiAlias,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Event Image
-                            if (event.imageUrl != null)
+                        child: InkWell(
+                          onTap: event.businessId != null 
+                            ? () => context.push('/business/${event.businessId}')
+                            : null,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Event Image
+                              if (event.imageUrl != null)
                               CachedNetworkImage(
                                 imageUrl: event.imageUrl!,
                                 height: 150,

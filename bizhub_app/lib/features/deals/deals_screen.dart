@@ -51,151 +51,144 @@ class DealsScreen extends ConsumerWidget {
                     color: SpotifyColors.surface,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Deal Header (Badges)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            if (deal.isFlashDeal)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.red.shade50,
-                                  border: Border.all(color: Colors.red.shade200),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      width: 6,
-                                      height: 6,
-                                      decoration: BoxDecoration(
-                                        color: Colors.red.shade600,
-                                        shape: BoxShape.circle,
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: deal.businessId != null 
+                        ? () => context.push('/business/${deal.businessId}')
+                        : null,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Deal Header (Badges)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              if (deal.isFlashDeal)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red.shade50,
+                                    border: Border.all(color: Colors.red.shade200),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 6,
+                                        height: 6,
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.shade600,
+                                          shape: BoxShape.circle,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      'LIVE PULSE',
-                                      style: TextStyle(
-                                        color: Colors.red.shade600,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w900,
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'LIVE PULSE',
+                                        style: TextStyle(
+                                          color: Colors.red.shade600,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w900,
+                                        ),
                                       ),
+                                    ],
+                                  ),
+                                )
+                              else
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFD4AF37).withAlpha(30),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Text(
+                                    '🏷️ DEAL',
+                                    style: TextStyle(
+                                      color: Color(0xFFD4AF37),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                  ],
-                                ),
-                              )
-                            else
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFD4AF37).withAlpha(30),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Text(
-                                  '🏷️ DEAL',
-                                  style: TextStyle(
-                                    color: Color(0xFFD4AF37),
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ),
-                            
-                            if (deal.daysRemaining != null)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: isUrgent ? SpotifyColors.error.withAlpha(40) : SpotifyColors.green.withAlpha(20),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  '${isUrgent || deal.isFlashDeal ? '⚡ ' : ''}${deal.daysRemaining} days left',
-                                  style: TextStyle(
-                                    color: isUrgent ? SpotifyColors.error : SpotifyColors.green,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
+                              
+                              if (deal.daysRemaining != null)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: isUrgent ? SpotifyColors.error.withAlpha(40) : SpotifyColors.green.withAlpha(20),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    '${isUrgent || deal.isFlashDeal ? '⚡ ' : ''}${deal.daysRemaining} days left',
+                                    style: TextStyle(
+                                      color: isUrgent ? SpotifyColors.error : SpotifyColors.green,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Deal Content
-                        Text(
-                          deal.title,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: SpotifyColors.textPrimary,
+                            ],
                           ),
-                        ),
-                        if (deal.description != null) ...[
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 12),
+
+                          // Deal Content
                           Text(
-                            deal.description!,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: SpotifyColors.textSecondary,
+                            deal.title,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: SpotifyColors.textPrimary,
                             ),
+                          ),
+                          if (deal.description != null) ...[
+                            const SizedBox(height: 6),
+                            Text(
+                              deal.description!,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: SpotifyColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 16),
+                          const Divider(height: 1, color: SpotifyColors.highlight),
+                          const SizedBox(height: 12),
+
+                          // Business Info
+                          Row(
+                            children: [
+                              Container(
+                                width: 32,
+                                height: 32,
+                                decoration: const BoxDecoration(
+                                  color: SpotifyColors.highlight,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    deal.businessName.isNotEmpty ? deal.businessName[0].toUpperCase() : '?',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  deal.businessName,
+                                  style: TextStyle(
+                                    color: SpotifyColors.textPrimary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
-                        const SizedBox(height: 16),
-                        const Divider(height: 1, color: SpotifyColors.highlight),
-                        const SizedBox(height: 12),
-
-                        // Business Info
-                        Row(
-                          children: [
-                            Container(
-                              width: 32,
-                              height: 32,
-                              decoration: const BoxDecoration(
-                                color: SpotifyColors.highlight,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  deal.businessName.isNotEmpty ? deal.businessName[0].toUpperCase() : '?',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                deal.businessName,
-                                style: TextStyle(
-                                  color: SpotifyColors.textPrimary,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                            if (deal.businessId != null)
-                              TextButton(
-                                onPressed: () => context.push('/business/${deal.businessId}'),
-                                style: TextButton.styleFrom(
-                                  padding: EdgeInsets.zero,
-                                  minimumSize: Size.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                child: Text(
-                                  'View',
-                                  style: TextStyle(color: theme.colorScheme.primary),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 );

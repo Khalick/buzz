@@ -160,8 +160,13 @@ export default function DirectoryPage() {
     const isCompared = compareList.some(b => b.id === business.id);
 
     return (
-      <div className={`group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 relative ${business.isPremium ? 'ring-2 ring-[#D4AF37]' : ''}`}>
-        <div className="absolute top-3 left-3 z-10 flex gap-1.5 items-center">
+      <div 
+        onClick={() => {
+          window.location.href = `/business/${business.id}`;
+        }}
+        className={`group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 relative cursor-pointer ${business.isPremium ? 'ring-2 ring-[#D4AF37]' : ''}`}
+      >
+        <div className="absolute top-3 left-3 z-10 flex gap-1.5 items-center" onClick={(e) => e.stopPropagation()}>
           <FavoriteButton businessId={business.id} />
           <button
             onClick={(e) => {
@@ -254,12 +259,13 @@ export default function DirectoryPage() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2" onClick={(e) => e.stopPropagation()}>
             {(business.contact.whatsapp || business.contact.phone) && (
               <a
                 href={getWhatsAppLink()}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
                 className="bg-[#25D366] text-white px-3 py-2.5 rounded-xl hover:bg-[#20BD5C] transition-colors text-sm font-medium flex items-center justify-center gap-1.5"
               >
                 <MessageCircle className="h-4 w-4" />
@@ -268,6 +274,7 @@ export default function DirectoryPage() {
             )}
             <Link
               href={`/business/${business.id}`}
+              onClick={(e) => e.stopPropagation()}
               className="bg-[#1B4332] text-white px-3 py-2.5 rounded-xl hover:bg-[#2D6A4F] transition-colors text-sm font-medium text-center flex items-center justify-center"
             >
               View Details
@@ -318,6 +325,18 @@ export default function DirectoryPage() {
               </div>
               
               <SearchFilter 
+                onSearch={(q) => {
+                  setSearchQuery(q);
+                  setPagination(prev => ({ ...prev, currentPage: 1 }));
+                }}
+                onCategoryFilter={(c) => {
+                  setSelectedCategory(c || 'All Categories');
+                  setPagination(prev => ({ ...prev, currentPage: 1 }));
+                }}
+                onLocationFilter={(l) => {
+                  setSelectedCounty(l || 'All Counties');
+                  setPagination(prev => ({ ...prev, currentPage: 1 }));
+                }}
                 onSortChange={(sort) => {
                   setSortBy(sort);
                   setPagination(prev => ({ ...prev, currentPage: 1 }));

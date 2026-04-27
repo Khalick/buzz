@@ -15,6 +15,15 @@ interface Promotion {
 export default function PromotionsPage() {
   const [promos, setPromos] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    code: '',
+    discount: '',
+    type: 'Percentage',
+    usage: '100',
+    status: 'Active'
+  });
 
   useEffect(() => {
     async function fetchPromos() {
@@ -34,6 +43,26 @@ export default function PromotionsPage() {
     fetchPromos();
   }, []);
 
+  const handleCreatePromo = async () => {
+    if (!formData.code || !formData.discount) return;
+    setActionLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('promotions')
+        .insert([formData])
+        .select()
+        .single();
+      if (error) throw error;
+      if (data) setPromos(prev => [data, ...prev]);
+      setIsModalOpen(false);
+      setFormData({ code: '', discount: '', type: 'Percentage', usage: '100', status: 'Active' });
+    } catch (err) {
+      console.error('Failed to create promotion:', err);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-end">
@@ -41,7 +70,10 @@ export default function PromotionsPage() {
           <h1 className="text-3xl font-black text-[#D4AF37] tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>Voucher & Promo Engine</h1>
           <p className="text-[#E0E0E0]/70 mt-1">Generate marketing codes for field agents and online campaigns.</p>
         </div>
-        <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10"
+        >
           <Plus size={18} /> New Promo Code
         </button>
       </div>
@@ -88,6 +120,53 @@ export default function PromotionsPage() {
           </tbody>
         </table>
       </div>
+
+      {/* New Promo Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-2xl p-8" style={{ background: '#0D1F16', border: '1px solid rgba(212, 175, 55, 0.3)' }}>
+            <h2 className="text-2xl font-bold text-white mb-6" style={{ fontFamily: 'Outfit, sans-serif' }}>Create Promo Code</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#E0E0E0]/70">Code</label>
+                <input type="text" value={formData.code} onChange={(e) => setFormData({...formData, code: e.target.value.toUpperCase()})} placeholder="e.g. SUMMER24" className="w-full px-4 py-3 rounded-xl text-white outline-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#E0E0E0]/70">Discount Value</label>
+                  <input type="text" value={formData.discount} onChange={(e) => setFormData({...formData, discount: e.target.value})} placeholder="e.g. 25% or KES 500" className="w-full px-4 py-3 rounded-xl text-white outline-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#E0E0E0]/70">Type</label>
+                  <select value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value})} className="w-full px-4 py-3 rounded-xl text-white outline-none appearance-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <option value="Percentage">Percentage</option>
+                    <option value="Fixed Amount">Fixed Amount</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#E0E0E0]/70">Usage Limit</label>
+                <input type="number" value={formData.usage} onChange={(e) => setFormData({...formData, usage: e.target.value})} className="w-full px-4 py-3 rounded-xl text-white outline-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+              </div>
+
+              <div className="pt-4 mt-4 flex gap-4">
+                <button onClick={() => setIsModalOpen(false)} className="flex-1 py-3 rounded-xl font-bold text-white border border-white/10 hover:bg-white/5 transition-colors">Cancel</button>
+                <button 
+                  onClick={handleCreatePromo}
+                  disabled={actionLoading || !formData.code || !formData.discount}
+                  className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+                  style={{ background: '#D4AF37', color: '#0D1F16' }}
+                >
+                  {actionLoading ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />} Create Promo
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

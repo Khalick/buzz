@@ -9,9 +9,16 @@ interface Business {
   id: string;
   name: string;
   category: string;
-  whatsapp: string;
+  contact?: {
+    whatsapp?: string;
+    phone?: string;
+  };
   approved: boolean;
-  address?: string;
+  location?: {
+    address?: string;
+    county?: string;
+    town?: string;
+  };
   created_at: string;
 }
 
@@ -25,7 +32,7 @@ export default function MerchantsPage() {
       try {
         const { data, error } = await supabase
           .from('businesses')
-          .select('id, name, category, whatsapp, approved, address, created_at')
+          .select('id, name, category, contact, approved, location, created_at')
           .order('created_at', { ascending: false });
         
         if (error) throw error;
@@ -39,10 +46,11 @@ export default function MerchantsPage() {
     fetchMerchants();
   }, []);
 
-  const filteredMerchants = merchants.filter(m => 
-    m.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    m.whatsapp.includes(searchTerm)
-  );
+  const filteredMerchants = merchants.filter(m => {
+    const searchString = searchTerm.toLowerCase();
+    const phone = m.contact?.whatsapp || m.contact?.phone || '';
+    return m.name.toLowerCase().includes(searchString) || phone.includes(searchString);
+  });
 
   return (
     <div className="space-y-8">
@@ -114,13 +122,13 @@ export default function MerchantsPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                        <Phone size={14} className="text-[#E0E0E0]/40" />
-                       {merchant.whatsapp}
+                       {merchant.contact?.whatsapp || merchant.contact?.phone || 'N/A'}
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                        <MapPin size={14} className="text-[#E0E0E0]/40" />
-                       <span className="truncate max-w-[150px]">{merchant.address || 'GPS Only'}</span>
+                       <span className="truncate max-w-[150px]">{merchant.location?.address || `${merchant.location?.town || 'GPS Only'}`}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
