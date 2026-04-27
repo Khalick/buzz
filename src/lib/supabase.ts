@@ -172,7 +172,13 @@ export const signInWithEmail = async (email: string, password: string) => {
 };
 
 export const signUpWithEmail = async (email: string, password: string) => {
-  return supabase.auth.signUp({ email, password });
+  return supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${getURL()}/auth/callback`,
+    },
+  });
 };
 
 export const signInWithGoogle = async () => {

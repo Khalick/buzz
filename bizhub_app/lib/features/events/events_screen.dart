@@ -251,9 +251,10 @@ class EventsScreen extends ConsumerWidget {
                             ),
                           ],
                         ),
-                      );
-                    },
-                  );
+                      ),
+                    );
+                  },
+                );
                 },
                 loading: () => ListView.builder(
                   padding: const EdgeInsets.all(16),
