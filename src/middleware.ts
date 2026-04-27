@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createHash } from 'crypto';
+
+// djb2 hash string for rate limiting (avoids Node.js crypto in Edge runtime)
+function hashString(str: string) {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 33) ^ str.charCodeAt(i);
+  }
+  return (hash >>> 0).toString(16);
+}
 
 // ============================================================
 // BIZHUB SECURITY MIDDLEWARE
@@ -93,7 +101,11 @@ function getClientIp(req: NextRequest): string {
 function generateNonce(): string {
   const array = new Uint8Array(16);
   crypto.getRandomValues(array);
-  return Buffer.from(array).toString('base64');
+  let str = '';
+  for (let i = 0; i < array.length; i++) {
+    str += String.fromCharCode(array[i]);
+  }
+  return btoa(str);
 }
 
 // --- 6. Comprehensive security headers (CSP, HSTS, anti-clickjack, etc.) ---
@@ -210,7 +222,7 @@ export function middleware(req: NextRequest) {
     // Prefer user ID from auth header if available, otherwise use IP
     const authHeader = req.headers.get('authorization') || '';
     const rateLimitKey = authHeader
-      ? createHash('sha256').update(authHeader).digest('hex').slice(0, 16)
+      ? `user:${hashString(authHeader)}`
       : `ip:${clientIp}`;
 
     const { allowed, remaining, resetAt } = checkRateLimit(`${rateLimitKey}:${pathname}`, pathname);
