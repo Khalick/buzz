@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_service.dart';
 
@@ -33,7 +34,7 @@ class AuthService {
     return await _client.auth.signUp(
       email: email,
       password: password,
-      emailRedirectTo: const bool.fromEnvironment('dart.library.js_util') 
+      emailRedirectTo: kIsWeb 
           ? Uri.base.origin 
           : 'io.supabase.bizhub://login-callback/',
     );
@@ -43,7 +44,7 @@ class AuthService {
   Future<bool> signInWithGoogle() async {
     return await _client.auth.signInWithOAuth(
       OAuthProvider.google,
-      redirectTo: const bool.fromEnvironment('dart.library.js_util') 
+      redirectTo: kIsWeb 
           ? Uri.base.origin 
           : 'io.supabase.bizhub://login-callback/',
     );
