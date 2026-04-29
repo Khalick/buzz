@@ -4,17 +4,21 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useBusinessOwner } from '@/hooks/useBusinessOwner';
-import { LayoutDashboard, Star, Eye, MessageCircle, Edit3, Tag, Plus, Building2, CheckCircle, Clock, TrendingUp, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Star, Eye, MessageCircle, Edit3, Tag, Plus, Building2, CheckCircle, Clock, TrendingUp, Sparkles, ShieldCheck } from 'lucide-react';
 
 export default function DashboardPage() {
-  const { businesses, loading, user } = useBusinessOwner();
+  const { businesses, loading, user, isMerchant, userRole } = useBusinessOwner();
   const router = useRouter();
 
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
     }
-  }, [loading, user, router]);
+    // Redirect non-merchant users to the upgrade page
+    if (!loading && user && userRole !== null && !isMerchant) {
+      router.push('/become-merchant');
+    }
+  }, [loading, user, isMerchant, userRole, router]);
 
   if (loading) {
     return (
@@ -166,6 +170,13 @@ export default function DashboardPage() {
                 >
                   <Sparkles className="h-4 w-4" />
                   Smart Leads Inbox
+                </Link>
+                <Link
+                  href="/dashboard/verification"
+                  className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 border border-blue-200 font-semibold py-2.5 px-5 rounded-xl hover:bg-blue-100 transition-colors text-sm"
+                >
+                  <ShieldCheck className="h-4 w-4" />
+                  Get Verified
                 </Link>
                 <Link
                   href="/directory/add"

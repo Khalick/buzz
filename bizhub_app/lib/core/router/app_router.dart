@@ -24,11 +24,13 @@ import '../../features/dashboard/insights_screen.dart';
 import '../../features/dashboard/leads_inbox_screen.dart';
 import '../../features/dashboard/partnerships_screen.dart';
 import '../../features/dashboard/top_promoters_screen.dart';
+import '../../features/dashboard/verification_screen.dart';
 import '../../features/requests/broadcast_request_screen.dart';
 import '../../features/invitations/invitations_screen.dart';
 import '../../features/admin/analytics_screen.dart';
 import '../../features/admin/competitor_insights_screen.dart';
 import '../../features/proof/proof_of_visit_screen.dart';
+import '../../features/profile/become_merchant_screen.dart';
 import '../../features/home/ask_bizhub_screen.dart';
 import '../services/supabase_service.dart';
 
@@ -140,6 +142,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/proof-of-visit',
         builder: (context, state) => const ProofOfVisitScreen(),
       ),
+      GoRoute(
+        path: '/become-merchant',
+        builder: (context, state) => const BecomeMerchantScreen(),
+      ),
       // --- New Feature Routes ---
       GoRoute(
         path: '/dashboard/edit/:id',
@@ -175,6 +181,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/dashboard/promoters',
         builder: (context, state) => const TopPromotersScreen(),
+      ),
+      GoRoute(
+        path: '/dashboard/verification',
+        builder: (context, state) => const VerificationScreen(),
       ),
       GoRoute(
         path: '/requests/new',

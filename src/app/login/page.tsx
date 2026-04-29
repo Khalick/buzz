@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { signInWithEmail, signUpWithEmail, signInWithGoogle } from '@/lib/supabase';
+import { signInWithEmail, signUpWithEmail, signInWithGoogle, supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -30,6 +30,23 @@ const LoginPage = () => {
       } else {
         const { data, error } = await signInWithEmail(email, password);
         if (error) throw error;
+        // Ensure public.users row exists (backfill for pre-trigger accounts)
+        if (data?.user) {
+          try {
+            await supabase.from('users').upsert(
+              {
+                id: data.user.id,
+                email: data.user.email || '',
+                display_name: data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || '',
+                role: 'user',
+                updated_at: new Date().toISOString(),
+              },
+              { onConflict: 'id', ignoreDuplicates: true }
+            );
+          } catch (err) {
+            console.error('User profile upsert error (non-fatal):', err);
+          }
+        }
       }
 
       router.push('/');

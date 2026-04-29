@@ -263,6 +263,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       _buildQuickAction(Icons.favorite, 'Favorites', () => context.push('/favorites'), theme),
                       _buildQuickAction(Icons.mail_outline, 'Invitations', () => context.push('/invitations'), theme),
                       _buildQuickAction(Icons.broadcast_on_personal, 'Request a Service', () => context.push('/requests/new'), theme),
+                      if (profile.role != 'merchant' && profile.role != 'admin')
+                        _buildQuickAction(Icons.store, 'Become a Merchant', () => context.push('/become-merchant'), theme),
                     ],
                   ),
                   const SizedBox(height: 24),

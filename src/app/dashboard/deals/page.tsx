@@ -14,6 +14,7 @@ interface Deal {
   business_id: string;
   expiry_date?: string;
   is_flash_deal?: boolean;
+  redeem_count?: number;
 }
 
 export default function DealsDashboard() {
@@ -254,9 +255,14 @@ export default function DealsDashboard() {
                 </div>
                 <h4 className="font-bold text-[#1A1A1A] text-lg">{deal.title}</h4>
                 {deal.expiry_date && (
-                   <p className="text-xs text-[#737373] mt-1 flex items-center gap-1">
-                     <Clock className="w-3 h-3" /> Expires: {new Date(deal.expiry_date).toLocaleString()}
-                   </p>
+                   <div className="flex items-center gap-3">
+                     <p className="text-xs text-[#737373] mt-1 flex items-center gap-1">
+                       <Clock className="w-3 h-3" /> Expires: {new Date(deal.expiry_date).toLocaleString()}
+                     </p>
+                     <p className="text-xs text-[#1B4332] font-semibold mt-1 flex items-center gap-1 bg-[#1B4332]/10 px-2 py-0.5 rounded">
+                       Redeemed: {deal.redeem_count || 0} times
+                     </p>
+                   </div>
                 )}
               </div>
               <button 

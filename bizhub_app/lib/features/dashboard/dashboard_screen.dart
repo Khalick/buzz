@@ -101,6 +101,7 @@ class DashboardScreen extends ConsumerWidget {
                   _QuickAction(icon: Icons.handshake_outlined, label: 'Partnerships', onTap: () => context.push('/dashboard/partnerships')),
                   _QuickAction(icon: Icons.inbox_outlined, label: 'Smart Leads', onTap: () => context.push('/dashboard/leads')),
                   _QuickAction(icon: Icons.favorite_border, label: 'Top Promoters', onTap: () => context.push('/dashboard/promoters')),
+                  _QuickAction(icon: Icons.verified_outlined, label: 'Get Verified', onTap: () => context.push('/dashboard/verification')),
                 ]),
                 const SizedBox(height: 24),
 

@@ -79,8 +79,6 @@ export default function BusinessDetailPage() {
 
   const fetchBusiness = async () => {
     try {
-      const res = await fetch(`/api/businesses?search=&page=1&limit=1`);
-      // We need a dedicated single-business endpoint, so let's use supabase directly
       const { supabase } = await import('@/lib/supabase');
       const { data, error } = await supabase
         .from('businesses')
@@ -90,6 +88,14 @@ export default function BusinessDetailPage() {
 
       if (error) throw error;
       setBusiness(data);
+
+      // Increment views via RPC securely and asynchronously without blocking
+      const incrementViews = async () => {
+        const { error: rpcError } = await supabase.rpc('increment_business_views', { business_id: businessId });
+        if (rpcError) console.error('Error incrementing views:', rpcError);
+      };
+      incrementViews();
+
     } catch (err) {
       console.error('Error fetching business:', err);
     } finally {

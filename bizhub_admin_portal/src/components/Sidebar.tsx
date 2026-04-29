@@ -3,12 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { LayoutDashboard, Users, ShieldCheck, CreditCard, Search, MapPin, LogOut, Megaphone, Star, ShieldAlert, FileText, Tag, LifeBuoy, Building, DownloadCloud } from 'lucide-react';
+import { LayoutDashboard, Users, ShieldCheck, CreditCard, Search, MapPin, LogOut, Megaphone, Star, ShieldAlert, FileText, Tag, LifeBuoy, Building, DownloadCloud, Store } from 'lucide-react';
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/users', label: 'Platform Users', icon: Users },
   { href: '/queue', label: 'Verification Queue', icon: ShieldCheck },
-  { href: '/merchants', label: 'All Merchants', icon: Users },
+  { href: '/merchants', label: 'All Merchants', icon: Store },
+  { href: '/merchant-requests', label: 'Merchant Requests', icon: Store },
   { href: '/payments', label: 'M-Pesa Ledger', icon: CreditCard },
   { href: '/ads', label: 'Featured Ads', icon: Star },
   { href: '/moderation', label: 'Moderation Feed', icon: ShieldCheck },

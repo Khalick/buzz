@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { signOut } from '@/lib/supabase';
 
 import NotificationBell from '@/components/ui/NotificationBell';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 const Header = () => {
   const { user, loading } = useAuth();
@@ -92,6 +93,7 @@ const Header = () => {
 
           {/* User Actions */}
           <div className="hidden lg:flex items-center gap-3">
+            <ThemeToggle />
             {loading ? (
               <div className="flex items-center gap-2">
                 <div className="w-5 h-5 border-2 border-[#1B4332]/20 border-t-[#1B4332] rounded-full animate-spin"></div>
@@ -186,7 +188,11 @@ const Header = () => {
 
             </div>
 
-            <div className="mt-4 pt-4 border-t border-[#1B4332]/10">
+            <div className="mt-4 pt-4 border-t border-[#1B4332]/10 flex flex-col gap-2">
+              <div className="flex items-center justify-between px-4 py-2">
+                <span className="text-sm font-medium text-[#525252]">Dark Mode</span>
+                <ThemeToggle />
+              </div>
               {loading ? (
                 <div className="flex justify-center py-4">
                   <div className="w-6 h-6 border-2 border-[#1B4332]/20 border-t-[#1B4332] rounded-full animate-spin"></div>

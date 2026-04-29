@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase, signOut } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { User, MapPin, Phone, FileText, Calendar, Edit3, Save, X, LogOut, Briefcase, Camera, Award } from 'lucide-react';
+import { User, MapPin, Phone, FileText, Calendar, Edit3, Save, X, LogOut, Briefcase, Camera, Award, Store } from 'lucide-react';
 
 interface UserProfile {
   id: string;
@@ -29,6 +29,7 @@ const ProfilePage = () => {
   const { user, loading } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [activities, setActivities] = useState<UserActivity[]>([]);
+  const [merchantRequest, setMerchantRequest] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
     display_name: '',
@@ -156,6 +157,20 @@ const ProfilePage = () => {
 
       activities.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       setActivities(activities);
+
+      // Fetch merchant request status safely
+      try {
+        const { data: request } = await supabase
+          .from('merchant_requests')
+          .select('status')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+        if (request) setMerchantRequest(request);
+      } catch (err) {
+        console.error('No merchant requests table yet or error fetching.');
+      }
     } catch (error) {
       console.error('Error fetching activities:', error);
     }
@@ -350,6 +365,30 @@ const ProfilePage = () => {
                         <LogOut className="h-4 w-4" />
                         Sign Out
                       </button>
+                      
+                      {profile.role !== 'admin' && profile.role !== 'merchant' && (
+                        <div className="pt-4 border-t border-[#E5E5E5] mt-2">
+                          {merchantRequest ? (
+                            <div className={`p-4 rounded-xl border flex flex-col gap-1 items-center justify-center text-center ${
+                              merchantRequest.status === 'pending' ? 'bg-[#D4AF37]/10 border-[#D4AF37] text-[#856404]' :
+                              merchantRequest.status === 'rejected' ? 'bg-red-50 border-red-200 text-red-700' :
+                              'bg-green-50 border-green-200 text-green-700'
+                            }`}>
+                              <Briefcase className="h-5 w-5 mb-1" />
+                              <span className="font-bold text-sm">Merchant Status: {merchantRequest.status.toUpperCase()}</span>
+                              {merchantRequest.status === 'pending' && <span className="text-xs">Your request is under review.</span>}
+                            </div>
+                          ) : (
+                            <a
+                              href="/become-merchant"
+                              className="w-full bg-[#D4AF37] text-white font-semibold flex items-center justify-center gap-2 py-3 px-4 rounded-xl hover:bg-[#B3932F] transition-colors shadow-sm"
+                            >
+                              <Store className="h-4 w-4" />
+                              Become a Merchant
+                            </a>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ) : (

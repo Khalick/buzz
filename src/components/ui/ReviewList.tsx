@@ -13,6 +13,8 @@ interface Review {
   comment: string | null;
   created_at: string;
   user_name?: string;
+  response?: string | null;
+  response_at?: string | null;
 }
 
 interface ReviewStats {

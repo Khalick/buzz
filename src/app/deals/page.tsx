@@ -96,6 +96,15 @@ const DealsPage = () => {
                 <Link
                   href={deal.business_id ? `/business/${deal.business_id}` : `/directory`}
                   key={deal.id}
+                  onClick={() => {
+                    if (deal.id) {
+                      const redeem = async () => {
+                        const { error } = await supabase.rpc('increment_deal_redeems', { deal_id: deal.id });
+                        if (error) console.error(error);
+                      };
+                      redeem();
+                    }
+                  }}
                   className="group card-premium p-6 hover:shadow-2xl block cursor-pointer transition-all duration-300"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >

@@ -3,14 +3,12 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { 
-  Users, 
-  Store, 
-  MapPin, 
-  ShieldCheck, 
-  TrendingUp, 
-  Activity,
-  Loader2
+  Users, Store, MapPin, ShieldCheck, TrendingUp, Activity, Loader2
 } from 'lucide-react';
+import { 
+  LineChart, Line, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, 
+  PieChart, Pie, Cell, Legend 
+} from 'recharts';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -20,7 +18,11 @@ export default function Dashboard() {
     trustScoreAvg: 0
   });
   const [logs, setLogs] = useState<any[]>([]);
+  const [userGrowth, setUserGrowth] = useState<any[]>([]);
+  const [categoryData, setCategoryData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const COLORS = ['#D4AF37', '#2D6A4F', '#0D1F16', '#40916C', '#1B4332'];
 
   useEffect(() => {
     async function fetchStats() {
@@ -55,6 +57,33 @@ export default function Dashboard() {
 
         if (recentLogs) {
           setLogs(recentLogs);
+        }
+
+        // Fetch users for growth chart
+        const { data: allUsers } = await supabase.from('users').select('created_at');
+        if (allUsers) {
+          const dateCounts: Record<string, number> = {};
+          // Group by short date string
+          allUsers.forEach(u => {
+             const date = new Date(u.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+             dateCounts[date] = (dateCounts[date] || 0) + 1;
+          });
+          // For demo, creating a sequence of last 7 days if data is too small, or just using what we have
+          const chartData = Object.keys(dateCounts).map(k => ({ date: k, users: dateCounts[k] })).slice(-7);
+          setUserGrowth(chartData.length > 0 ? chartData : [{ date: 'Today', users: 0 }]);
+        }
+
+        // Fetch businesses for category pie chart
+        const { data: allBiz } = await supabase.from('businesses').select('category');
+        if (allBiz) {
+          const catCounts: Record<string, number> = {};
+          allBiz.forEach(b => {
+             const cat = b.category || 'Other';
+             catCounts[cat] = (catCounts[cat] || 0) + 1;
+          });
+          const pieData = Object.keys(catCounts).map(k => ({ name: k, value: catCounts[k] }))
+                            .sort((a,b) => b.value - a.value).slice(0, 5); // top 5
+          setCategoryData(pieData);
         }
 
         setStats({
@@ -137,42 +166,68 @@ export default function Dashboard() {
       )}
 
       {/* Main Charts Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 rounded-2xl p-6" style={{
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* User Growth Chart */}
+        <div className="rounded-2xl p-6" style={{
           background: 'rgba(27, 67, 50, 0.4)',
           backdropFilter: 'blur(12px)',
           border: '1px solid rgba(212, 175, 55, 0.15)',
         }}>
-          <h3 className="text-lg font-bold text-white mb-6" style={{ fontFamily: 'Outfit, sans-serif' }}>System Activity (Live)</h3>
-          <div className="space-y-4">
-             {logs.length === 0 ? (
-                 <div className="h-64 w-full flex items-center justify-center border border-dashed rounded-xl" style={{ borderColor: 'rgba(212, 175, 55, 0.2)' }}>
-                   <p className="text-sm text-[#E0E0E0]/40 font-medium">No recent system activity recorded.</p>
-                 </div>
-             ) : (
-                logs.map((log) => (
-                  <div key={log.id} className="p-3 bg-white/5 rounded-xl border border-white/5 text-sm flex justify-between items-center">
-                     <div>
-                       <span className="font-bold text-white">{log.action}</span>
-                       <p className="text-xs text-[#E0E0E0]/60 mt-1">{log.target}</p>
-                     </div>
-                     <span className="text-xs text-[#D4AF37] opacity-60 font-mono">{log.created_at ? new Date(log.created_at).toLocaleString() : log.time}</span>
-                  </div>
-                ))
-             )}
+          <h3 className="text-lg font-bold text-white mb-6" style={{ fontFamily: 'Outfit, sans-serif' }}>New User Signups</h3>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={userGrowth}>
+                <XAxis dataKey="date" stroke="#E0E0E080" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="#E0E0E080" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
+                <RechartsTooltip 
+                   contentStyle={{ backgroundColor: '#0D1F16', borderColor: '#D4AF3740', color: '#fff', borderRadius: '8px' }}
+                   itemStyle={{ color: '#D4AF37', fontWeight: 'bold' }}
+                />
+                <Line type="monotone" dataKey="users" stroke="#D4AF37" strokeWidth={3} dot={{ r: 4, fill: '#D4AF37' }} activeDot={{ r: 6 }} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="rounded-2xl p-6 flex flex-col items-center justify-center" style={{
+        {/* Business Category Breakdown */}
+        <div className="rounded-2xl p-6 flex flex-col" style={{
           background: 'rgba(27, 67, 50, 0.4)',
           backdropFilter: 'blur(12px)',
           border: '1px solid rgba(212, 175, 55, 0.15)',
         }}>
-          <ShieldCheck size={48} className="text-[#D4AF37] opacity-30 mb-4" />
-          <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>Pending Registration Queue</h3>
-          <p className="text-sm text-[#E0E0E0]/60 text-center mb-6">Check the Verification Queue to manually activate businesses.</p>
-          <a href="/queue" className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all text-[#0D1F16]" style={{ background: 'linear-gradient(135deg, #D4AF37, #c4a030)' }}>Manage Approvals</a>
+          <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'Outfit, sans-serif' }}>Business Category Breakdown</h3>
+          <div className="flex-1 h-[300px] w-full min-h-0 relative">
+            {categoryData.length > 0 ? (
+               <ResponsiveContainer width="100%" height="100%">
+                 <PieChart>
+                   <Pie
+                     data={categoryData}
+                     cx="50%"
+                     cy="50%"
+                     innerRadius={60}
+                     outerRadius={90}
+                     paddingAngle={5}
+                     dataKey="value"
+                     stroke="none"
+                   >
+                     {categoryData.map((entry, index) => (
+                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                     ))}
+                   </Pie>
+                   <RechartsTooltip 
+                     contentStyle={{ backgroundColor: '#0D1F16', borderColor: '#D4AF3740', color: '#fff', borderRadius: '8px' }}
+                   />
+                   <Legend verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: '12px', color: '#E0E0E0' }} />
+                 </PieChart>
+               </ResponsiveContainer>
+            ) : (
+               <div className="w-full h-full flex items-center justify-center">
+                 <p className="text-sm text-[#E0E0E0]/50">No business data available.</p>
+               </div>
+            )}
+          </div>
         </div>
+
       </div>
     </div>
   );

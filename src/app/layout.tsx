@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { NotificationProvider } from "@/components/ui/NotificationSystem";
 import AskBizHub from "@/components/ui/AskBizHub";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -45,14 +46,16 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable} scroll-smooth`} data-scroll-behavior="smooth">
       <body className="font-sans antialiased bg-[#FAFAF8] text-neutral-900">
-        <NotificationProvider>
-          <Header />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-          <AskBizHub />
-        </NotificationProvider>
+        <ThemeProvider>
+          <NotificationProvider>
+            <Header />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
+            <AskBizHub />
+          </NotificationProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

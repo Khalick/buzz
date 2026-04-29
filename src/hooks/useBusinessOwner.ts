@@ -27,6 +27,7 @@ interface OwnedBusiness {
 export function useBusinessOwner() {
   const { user, loading: authLoading } = useAuth();
   const [businesses, setBusinesses] = useState<OwnedBusiness[]>([]);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -36,8 +37,20 @@ export function useBusinessOwner() {
       return;
     }
 
-    const fetchOwnedBusinesses = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch user role from public.users
+        const { data: userData } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (userData) {
+          setUserRole(userData.role);
+        }
+
+        // Fetch owned businesses
         const { data, error } = await supabase
           .from('businesses')
           .select('id, name, category, description, rating, review_count, views, approved, is_premium, images, created_at, owner_id, location')
@@ -53,8 +66,10 @@ export function useBusinessOwner() {
       }
     };
 
-    fetchOwnedBusinesses();
+    fetchData();
   }, [user, authLoading]);
+
+  const isMerchant = userRole === 'merchant' || userRole === 'admin';
 
   const isOwner = (businessId: string) => {
     return businesses.some(b => b.id === businessId);
@@ -79,5 +94,5 @@ export function useBusinessOwner() {
     }
   };
 
-  return { businesses, loading: loading || authLoading, isOwner, refresh, user };
+  return { businesses, loading: loading || authLoading, isOwner, isMerchant, userRole, refresh, user };
 }
