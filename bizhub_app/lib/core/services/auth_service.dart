@@ -35,7 +35,7 @@ class AuthService {
       email: email,
       password: password,
       emailRedirectTo: kIsWeb 
-          ? Uri.base.origin 
+          ? '${Uri.base.origin}/' 
           : 'io.supabase.bizhub://login-callback/',
     );
   }
@@ -45,7 +45,7 @@ class AuthService {
     return await _client.auth.signInWithOAuth(
       OAuthProvider.google,
       redirectTo: kIsWeb 
-          ? Uri.base.origin 
+          ? '${Uri.base.origin}/' 
           : 'io.supabase.bizhub://login-callback/',
     );
   }
