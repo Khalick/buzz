@@ -146,6 +146,7 @@ export type Tables = {
     description: string;
     budget: string | null;
     status: 'open' | 'closed';
+    target_businesses: string[] | null;
     created_at: string;
     updated_at: string;
   };

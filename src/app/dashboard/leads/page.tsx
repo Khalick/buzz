@@ -51,9 +51,17 @@ export default function LeadsDashboard() {
           .order('created_at', { ascending: false });
 
         if (error) throw error;
+
+        // Filter for targeted broadcasts: 
+        // Show if target_businesses is null/empty OR if it contains any of the owner's business IDs
+        const ownerBusinessIds = businesses.map(b => b.id);
+        const relevantLeads = (data || []).filter((req: any) => {
+          if (!req.target_businesses || req.target_businesses.length === 0) return true;
+          return req.target_businesses.some((id: string) => ownerBusinessIds.includes(id));
+        });
         
         // Enrich with user info
-        const enriched = await Promise.all((data || []).map(async (req: any) => {
+        const enriched = await Promise.all(relevantLeads.map(async (req: any) => {
           let userName = 'Local Customer';
           if (req.user_id) {
             const { data: u } = await supabase

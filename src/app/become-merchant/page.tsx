@@ -5,12 +5,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { Store, Send, CheckCircle } from 'lucide-react';
+import { merchantRequestSchema } from '@/lib/schemas';
 
 export default function BecomeMerchantPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [form, setForm] = useState({
     business_name: '',
     category: '',
@@ -27,21 +29,32 @@ export default function BecomeMerchantPage() {
     e.preventDefault();
     if (!user) return;
     setIsSubmitting(true);
+    const validation = merchantRequestSchema.safeParse(form);
+    if (!validation.success) {
+      setErrorMsg(validation.error.issues[0].message);
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
-      const { error } = await supabase.from('merchant_requests').insert({
+      const { error: submitError } = await supabase.from('merchant_requests').insert({
         user_id: user.id,
-        business_name: form.business_name,
-        category: form.category,
-        contact_phone: form.contact_phone
+        business_name: validation.data.business_name,
+        category: validation.data.category,
+        contact_phone: validation.data.contact_phone
       });
 
-      if (error) throw error;
+      if (submitError) {
+        if (submitError.code === '23505') {
+          throw new Error('You already have a pending merchant request.');
+        }
+        throw submitError;
+      }
       setSuccess(true);
       setTimeout(() => router.push('/profile'), 3000);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error submitting merchant request:', err);
-      alert('Failed to submit request. Please try again.');
+      setErrorMsg(err.message || 'Failed to submit request. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -73,6 +86,11 @@ export default function BecomeMerchantPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {errorMsg && (
+                <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-100 mb-4">
+                  {errorMsg}
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-semibold text-[#1A1A1A] mb-1.5">Business Name</label>
                 <input

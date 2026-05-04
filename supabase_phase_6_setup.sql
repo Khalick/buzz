@@ -27,11 +27,19 @@ ALTER TABLE broadcast_responses ENABLE ROW LEVEL SECURITY;
 
 -- Note: Depending on your exact security model, you may want to restrict these.
 -- For now, allowing all authenticated users to insert/read requests.
+DROP POLICY IF EXISTS "Enable read access for all" ON broadcast_requests;
 CREATE POLICY "Enable read access for all" ON broadcast_requests FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Enable insert for authenticated users" ON broadcast_requests;
 CREATE POLICY "Enable insert for authenticated users" ON broadcast_requests FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Enable update for owner" ON broadcast_requests;
 CREATE POLICY "Enable update for owner" ON broadcast_requests FOR UPDATE USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Enable read access for all" ON broadcast_responses;
 CREATE POLICY "Enable read access for all" ON broadcast_responses FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Enable insert for businesses" ON broadcast_responses;
 CREATE POLICY "Enable insert for businesses" ON broadcast_responses FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
 
@@ -50,8 +58,14 @@ CREATE TABLE IF NOT EXISTS business_partnerships (
 );
 
 ALTER TABLE business_partnerships ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Enable read access for all" ON business_partnerships;
 CREATE POLICY "Enable read access for all" ON business_partnerships FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Enable insert for businesses" ON business_partnerships;
 CREATE POLICY "Enable insert for businesses" ON business_partnerships FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Enable update for businesses" ON business_partnerships;
 CREATE POLICY "Enable update for businesses" ON business_partnerships FOR UPDATE USING (auth.role() = 'authenticated');
 
 

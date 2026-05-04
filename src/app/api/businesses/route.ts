@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { businessSubmissionSchema } from '@/lib/schemas';
 import {
   validateText,
   validateName,
@@ -107,45 +108,38 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    let body: Record<string, unknown>;
+    let body: unknown;
     try {
       body = await request.json();
     } catch {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
-    // Deep input validation — rejects SQLi, XSS, and malformed data
-    const name        = validateName(body.name, 'name');
-    const description = validateText(body.description as unknown, 'description', { maxLength: 2000 });
-    const category    = validateText(body.category as unknown, 'category', { maxLength: 80 });
-    const location    = body.location as Record<string, string> | undefined;
-    const contact     = body.contact as Record<string, string> | undefined;
-
-    if (!location?.county) throw new ValidationError('County is required', 'location.county');
-    const county  = validateText(location.county, 'county', { maxLength: 80 });
-    const town    = validateText(location.town || '', 'town', { maxLength: 80, required: false });
-    const address = validateText(location.address || '', 'address', { maxLength: 200, required: false });
-
-    if (!contact?.phone && !contact?.email) {
-      throw new ValidationError('At least one contact method (phone or email) is required');
+    // Rigorous Input Serialization via Zod
+    const validation = businessSubmissionSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
     }
-    const phone    = contact?.phone ? validatePhone(contact.phone, 'phone') : null;
-    const email    = contact?.email ? validateEmail(contact.email, 'email') : null;
-    const whatsapp = contact?.whatsapp ? validatePhone(contact.whatsapp, 'whatsapp') : null;
-    const website  = body.website ? validateUrl(body.website as unknown, 'website') : null;
-
-    // Images must be URLs we control
-    const rawImages = Array.isArray(body.images) ? (body.images as unknown[]) : [];
-    const images = rawImages
-      .filter((img): img is string => typeof img === 'string' && img.startsWith('https://'))
-      .slice(0, 20); // max 20 images
+    
+    const validData = validation.data;
 
     const businessData = {
-      name, description, category,
-      location: { county, town, address, coordinates: null },
-      contact: { phone, email, whatsapp },
-      website,
-      images,
+      name: validData.name, 
+      description: validData.description, 
+      category: validData.category,
+      location: { 
+        county: validData.location.county, 
+        town: validData.location.town || null, 
+        address: validData.location.address || null, 
+        coordinates: null 
+      },
+      contact: { 
+        phone: validData.contact.phone || null, 
+        email: validData.contact.email || null, 
+        whatsapp: validData.contact.whatsapp || null 
+      },
+      website: validData.website || null,
+      images: validData.images || [],
       owner_id: user.id,
       submitted_by: user.id,
       approved: false,    // always start unapproved — admin must approve
