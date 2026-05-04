@@ -201,7 +201,17 @@ export function validateOrigin(
   const origin = originHeader || refererHeader || '';
   if (!origin) return false; // no origin = suspicious for mutating ops
 
-  return trustedOrigins.some((trusted) => origin.startsWith(trusted));
+  // Check if it's a known explicitly trusted origin
+  if (trustedOrigins.some((trusted) => origin.startsWith(trusted))) {
+    return true;
+  }
+
+  // Allow Vercel preview URLs dynamically
+  if (origin.startsWith('https://') && origin.includes('.vercel.app')) {
+    return true;
+  }
+
+  return false;
 }
 
 /**
