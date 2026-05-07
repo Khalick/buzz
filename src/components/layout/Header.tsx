@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { signOut } from '@/lib/supabase';
 
@@ -10,6 +11,7 @@ import ThemeToggle from '@/components/ui/ThemeToggle';
 
 const Header = () => {
   const { user, loading } = useAuth();
+  const pathname = usePathname();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -79,15 +81,22 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="px-4 py-2 text-sm font-medium text-[#525252] hover:text-[#1B4332] hover:bg-[#1B4332]/5 rounded-lg transition-all duration-200"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    isActive
+                      ? 'text-[#1B4332] font-bold bg-[#1B4332]/10 border-b-2 border-[#1B4332]'
+                      : 'text-[#525252] hover:text-[#1B4332] hover:bg-[#1B4332]/5'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
 
           </nav>
 
@@ -175,16 +184,23 @@ const Header = () => {
         <div className={`lg:hidden overflow-hidden transition-all duration-300 ${isMobileMenuOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'}`}>
           <nav className="py-4 border-t border-[#1B4332]/10">
             <div className="flex flex-col gap-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="px-4 py-3 text-base font-medium text-[#525252] hover:text-[#1B4332] hover:bg-[#1B4332]/5 rounded-lg transition-all duration-200"
-                  onClick={closeMobileMenu}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`px-4 py-3 text-base font-medium rounded-lg transition-all duration-200 ${
+                      isActive
+                        ? 'text-[#1B4332] font-bold bg-[#1B4332]/10 border-l-4 border-[#1B4332]'
+                        : 'text-[#525252] hover:text-[#1B4332] hover:bg-[#1B4332]/5'
+                    }`}
+                    onClick={closeMobileMenu}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
 
             </div>
 

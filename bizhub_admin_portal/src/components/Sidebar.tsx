@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { LayoutDashboard, Users, ShieldCheck, CreditCard, Search, MapPin, LogOut, Megaphone, Star, ShieldAlert, FileText, Tag, LifeBuoy, Building, DownloadCloud, Store } from 'lucide-react';
+import { LayoutDashboard, Users, ShieldCheck, CreditCard, Search, MapPin, LogOut, Megaphone, Star, ShieldAlert, FileText, Tag, LifeBuoy, Building, DownloadCloud, Store, Camera } from 'lucide-react';
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -14,6 +14,7 @@ const navItems = [
   { href: '/payments', label: 'M-Pesa Ledger', icon: CreditCard },
   { href: '/ads', label: 'Featured Ads', icon: Star },
   { href: '/moderation', label: 'Moderation Feed', icon: ShieldCheck },
+  { href: '/proof-review', label: 'Proof of Visit', icon: Camera },
   { href: '/broadcasts', label: 'SMS/Push Broadcasts', icon: Megaphone },
   { href: '/search-metrics', label: 'AI Search Tuning', icon: Search },
   { href: '/agents', label: 'Agent Tracking', icon: MapPin },

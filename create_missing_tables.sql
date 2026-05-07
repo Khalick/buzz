@@ -128,8 +128,17 @@ CREATE TABLE IF NOT EXISTS public.featured_placements (
 ALTER TABLE public.featured_placements ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "fp_public_read" ON public.featured_placements;
 DROP POLICY IF EXISTS "fp_admin_manage" ON public.featured_placements;
+DROP POLICY IF EXISTS "fp_admin_select" ON public.featured_placements;
+DROP POLICY IF EXISTS "fp_admin_insert" ON public.featured_placements;
+DROP POLICY IF EXISTS "fp_admin_update" ON public.featured_placements;
+DROP POLICY IF EXISTS "fp_admin_delete" ON public.featured_placements;
 CREATE POLICY "fp_public_read" ON public.featured_placements FOR SELECT USING (true);
-CREATE POLICY "fp_admin_manage" ON public.featured_placements FOR ALL TO authenticated
+CREATE POLICY "fp_admin_insert" ON public.featured_placements FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "fp_admin_update" ON public.featured_placements FOR UPDATE TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "fp_admin_delete" ON public.featured_placements FOR DELETE TO authenticated
   USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
 
 -- ----------------------------------------------------------------
@@ -150,8 +159,17 @@ CREATE TABLE IF NOT EXISTS public.promotions (
 ALTER TABLE public.promotions ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "promo_public_read" ON public.promotions;
 DROP POLICY IF EXISTS "promo_admin_manage" ON public.promotions;
+DROP POLICY IF EXISTS "promo_admin_select" ON public.promotions;
+DROP POLICY IF EXISTS "promo_admin_insert" ON public.promotions;
+DROP POLICY IF EXISTS "promo_admin_update" ON public.promotions;
+DROP POLICY IF EXISTS "promo_admin_delete" ON public.promotions;
 CREATE POLICY "promo_public_read" ON public.promotions FOR SELECT USING (true);
-CREATE POLICY "promo_admin_manage" ON public.promotions FOR ALL TO authenticated
+CREATE POLICY "promo_admin_insert" ON public.promotions FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "promo_admin_update" ON public.promotions FOR UPDATE TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "promo_admin_delete" ON public.promotions FOR DELETE TO authenticated
   USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
 
 -- ----------------------------------------------------------------
@@ -173,7 +191,18 @@ CREATE TABLE IF NOT EXISTS public.broadcasts (
 
 ALTER TABLE public.broadcasts ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "bc_admin_manage" ON public.broadcasts;
-CREATE POLICY "bc_admin_manage" ON public.broadcasts FOR ALL TO authenticated
+DROP POLICY IF EXISTS "bc_admin_select" ON public.broadcasts;
+DROP POLICY IF EXISTS "bc_admin_insert" ON public.broadcasts;
+DROP POLICY IF EXISTS "bc_admin_update" ON public.broadcasts;
+DROP POLICY IF EXISTS "bc_admin_delete" ON public.broadcasts;
+CREATE POLICY "bc_admin_select" ON public.broadcasts FOR SELECT TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "bc_admin_insert" ON public.broadcasts FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "bc_admin_update" ON public.broadcasts FOR UPDATE TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "bc_admin_delete" ON public.broadcasts FOR DELETE TO authenticated
   USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
 
 -- ----------------------------------------------------------------
@@ -192,7 +221,18 @@ CREATE TABLE IF NOT EXISTS public.invoices (
 
 ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "inv_admin_manage" ON public.invoices;
-CREATE POLICY "inv_admin_manage" ON public.invoices FOR ALL TO authenticated
+DROP POLICY IF EXISTS "inv_admin_select" ON public.invoices;
+DROP POLICY IF EXISTS "inv_admin_insert" ON public.invoices;
+DROP POLICY IF EXISTS "inv_admin_update" ON public.invoices;
+DROP POLICY IF EXISTS "inv_admin_delete" ON public.invoices;
+CREATE POLICY "inv_admin_select" ON public.invoices FOR SELECT TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "inv_admin_insert" ON public.invoices FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "inv_admin_update" ON public.invoices FOR UPDATE TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "inv_admin_delete" ON public.invoices FOR DELETE TO authenticated
   USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
 
 -- ----------------------------------------------------------------
@@ -212,7 +252,18 @@ CREATE TABLE IF NOT EXISTS public.support_tickets (
 
 ALTER TABLE public.support_tickets ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "st_admin_manage" ON public.support_tickets;
-CREATE POLICY "st_admin_manage" ON public.support_tickets FOR ALL TO authenticated
+DROP POLICY IF EXISTS "st_admin_select" ON public.support_tickets;
+DROP POLICY IF EXISTS "st_admin_insert" ON public.support_tickets;
+DROP POLICY IF EXISTS "st_admin_update" ON public.support_tickets;
+DROP POLICY IF EXISTS "st_admin_delete" ON public.support_tickets;
+CREATE POLICY "st_admin_select" ON public.support_tickets FOR SELECT TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "st_admin_insert" ON public.support_tickets FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "st_admin_update" ON public.support_tickets FOR UPDATE TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "st_admin_delete" ON public.support_tickets FOR DELETE TO authenticated
   USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
 
 -- ----------------------------------------------------------------
@@ -249,9 +300,25 @@ CREATE TABLE IF NOT EXISTS public.franchise_groups (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Backfill columns the admin portal frontend expects
+ALTER TABLE public.franchise_groups ADD COLUMN IF NOT EXISTS master_admin TEXT;
+ALTER TABLE public.franchise_groups ADD COLUMN IF NOT EXISTS branches INTEGER DEFAULT 0;
+ALTER TABLE public.franchise_groups ADD COLUMN IF NOT EXISTS total_sub TEXT DEFAULT 'KES 0';
+
 ALTER TABLE public.franchise_groups ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "fg_admin_read" ON public.franchise_groups;
-CREATE POLICY "fg_admin_read" ON public.franchise_groups FOR SELECT TO authenticated
+DROP POLICY IF EXISTS "fg_admin_select" ON public.franchise_groups;
+DROP POLICY IF EXISTS "fg_admin_insert" ON public.franchise_groups;
+DROP POLICY IF EXISTS "fg_admin_update" ON public.franchise_groups;
+DROP POLICY IF EXISTS "fg_admin_delete" ON public.franchise_groups;
+CREATE POLICY "fg_admin_select" ON public.franchise_groups FOR SELECT TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "fg_admin_insert" ON public.franchise_groups FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "fg_admin_update" ON public.franchise_groups FOR UPDATE TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "fg_admin_delete" ON public.franchise_groups FOR DELETE TO authenticated
   USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
 
 -- ----------------------------------------------------------------
@@ -267,9 +334,25 @@ CREATE TABLE IF NOT EXISTS public.search_tuning_rules (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Backfill columns the admin portal frontend expects
+ALTER TABLE public.search_tuning_rules ADD COLUMN IF NOT EXISTS term TEXT;
+ALTER TABLE public.search_tuning_rules ADD COLUMN IF NOT EXISTS maps_to TEXT;
+ALTER TABLE public.search_tuning_rules ADD COLUMN IF NOT EXISTS hits INTEGER DEFAULT 0;
+
 ALTER TABLE public.search_tuning_rules ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "str_admin_manage" ON public.search_tuning_rules;
-CREATE POLICY "str_admin_manage" ON public.search_tuning_rules FOR ALL TO authenticated
+DROP POLICY IF EXISTS "str_admin_select" ON public.search_tuning_rules;
+DROP POLICY IF EXISTS "str_admin_insert" ON public.search_tuning_rules;
+DROP POLICY IF EXISTS "str_admin_update" ON public.search_tuning_rules;
+DROP POLICY IF EXISTS "str_admin_delete" ON public.search_tuning_rules;
+CREATE POLICY "str_admin_select" ON public.search_tuning_rules FOR SELECT TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "str_admin_insert" ON public.search_tuning_rules FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "str_admin_update" ON public.search_tuning_rules FOR UPDATE TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "str_admin_delete" ON public.search_tuning_rules FOR DELETE TO authenticated
   USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
 
 -- ----------------------------------------------------------------
@@ -477,8 +560,11 @@ DROP POLICY IF EXISTS "proofs_admin_manage" ON public.proofs;
 CREATE POLICY "proofs_public_read" ON public.proofs FOR SELECT USING (approved = true);
 CREATE POLICY "proofs_auth_insert" ON public.proofs FOR INSERT TO authenticated WITH CHECK (true);
 CREATE POLICY "proofs_self_update" ON public.proofs FOR UPDATE TO authenticated
-  USING (submitted_by = auth.uid() OR EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
-CREATE POLICY "proofs_admin_manage" ON public.proofs FOR ALL TO authenticated
+  USING (submitted_by = auth.uid() OR EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'))
+  WITH CHECK (submitted_by = auth.uid() OR EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "proofs_admin_select" ON public.proofs FOR SELECT TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "proofs_admin_delete" ON public.proofs FOR DELETE TO authenticated
   USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
 
 -- Storage bucket for proof-of-visit photos
@@ -495,3 +581,28 @@ CREATE POLICY "proofs_auth_insert_storage" ON storage.objects FOR INSERT TO auth
 -- DONE! All missing tables, columns, storage buckets, and
 -- functions created. Run this in your Supabase SQL Editor.
 -- ================================================================
+
+-- ================================================================
+-- 20. MERCHANT_REQUESTS — RLS Policies
+-- This table was created by supabase_merchant_upgrade.sql but
+-- has NO RLS policies, causing all operations to be blocked.
+-- ================================================================
+ALTER TABLE IF EXISTS public.merchant_requests ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "mr_user_read" ON public.merchant_requests;
+DROP POLICY IF EXISTS "mr_user_insert" ON public.merchant_requests;
+DROP POLICY IF EXISTS "mr_admin_select" ON public.merchant_requests;
+DROP POLICY IF EXISTS "mr_admin_update" ON public.merchant_requests;
+CREATE POLICY "mr_user_read" ON public.merchant_requests FOR SELECT TO authenticated
+  USING (user_id = auth.uid());
+CREATE POLICY "mr_user_insert" ON public.merchant_requests FOR INSERT TO authenticated
+  WITH CHECK (user_id = auth.uid());
+CREATE POLICY "mr_admin_select" ON public.merchant_requests FOR SELECT TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "mr_admin_update" ON public.merchant_requests FOR UPDATE TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'))
+  WITH CHECK (EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin'));
+
+-- ================================================================
+-- 21. BUSINESSES — add is_verified column for verification queue
+-- ================================================================
+ALTER TABLE public.businesses ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT false;
