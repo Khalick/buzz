@@ -138,11 +138,16 @@ export default function AskBizHub() {
         status: 'open'
       });
 
-      if (error) throw error;
-      setBroadcastMessage('✅ Broadcast sent! Check your inbox for quotes. (Refresh page if needed)');
+      if (error) {
+        console.error('Broadcast insert error:', error.message, error.details, error.hint);
+        setBroadcastMessage(`⚠️ Failed: ${error.message || 'Unknown error'}. Try again.`);
+        setBroadcasting(false);
+        return;
+      }
+      setBroadcastMessage('✅ Broadcast sent! Check your requests inbox for quotes.');
     } catch (err: any) {
-      console.error(err);
-      setBroadcastMessage('⚠️ Failed to broadcast. Try again.');
+      console.error('Broadcast error:', err);
+      setBroadcastMessage(`⚠️ ${err?.message || 'Network error. Please try again.'}`);
     } finally {
       setBroadcasting(false);
     }

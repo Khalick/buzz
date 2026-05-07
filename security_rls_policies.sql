@@ -240,8 +240,11 @@ BEGIN
     ALTER TABLE public.broadcast_requests ENABLE ROW LEVEL SECURITY;
     DROP POLICY IF EXISTS "br_read"   ON public.broadcast_requests;
     DROP POLICY IF EXISTS "br_insert" ON public.broadcast_requests;
-    CREATE POLICY "br_read"   ON public.broadcast_requests FOR SELECT TO authenticated USING (user_id = auth_uid() OR is_admin());
+    DROP POLICY IF EXISTS "br_update" ON public.broadcast_requests;
+    -- Allow reading open requests (merchant leads), own requests, or admin sees all
+    CREATE POLICY "br_read"   ON public.broadcast_requests FOR SELECT TO authenticated USING (status = 'open' OR user_id = auth_uid() OR is_admin());
     CREATE POLICY "br_insert" ON public.broadcast_requests FOR INSERT TO authenticated WITH CHECK (user_id = auth_uid());
+    CREATE POLICY "br_update" ON public.broadcast_requests FOR UPDATE TO authenticated USING (user_id = auth_uid() OR is_admin());
   END IF;
 END $$;
 

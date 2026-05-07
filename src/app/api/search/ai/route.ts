@@ -22,10 +22,10 @@ export async function POST(request: NextRequest) {
     }
     const query = validateText(body.query, 'query', { maxLength: 300 });
 
-    const geminiKey = process.env.GEMINI_API_KEY;
-    if (!geminiKey) {
+    const groqKey = process.env.GROQ_API_KEY;
+    if (!groqKey) {
       return NextResponse.json({
-        error: 'AI search is not configured yet. Please add GEMINI_API_KEY to your environment variables.',
+        error: 'AI search is not configured yet. Please add GROQ_API_KEY to your environment variables.',
       }, { status: 503 });
     }
 
@@ -59,38 +59,41 @@ Rules:
 6. Format your response in a clean, readable way.
 7. Respond in under 150 words.`;
 
-    // Call Gemini REST API directly
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`;
+    // Call Groq API (OpenAI-compatible format) — free tier with Llama 3.3 70B
+    const groqUrl = 'https://api.groq.com/openai/v1/chat/completions';
 
-    const geminiResponse = await fetch(geminiUrl, {
+    const groqResponse = await fetch(groqUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${groqKey}`,
+      },
       body: JSON.stringify({
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: query }],
-          },
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: query },
         ],
-        systemInstruction: {
-          parts: [{ text: systemPrompt }],
-        },
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 300,
-        },
+        temperature: 0.7,
+        max_tokens: 300,
       }),
       signal: AbortSignal.timeout(15000),
     });
 
-    if (!geminiResponse.ok) {
-      const errData = await geminiResponse.json().catch(() => ({}));
-      console.error('Gemini API error:', geminiResponse.status, errData);
+    if (!groqResponse.ok) {
+      const errData = await groqResponse.json().catch(() => ({}));
+      console.error('Groq API error:', groqResponse.status, errData);
 
-      if (geminiResponse.status === 429) {
+      if (groqResponse.status === 429) {
         return NextResponse.json({
           error: 'AI is temporarily busy. Please try again in a minute.',
         }, { status: 429 });
+      }
+
+      if (groqResponse.status === 401) {
+        return NextResponse.json({
+          error: 'AI API key is invalid. Please check your GROQ_API_KEY.',
+        }, { status: 503 });
       }
 
       return NextResponse.json({
@@ -98,9 +101,9 @@ Rules:
       }, { status: 502 });
     }
 
-    const aiData = await geminiResponse.json();
+    const aiData = await groqResponse.json();
     const answer =
-      aiData?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      aiData?.choices?.[0]?.message?.content ||
       'Sorry, I couldn\'t process that request.';
 
     // Extract mentioned business IDs for linking
