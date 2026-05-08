@@ -166,15 +166,21 @@ export default function FeaturedAdsPage() {
         </div>
         <div className="rounded-2xl p-6" style={{ background: 'rgba(27, 67, 50, 0.4)', border: '1px solid rgba(212, 175, 55, 0.15)' }}>
           <p className="text-sm font-bold text-[#E0E0E0]/70 uppercase tracking-wider mb-2">Total Impressions</p>
-          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>17.7K</p>
+          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            {ads.reduce((sum, a) => sum + (a.views || 0), 0).toLocaleString()}
+          </p>
         </div>
         <div className="rounded-2xl p-6" style={{ background: 'rgba(27, 67, 50, 0.4)', border: '1px solid rgba(212, 175, 55, 0.15)' }}>
           <p className="text-sm font-bold text-[#E0E0E0]/70 uppercase tracking-wider mb-2">Total Clicks</p>
-          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>1.2K</p>
+          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            {ads.reduce((sum, a) => sum + (a.clicks || 0), 0).toLocaleString()}
+          </p>
         </div>
         <div className="rounded-2xl p-6" style={{ background: 'rgba(27, 67, 50, 0.4)', border: '1px solid rgba(212, 175, 55, 0.15)' }}>
-          <p className="text-sm font-bold text-[#E0E0E0]/70 uppercase tracking-wider mb-2">Ad Revenue</p>
-          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>KES 45K</p>
+          <p className="text-sm font-bold text-[#E0E0E0]/70 uppercase tracking-wider mb-2">Est. Ad Revenue</p>
+          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            KES {(ads.filter(a => a.status !== 'expired').length * 2500).toLocaleString()}
+          </p>
         </div>
       </div>
 

@@ -61,6 +61,16 @@ export default function PaymentsLedgerPage() {
     }
   };
 
+  const todaysRevenue = transactions
+    .filter(t => t.status === 'success' && new Date(t.created_at || t.date).toDateString() === new Date().toDateString())
+    .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+
+  const totalRevenue = transactions
+    .filter(t => t.status === 'success')
+    .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+
+  const failedCount = transactions.filter(t => t.status !== 'success').length;
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -80,21 +90,21 @@ export default function PaymentsLedgerPage() {
             <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center"><DollarSign size={16} className="text-[#D4AF37]" /></div>
             <p className="text-sm font-bold text-[#E0E0E0]/70 uppercase tracking-wider">Today's Revenue</p>
           </div>
-          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>KES 5,500</p>
+          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>KES {todaysRevenue.toLocaleString()}</p>
         </div>
         <div className="rounded-2xl p-6" style={{ background: 'rgba(27, 67, 50, 0.4)', border: '1px solid rgba(212, 175, 55, 0.15)' }}>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center"><ArrowUpRight size={16} className="text-blue-400" /></div>
             <p className="text-sm font-bold text-[#E0E0E0]/70 uppercase tracking-wider">MRR</p>
           </div>
-          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>KES 420K</p>
+          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>KES {totalRevenue.toLocaleString()}</p>
         </div>
         <div className="rounded-2xl p-6" style={{ background: 'rgba(27, 67, 50, 0.4)', border: '1px solid rgba(212, 175, 55, 0.15)' }}>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center"><ArrowDownLeft size={16} className="text-red-400" /></div>
             <p className="text-sm font-bold text-[#E0E0E0]/70 uppercase tracking-wider">Failed Txs</p>
           </div>
-          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>1</p>
+          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>{failedCount}</p>
         </div>
       </div>
 

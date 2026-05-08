@@ -52,21 +52,27 @@ export default function AgentTrackerPage() {
             <Users size={16} className="text-[#D4AF37]" />
             <p className="text-sm font-bold text-[#E0E0E0]/70 uppercase tracking-wider">Active Field Agents</p>
           </div>
-          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>12</p>
+          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            {agents.filter(a => a.active).length}
+          </p>
         </div>
         <div className="rounded-2xl p-6" style={{ background: 'rgba(27, 67, 50, 0.4)', border: '1px solid rgba(212, 175, 55, 0.15)' }}>
           <div className="flex items-center gap-3 mb-2">
             <Target size={16} className="text-[#D4AF37]" />
-            <p className="text-sm font-bold text-[#E0E0E0]/70 uppercase tracking-wider">Today's Verifications</p>
+            <p className="text-sm font-bold text-[#E0E0E0]/70 uppercase tracking-wider">Total Verifications</p>
           </div>
-          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>85</p>
+          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            {agents.reduce((sum, a) => sum + (a.verifications || 0), 0).toLocaleString()}
+          </p>
         </div>
         <div className="rounded-2xl p-6" style={{ background: 'rgba(27, 67, 50, 0.4)', border: '1px solid rgba(212, 175, 55, 0.15)' }}>
           <div className="flex items-center gap-3 mb-2">
             <Activity size={16} className="text-[#D4AF37]" />
             <p className="text-sm font-bold text-[#E0E0E0]/70 uppercase tracking-wider">Agent Commission Pool</p>
           </div>
-          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>KES 4,250</p>
+          <p className="text-3xl font-black text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            KES {(agents.reduce((sum, a) => sum + (a.verifications || 0), 0) * 50).toLocaleString()}
+          </p>
         </div>
       </div>
 

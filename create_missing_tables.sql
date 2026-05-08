@@ -557,6 +557,8 @@ DROP POLICY IF EXISTS "proofs_public_read" ON public.proofs;
 DROP POLICY IF EXISTS "proofs_auth_insert" ON public.proofs;
 DROP POLICY IF EXISTS "proofs_self_update" ON public.proofs;
 DROP POLICY IF EXISTS "proofs_admin_manage" ON public.proofs;
+DROP POLICY IF EXISTS "proofs_admin_select" ON public.proofs;
+DROP POLICY IF EXISTS "proofs_admin_delete" ON public.proofs;
 CREATE POLICY "proofs_public_read" ON public.proofs FOR SELECT USING (approved = true);
 CREATE POLICY "proofs_auth_insert" ON public.proofs FOR INSERT TO authenticated WITH CHECK (true);
 CREATE POLICY "proofs_self_update" ON public.proofs FOR UPDATE TO authenticated
