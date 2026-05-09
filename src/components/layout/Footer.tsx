@@ -45,7 +45,7 @@ const Footer = () => {
             {/* Social Links */}
             <div className="flex items-center gap-3">
               <a
-                href="#"
+                href="https://x.com/bizhub_net"
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-[#D4AF37] flex items-center justify-center transition-all duration-300 group"
                 aria-label="Twitter"
               >
@@ -54,7 +54,7 @@ const Footer = () => {
                 </svg>
               </a>
               <a
-                href="#"
+                href="instagram.com/bizhub_network"
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-[#D4AF37] flex items-center justify-center transition-all duration-300 group"
                 aria-label="Instagram"
               >
@@ -63,7 +63,7 @@ const Footer = () => {
                 </svg>
               </a>
               <a
-                href="#"
+                href="facebook.com/share/17iYYz2U8T/"
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-[#D4AF37] flex items-center justify-center transition-all duration-300 group"
                 aria-label="Facebook"
               >
