@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BizHub Network | Elite Pitch 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { font-family: 'Outfit', sans-serif; background-color: #020705; color: #FFF; overflow-x: hidden; scroll-behavior: smooth; }
+    ::selection { background: #D4AF37; color: #000; }
+    
+    /* Premium Gradient Mesh Background */
+    .bg-mesh { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background: #020705; overflow: hidden; }
+    .bg-mesh::before, .bg-mesh::after { content: ''; position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.4; animation: moveOrbs 25s infinite alternate ease-in-out; }
+    .bg-mesh::before { width: 80vw; height: 80vw; background: radial-gradient(circle, #082d1c 0%, transparent 70%); top: -40%; left: -20%; }
+    .bg-mesh::after { width: 60vw; height: 60vw; background: radial-gradient(circle, #1c1505 0%, transparent 70%); bottom: -20%; right: -20%; animation-delay: -5s; }
+    
+    @keyframes moveOrbs { 0% { transform: scale(1) translate(0, 0); } 50% { transform: scale(1.1) translate(10%, 10%); } 100% { transform: scale(0.9) translate(-10%, -5%); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulseSoft { 0%, 100% { opacity: 0.5; transform: scale(1); box-shadow: 0 0 20px rgba(212,175,55,0.1); } 50% { opacity: 1; transform: scale(1.02); box-shadow: 0 0 40px rgba(212,175,55,0.4); } }
+    @keyframes floatY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+    
+    .animate-up { animation: fadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+    .delay-1 { animation-delay: 150ms; } .delay-2 { animation-delay: 300ms; } .delay-3 { animation-delay: 450ms; }
+    
+    /* Ultimate Glass Card */
+    .glass-card { 
+      background: radial-gradient(130% 130% at 50% 0%, rgba(27,67,50,0.15) 0%, rgba(5,11,10,0.4) 100%); 
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+      border: 1px solid rgba(255, 255, 255, 0.08); border-top: 1px solid rgba(212, 175, 55, 0.2); 
+      border-radius: 24px; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
+    }
+    .glass-card:hover { transform: translateY(-8px) scale(1.01); border-top: 1px solid rgba(212, 175, 55, 0.6); box-shadow: 0 20px 60px rgba(212, 175, 55, 0.15); }
+    
+    /* Image Wrappers */
+    .premium-image { border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); width: 100%; object-fit: cover; }
+    
+    .text-gold { color: #D4AF37; }
+    .gradient-gold { background: linear-gradient(135deg, #FFF 0%, #D4AF37 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .gradient-teal { background: linear-gradient(135deg, #FFF 0%, #34d399 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    .icon-wrapper { width: 56px; height: 56px; border-radius: 16px; background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.25); display: flex; align-items: center; justify-content: center; color: #D4AF37; margin-bottom: 24px; box-shadow: inset 0 0 20px rgba(212,175,55,0.05); }
+  </style>
+</head>
+<body class="relative min-h-screen antialiased">
+  <div class="bg-mesh"></div>
+  <div class="fixed top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#1B4332] via-[#D4AF37] to-[#1B4332] z-50"></div>
+
+  <main class="max-w-7xl mx-auto px-6 pt-24 pb-32">
+
+    <!-- HERO SECTION -->
+    <header class="text-center min-h-[90vh] flex flex-col justify-center items-center relative z-10">
+      <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/10 text-gold text-xs font-bold tracking-[0.2em] uppercase mb-10 animate-up shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+        <i data-lucide="shield-check" class="w-4 h-4"></i> Amazon Investment Strategy 2026
+      </div>
+      
+      <h1 class="text-6xl md:text-[6.5rem] font-black mb-10 animate-up delay-1 leading-[1.1] tracking-tight">
+        The Gateway to Africa's <br/><span class="gradient-gold">7.9M Offline SMEs.</span>
+      </h1>
+      
+      <p class="text-xl md:text-3xl text-gray-400 font-light max-w-4xl mx-auto leading-relaxed animate-up delay-2 mb-16">
+        BizHub is digitizing the <strong class="text-white font-medium">$1.5B</strong> local market by building a Zero-Trust, AI-powered directory for 290+ towns. One platform. Total commerce visibility.
+      </p>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 w-full animate-up delay-3">
+        <div class="glass-card p-6 flex flex-col justify-center items-center"><h3 class="text-4xl md:text-5xl font-black text-white">7.9M+</h3><p class="text-xs text-[#D4AF37] font-bold uppercase tracking-widest mt-2">SMEs In Kenya</p></div>
+        <div class="glass-card p-6 flex flex-col justify-center items-center"><h3 class="text-4xl md:text-5xl font-black text-white">290+</h3><p class="text-xs text-[#D4AF37] font-bold uppercase tracking-widest mt-2">Towns Unmapped</p></div>
+        <div class="glass-card p-6 flex flex-col justify-center items-center"><h3 class="text-4xl md:text-5xl font-black text-white">$1.5B</h3><p class="text-xs text-[#D4AF37] font-bold uppercase tracking-widest mt-2">Serviceable TAM</p></div>
+        <div class="glass-card p-6 flex flex-col justify-center items-center"><h3 class="text-4xl md:text-5xl font-black text-white">$33M</h3><p class="text-xs text-[#D4AF37] font-bold uppercase tracking-widest mt-2">Local Ad Spend</p></div>
+      </div>
+    </header>
+
+    <!-- UI SHOWCASE WITH APP IMAGES -->
+    <section class="py-24 relative z-10 border-t border-white/5">
+      <div class="grid lg:grid-cols-2 gap-16 items-center animate-up">
+        <div class="space-y-10">
+          <h2 class="text-4xl md:text-6xl font-black leading-tight text-white mb-6">The <span class="gradient-gold">Trust Layer</span> <br/>for Local Commerce</h2>
+          <p class="text-xl text-gray-400 font-light leading-relaxed">
+            While major cities get digital attention, 290+ towns are invisible. Online shoppers are getting scammed via Facebook. BizHub bridges this gap by deploying physical verification agents to build an impenetrable Trust Economy.
+          </p>
+          <div class="space-y-6 pt-4">
+            <div class="flex gap-4 items-start"><i data-lucide="eye-off" class="text-red-500 w-6 h-6 shrink-0 mt-1"></i><div><h4 class="text-white font-bold text-lg">90% Invisible</h4><p class="text-gray-400 text-sm mt-1">Despite heavy mobile usage, the vast majority of local trades sit offline.</p></div></div>
+            <div class="flex gap-4 items-start"><i data-lucide="shield-alert" class="text-orange-500 w-6 h-6 shrink-0 mt-1"></i><div><h4 class="text-white font-bold text-lg">Rampant Scam Epidemic</h4><p class="text-gray-400 text-sm mt-1">68% fear fraud. Customers lose KES 15,000 to fake sellers daily.</p></div></div>
+          </div>
+        </div>
+        <div class="relative animate-[floatY_8s_infinite] delay-1">
+          <img src="public/pitch-app.png" alt="BizHub App Interface" class="premium-image z-10 relative">
+          <div class="absolute -inset-4 bg-gradient-to-tr from-[#1B4332] to-[#D4AF37] opacity-20 blur-2xl -z-10 rounded-full"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI INNOVATION -->
+    <section class="py-24 relative z-10 border-t border-white/5">
+      <div class="grid lg:grid-cols-2 gap-16 items-center animate-up">
+        <div class="order-2 lg:order-1 relative animate-[floatY_6s_infinite]">
+          <img src="public/pitch-ai.png" alt="AskBizHub Conversational AI" class="premium-image border-[#3b82f6]/30">
+          <div class="absolute -inset-4 bg-gradient-to-tr from-[#1a56db] to-[#3b82f6] opacity-10 blur-2xl -z-10 rounded-full"></div>
+        </div>
+        <div class="order-1 lg:order-2 space-y-10">
+          <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-400 text-xs font-bold tracking-widest uppercase">
+            <i data-lucide="bot" class="w-4 h-4"></i> Generative AI Integrated
+          </div>
+          <h2 class="text-4xl md:text-5xl font-black text-white leading-tight">"Ask BizHub" <br/><span class="gradient-teal">Conversational Search</span></h2>
+          <p class="text-xl text-gray-400 font-light leading-relaxed">
+            Customers type natural questions like <em>"Best affordable plumber open right now?"</em> Our AI (powered by Claude 3/OpenAI) instantly searches all verified businesses, analyzes 1,000s of reviews, and answers intelligently.
+          </p>
+          <div class="grid sm:grid-cols-2 gap-6 pt-2">
+            <div class="bg-black/30 p-5 rounded-2xl border border-white/5"><h4 class="text-white font-bold mb-1 flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-blue-400"></i> AI Reviews</h4><p class="text-gray-500 text-sm">Auto-generated sentiment summaries.</p></div>
+            <div class="bg-black/30 p-5 rounded-2xl border border-white/5"><h4 class="text-white font-bold mb-1 flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-orange-400"></i> Smart Leads</h4><p class="text-gray-500 text-sm">Reverse market bidding via natural language.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST INFRASTRUCTURE -->
+    <section class="py-24 relative z-10 border-t border-white/5 bg-gradient-to-b from-transparent to-[#050B0A]/80">
+      <div class="text-center max-w-4xl mx-auto mb-20 animate-up">
+        <h2 class="text-5xl md:text-6xl font-black mb-6">The Anti-Scam Ecosystem</h2>
+        <p class="text-xl text-gray-400 font-light mb-8">Trust is our moat. Our "Verified Badge" is an absolute guarantee. If it's on BizHub, it is real.</p>
+        <img src="public/pitch-trust.png" alt="Trust Verification Grid" class="rounded-[2rem] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] w-3/4 mx-auto block">
+      </div>
+    </section>
+
+    <!-- THE 18 FEATURES: LUCIDE SVG GRID -->
+    <section class="py-24 relative z-10 border-t border-white/5">
+      <h2 class="text-4xl md:text-5xl font-black text-center mb-6 animate-up">The <span class="gradient-gold">18 Engines</span> Engine</h2>
+      <p class="text-center text-gray-400 text-xl font-light max-w-3xl mx-auto mb-16 animate-up delay-1">Every feature is interlocked, replacing fragmented WhatsApp groups and static directories with a living, transactional super-app.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-up delay-2">
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="store" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">1. Smart Directory</h4><p class="text-sm text-gray-400">Rich profiles, active operating hours, GPS routing, and WhatsApp native links.</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="bot" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">2. AskBizHub AI</h4><p class="text-sm text-gray-400">Live AI chatbot allowing sentence-based natural queries across town catalogs.</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="brain" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">3. AI Review Summary</h4><p class="text-sm text-gray-400">Algorithmic text analysis compiling hundreds of reviews into one 10-word summary.</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="target" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">4. Smart Layouts</h4><p class="text-sm text-gray-400">"Just For You" predictive recommendations based on previous engagement.</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i class="w-6 h-6" data-lucide="bell-ring"></i></div><h4 class="font-bold text-lg text-white mb-2">5. Smart Alerts</h4><p class="text-sm text-gray-400">Consumer subscriptions targeting new business openings inside 5km boundaries.</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="zap" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">6. Flash Deals</h4><p class="text-sm text-gray-400">Urgency countdowns for expiring inventory ("50% off cakes next 2 hours").</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="calendar" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">7. Events Hub</h4><p class="text-sm text-gray-400">Centralized municipal calendar. Stops fragmented local WhatsApp noise.</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="camera" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">8. Proof of Visit</h4><p class="text-sm text-gray-400">Customers snap photos inside venues to permanently validate review authenticity.</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="radio-receiver" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">9. Smart Leads</h4><p class="text-sm text-gray-400">The Reverse Market. Users yell intents into the void; matched SMEs bid back instantly.</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="users" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">10. Local Partnerships</h4><p class="text-sm text-gray-400">B2B algorithmic matchmaking (e.g. Bakeries seamlessly partnering with Florists).</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="bar-chart-2" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">11. Merchant Analytics</h4><p class="text-sm text-gray-400">Deep local telemetry. Page hits, WhatsApp clicks, geographical conversion plotting.</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="activity" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">12. Competitor Benchmarks</h4><p class="text-sm text-gray-400">Actionable intelligence showing SMEs how their engagement compares to town averages.</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="map-pin" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">13. GPS Rooting</h4><p class="text-sm text-gray-400">Eliminates chaotic "Turn left at the tree" directions via exact LAT/LONG tracking.</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="message-square" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">14. Review CMS</h4><p class="text-sm text-gray-400">Allowing owners to directly respond to criticism natively inside the platform dashboard.</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="palette" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">15. Dynamic Typography</h4><p class="text-sm text-gray-400">The app dynamically adopts the primary theme color of whichever town you are visiting.</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="share-2" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">16. Viral Loops</h4><p class="text-sm text-gray-400">Gamified invite mechanics tracking micro-influencers distributing referral strings.</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="flag" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">17. Community Policing</h4><p class="text-sm text-gray-400">Crowdsourced flagging system guaranteeing old/bankrupt businesses are removed.</p></div>
+        <div class="glass-card p-8 group"><div class="icon-wrapper group-hover:bg-[#D4AF37] group-hover:text-black transition-colors"><i data-lucide="shield" class="w-6 h-6"></i></div><h4 class="font-bold text-lg text-white mb-2">18. Admin Overlord</h4><p class="text-sm text-gray-400">Inescapable back-office CRM controlling user verification strings and enterprise audits.</p></div>
+      </div>
+    </section>
+
+    <!-- NEW ENTERPRISE SECURITY (2026 UPDATE) -->
+    <section class="py-24 border-t border-white/5 relative z-10">
+      <div class="glass-card p-12 md:p-16 relative overflow-hidden backdrop-blur-3xl animate-up">
+        <div class="absolute inset-0 bg-gradient-to-r from-[#1B4332]/60 to-transparent"></div>
+        <div class="relative z-10">
+          <span class="px-4 py-1 border border-[#D4AF37]/40 bg-black/50 text-[#D4AF37] rounded-full text-xs font-bold tracking-[0.2em] uppercase mb-8 inline-block shadow-lg">New Platform Upgrade: Zero-Trust Backend</span>
+          <h2 class="text-4xl md:text-5xl font-black text-white mb-6">Securing the Market Ecosystem.</h2>
+          <p class="text-lg text-gray-300 font-light max-w-3xl mb-12">BizHub is secured by rigorous mathematical bounds natively resolving inside the core C++ PostgreSQL engine, establishing a bulletproof moat.</p>
+          
+          <div class="grid md:grid-cols-2 gap-x-12 gap-y-8">
+            <div class="flex gap-4">
+              <i data-lucide="database" class="w-8 h-8 text-gold mt-1 shrink-0"></i>
+              <div><h4 class="text-xl font-bold text-white mb-2">Row-Level Security (RLS)</h4><p class="text-sm text-gray-400 font-light">Completely isolated data silos. Malicious merchants are violently rejected by the database kernel if attempting IDOR exploits.</p></div>
+            </div>
+            <div class="flex gap-4">
+              <i data-lucide="shield-alert" class="w-8 h-8 text-gold mt-1 shrink-0"></i>
+              <div><h4 class="text-xl font-bold text-white mb-2">Immutable Audit Logging</h4><p class="text-sm text-gray-400 font-light">A totally air-gapped `security_audit_log` traps every single system intent execution automatically via un-evadable background triggers.</p></div>
+            </div>
+            <div class="flex gap-4">
+              <i data-lucide="code" class="w-8 h-8 text-gold mt-1 shrink-0"></i>
+              <div><h4 class="text-xl font-bold text-white mb-2">Zod Component Serialization</h4><p class="text-sm text-gray-400 font-light">No SQL bounds or malformed types can breach the Vercel architecture. Inputs are stripped and compiled directly down to safe JSON.</p></div>
+            </div>
+            <div class="flex gap-4">
+              <i data-lucide="globe-2" class="w-8 h-8 text-gold mt-1 shrink-0"></i>
+              <div><h4 class="text-xl font-bold text-white mb-2">Multi-Tenant Scalability</h4><p class="text-sm text-gray-400 font-light">Built on a single, extremely dense monolithic codebase. Firing up "EldoretBizHub" or "NakuruBizHub" takes seconds, not weeks.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="pt-32 pb-16 text-center animate-up relative z-10 border-t border-white/5 mt-10">
+      <h2 class="text-5xl md:text-7xl font-black mb-10 text-white tracking-widest">Phase 1: <span class="gradient-gold">Kenya.</span></h2>
+      <a href="mailto:peteragak61@gmail.com" class="inline-flex items-center gap-3 px-12 py-6 bg-[#D4AF37] text-black font-black text-xl rounded-2xl hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(212,175,55,0.4)] transition-all uppercase tracking-wider">
+        <i data-lucide="mail" class="w-6 h-6"></i> Initiate Contact
+      </a>
+      <p class="mt-20 text-xs text-gray-600 font-bold uppercase tracking-[0.3em]">BizHub Network LTD. Strictly Confidential. Do Not Distribute.</p>
+    </footer>
+
+  </main>
+  
+  <script>
+    lucide.createIcons();
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-up');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    document.querySelectorAll('.animate-up').forEach((el) => observer.observe(el));
+  </script>
+</body>
+</html>

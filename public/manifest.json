@@ -1,47 +1,75 @@
 {
-  "name": "ThikaBizHub - Local Business Directory",
-  "short_name": "ThikaBizHub",
-  "description": "Your premier platform for discovering local businesses in Thika, Kenya",
+  "name": "BizHub — Local Business Network & POS",
+  "short_name": "BizHub",
+  "description": "Discover verified local businesses, process walk-in sales offline, and grow your network. Powered by AI.",
   "start_url": "/",
+  "id": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#9333ea",
-  "orientation": "portrait-primary",
+  "background_color": "#0D1F16",
+  "theme_color": "#1B4332",
+  "orientation": "any",
+  "scope": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [
+      "purpose": "any"
+    },
     {
-      "src": "/screenshot1.png",
-      "sizes": "540x720",
-      "type": "image/png"
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["business", "lifestyle", "shopping"],
+  "categories": ["business", "finance", "lifestyle", "shopping"],
   "shortcuts": [
+    {
+      "name": "Open POS Terminal",
+      "short_name": "POS",
+      "description": "Launch the point-of-sale checkout terminal",
+      "url": "/dashboard/pos",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
     {
       "name": "Browse Directory",
       "short_name": "Directory",
-      "description": "Browse all businesses",
+      "description": "Browse all verified local businesses",
       "url": "/directory",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "View Deals",
+      "name": "Flash Deals",
       "short_name": "Deals",
+      "description": "View time-limited discounts and offers",
       "url": "/deals",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Merchant Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your business analytics and manage listings",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
-  ]
+  ],
+  "screenshots": [],
+  "related_applications": [],
+  "handle_links": "preferred"
 }

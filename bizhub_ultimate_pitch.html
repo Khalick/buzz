@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BizHub Ultimate | Seed Prospectus</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { font-family: 'Outfit', sans-serif; background-color: #030706; color: #FFF; overflow-x: hidden; scroll-behavior: smooth; }
+    ::selection { background: #D4AF37; color: #000; }
+    
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulseSoft { 0% { opacity: 0.6; } 50% { opacity: 0.2; } 100% { opacity: 0.6; } }
+    @keyframes slideRight { 0% { transform: translateX(-100%); } 100% { transform: translateX(0); } }
+    @keyframes dataFlow { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+    @keyframes morph { 0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; } 50% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; } }
+    
+    .animate-up { animation: fadeUp 1s ease-out forwards; opacity: 0; }
+    .delay-100 { animation-delay: 100ms; } .delay-200 { animation-delay: 200ms; } .delay-300 { animation-delay: 300ms; }
+    
+    .glass-card { background: rgba(10, 25, 20, 0.4); border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 16px; backdrop-filter: blur(12px); overflow: hidden; transition: all 0.4s ease; }
+    .glass-card:hover { transform: translateY(-5px); border-color: rgba(212, 175, 55, 0.4); box-shadow: 0 10px 40px rgba(212, 175, 55, 0.1); }
+    
+    .text-gold { color: #D4AF37; }
+    .gradient-gold { background: linear-gradient(135deg, #FFF 0%, #D4AF37 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    /* Dynamic UI CSS Animations replacing heavy images */
+    .ui-mockup { width: 100%; height: 200px; background: #0A1914; border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    
+    .mock-pulse { width: 60px; height: 60px; border-radius: 50%; background: rgba(212,175,55,0.2); animation: pulseSoft 2s infinite; position: absolute; }
+    .mock-line { height: 4px; background: linear-gradient(90deg, transparent, #D4AF37, transparent); width: 200%; position: absolute; animation: slideRight 3s infinite linear; }
+    .orb-bg { position: fixed; top: -20vh; right: -20vw; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(27,67,50,0.5) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; filter: blur(80px); z-index: -1; animation: morph 15s infinite alternate; }
+  </style>
+</head>
+<body class="relative">
+  <div class="orb-bg"></div>
+
+  <!-- HERO -->
+  <header class="min-h-screen flex flex-col justify-center items-center text-center px-6 pt-20">
+    <div class="px-6 py-2 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 text-gold text-sm tracking-widest uppercase font-bold mb-10 animate-up">
+      Interactive Technical Pitch Deck v3.0
+    </div>
+    <h1 class="text-6xl md:text-9xl font-black mb-8 animate-up delay-100 leading-tight">
+      18 Pillars of <br/><span class="gradient-gold">African Commerce</span>
+    </h1>
+    <p class="text-2xl text-gray-400 max-w-4xl mx-auto font-light leading-relaxed animate-up delay-200 mb-16">
+      BizHub is not an app. It is a Zero-Trust operating system integrating 18 distinct enterprise-grade engines to formalize the $300B unregulated gig economy.
+    </p>
+    <a href="#architecture" class="px-10 py-5 bg-[#D4AF37] text-black font-black text-xl rounded-xl animate-up delay-300 hover:scale-105 transition-transform shadow-[0_0_50px_rgba(212,175,55,0.4)]">
+      Explore Architecture
+    </a>
+  </header>
+
+  <!-- SECURITY ARCHITECTURE -->
+  <section id="architecture" class="py-32 px-6 max-w-7xl mx-auto border-t border-white/10">
+    <div class="text-center mb-24 animate-up">
+      <h2 class="text-5xl font-black text-white mb-6">Zero-Trust Infrastructure</h2>
+      <p class="text-xl text-gray-400 font-light max-w-3xl mx-auto">Built assuming the network is already breached. Rigorous mathematical proofs guard the financial moat.</p>
+    </div>
+    <div class="grid md:grid-cols-2 gap-10">
+      <div class="glass-card p-10">
+        <i data-lucide="database" class="w-12 h-12 text-gold mb-6"></i>
+        <h3 class="text-3xl font-bold mb-4">Postgres Row-Level Security (RLS)</h3>
+        <p class="text-gray-400 text-lg leading-relaxed">Data siloing occurs directly in the database C-compiler layer. API wrappers cannot physically fetch foreign rows, neutralizing IDORs entirely.</p>
+        <div class="mt-8 h-2 bg-gray-900 rounded-full overflow-hidden"><div class="h-full bg-gold w-full animate-[slideRight_2s_infinite]"></div></div>
+      </div>
+      <div class="glass-card p-10">
+        <i data-lucide="lock" class="w-12 h-12 text-gold mb-6"></i>
+        <h3 class="text-3xl font-bold mb-4">Strict Zod Edge Serialization</h3>
+        <p class="text-gray-400 text-lg leading-relaxed">Incoming payloads are violently parsed by Zod schemas before Vercel Server Actions execute, destroying SQL injection and malformed types instantly.</p>
+        <div class="mt-8 flex gap-2"><div class="h-8 w-1/3 bg-green-500/20 rounded border border-green-500/50"></div><div class="h-8 w-2/3 bg-[#D4AF37]/20 rounded border border-[#D4AF37]/50"></div></div>
+      </div>
+      <div class="glass-card p-10">
+        <i data-lucide="shield-alert" class="w-12 h-12 text-gold mb-6"></i>
+        <h3 class="text-3xl font-bold mb-4">Immutable Audit Triggers</h3>
+        <p class="text-gray-400 text-lg leading-relaxed">Background Postgres 'SECURITY DEFINER' functions silently trap every UPDATE/DELETE intent and hard-write the metadata to an air-gapped ledger.</p>
+        <div class="mt-8 flex gap-4 overflow-hidden opacity-50"><div class="mock-line"></div></div>
+      </div>
+      <div class="glass-card p-10">
+        <i data-lucide="fingerprint" class="w-12 h-12 text-gold mb-6"></i>
+        <h3 class="text-3xl font-bold mb-4">KRA PIN Biometrics</h3>
+        <p class="text-gray-400 text-lg leading-relaxed">Gig workers are not anonymous. Multi-factor national ID and KRA PIN bridging enforces strict KYC compliance across the network.</p>
+        <div class="mt-8 flex justify-center"><div class="mock-pulse"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE 18 FEATURES -->
+  <section class="py-32 px-6 max-w-7xl mx-auto bg-black/40 rounded-[3rem] border border-white/5">
+    <div class="text-center mb-24">
+      <h2 class="text-6xl font-black gradient-gold mb-6">The 18 Core Engines</h2>
+      <p class="text-2xl text-gray-400 font-light">BizHub natively replaces 18 fragmented SaaS tools in East Africa.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      
+      <!-- 1 -->
+      <div class="glass-card">
+        <div class="ui-mockup"><i data-lucide="bar-chart-3" class="w-16 h-16 text-gold opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">1. Executive Dashboard</h3>
+          <p class="text-gray-400">Live operational KPIs calculated in real-time. Admins view gross volume, active merchants, and escrow balance at a glance.</p>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="glass-card">
+        <div class="ui-mockup bg-[#1B4332]/20"><div class="mock-line"></div><i data-lucide="users" class="w-16 h-16 text-emerald-500 opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">2. Platform Users</h3>
+          <p class="text-gray-400">Total manipulation of the consumer node network. View individual intent histories, pause abusive accounts, and moderate activity.</p>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="glass-card">
+        <div class="ui-mockup"><i data-lucide="shield-check" class="w-16 h-16 text-blue-500 opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">3. Verification Queue</h3>
+          <p class="text-gray-400">The "Blue Checkmark" factory. Admins execute dual-factor screening on submitted KRA documents, elevating users to Merchant status.</p>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="glass-card">
+        <div class="ui-mockup bg-purple-900/10"><i data-lucide="store" class="w-16 h-16 text-purple-400 opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">4. All Merchants Registry</h3>
+          <p class="text-gray-400">Definitive database of all formal and informal enterprises. Complete visibility into merchant success metrics and escrow payouts.</p>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="glass-card">
+        <div class="ui-mockup"><div class="mock-pulse bg-orange-500/20"></div><i data-lucide="inbox" class="w-16 h-16 text-orange-500 opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">5. Merchant Requests</h3>
+          <p class="text-gray-400">Live feed of gig-workers actively requesting elevation to the merchant layer. Integrates with the backend role-update triggers.</p>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="glass-card">
+        <div class="ui-mockup bg-[#D4AF37]/5"><i data-lucide="credit-card" class="w-16 h-16 text-gold opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">6. M-Pesa Native Ledger</h3>
+          <p class="text-gray-400">The financial heart. Direct API ledger hooks tracking Safaricom C2B and B2C flows, reconciling consumer escrow holds silently.</p>
+        </div>
+      </div>
+
+      <!-- 7 -->
+      <div class="glass-card">
+        <div class="ui-mockup bg-pink-900/10"><i data-lucide="star" class="w-16 h-16 text-pink-400 opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">7. Featured Ads Engine</h3>
+          <p class="text-gray-400">Algorithmic placement of paying merchant banners onto consumer feeds. Highly configurable schedule and slot management.</p>
+        </div>
+      </div>
+
+      <!-- 8 -->
+      <div class="glass-card">
+        <div class="ui-mockup"><i data-lucide="alert-triangle" class="w-16 h-16 text-red-500 opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">8. Moderation Feed</h3>
+          <p class="text-gray-400">Real-time surveillance of user reviews and community flags. Enforces algorithmic safety across the informal sector.</p>
+        </div>
+      </div>
+
+      <!-- 9 -->
+      <div class="glass-card">
+        <div class="ui-mockup bg-cyan-900/10"><div class="mock-line"></div><i data-lucide="camera" class="w-16 h-16 text-cyan-400 opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">9. Proof of Visit Engine</h3>
+          <p class="text-gray-400">Natively traps photographic and geofenced proof that a gig-worker actually arrived. Admins process visual approvals to release escrow.</p>
+        </div>
+      </div>
+
+      <!-- 10 -->
+      <div class="glass-card">
+        <div class="ui-mockup"><div class="mock-pulse"></div><i data-lucide="megaphone" class="w-16 h-16 text-gold opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">10. SMS/Push Broadcasts</h3>
+          <p class="text-gray-400">The reverse-marketplace engine. Users broadcast text/audio intents, and AI automatically shoots targeted push signals to matching merchants.</p>
+        </div>
+      </div>
+
+      <!-- 11 -->
+      <div class="glass-card">
+        <div class="ui-mockup bg-teal-900/10"><i data-lucide="search" class="w-16 h-16 text-teal-400 opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">11. AI Search Tuning</h3>
+          <p class="text-gray-400">Solves the African street-address paradox. Maps completely unstructured local slang (e.g., 'Kamakis') to strict LAT/LONG geometry.</p>
+        </div>
+      </div>
+
+      <!-- 12 -->
+      <div class="glass-card">
+        <div class="ui-mockup"><i data-lucide="map-pin" class="w-16 h-16 text-green-400 opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">12. Agent Tracking</h3>
+          <p class="text-gray-400">Gamified tracking for offline field agents generating leads. Maps their physically onboarded merchants to an automated commission tree.</p>
+        </div>
+      </div>
+
+      <!-- 13 -->
+      <div class="glass-card">
+        <div class="ui-mockup bg-red-900/10"><i data-lucide="activity" class="w-16 h-16 text-red-500 opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">13. Immutable Audit Logs</h3>
+          <p class="text-gray-400">Air-gapped chronological tracking of every hyper-sensitive system intent, driven by Postgres system-level triggers bypassing API edits.</p>
+        </div>
+      </div>
+
+      <!-- 14 -->
+      <div class="glass-card">
+        <div class="ui-mockup"><div class="mock-line"></div><i data-lucide="file-text" class="w-16 h-16 text-blue-300 opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">14. Corporate B2B Invoicing</h3>
+          <p class="text-gray-400">Allows enterprise procurement teams to sidestep strict corporate spending limitations by generating compliant B2B PDFs for gig work pooling.</p>
+        </div>
+      </div>
+
+      <!-- 15 -->
+      <div class="glass-card">
+        <div class="ui-mockup bg-fuchsia-900/10"><i data-lucide="tag" class="w-16 h-16 text-fuchsia-400 opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">15. Promo Code Matrix</h3>
+          <p class="text-gray-400">Algorithmically designed voucher deployment. Injects conditional financial stimulus directly into low-liquidity geographical zones.</p>
+        </div>
+      </div>
+
+      <!-- 16 -->
+      <div class="glass-card">
+        <div class="ui-mockup"><i data-lucide="building" class="w-16 h-16 text-stone-400 opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">16. Franchise Groups</h3>
+          <p class="text-gray-400">Enterprise abstraction. Grants top-tier access controls for chain-businesses to control, analyze, and sweep profits from underlying sub-branches.</p>
+        </div>
+      </div>
+
+      <!-- 17 -->
+      <div class="glass-card">
+        <div class="ui-mockup bg-lime-900/10"><i data-lucide="download-cloud" class="w-16 h-16 text-lime-400 opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">17. Data Export Pipeline</h3>
+          <p class="text-gray-400">Deep extraction funnels allowing automated CSV telemetry drops for external auditors, local regulators, or custom predictive AI models.</p>
+        </div>
+      </div>
+
+      <!-- 18 -->
+      <div class="glass-card">
+        <div class="ui-mockup"><div class="mock-pulse bg-rose-500/20"></div><i data-lucide="life-buoy" class="w-16 h-16 text-rose-500 opacity-50"></i></div>
+        <div class="p-8">
+          <h3 class="text-2xl font-bold mb-3">18. Support CRM Desk</h3>
+          <p class="text-gray-400">Lightweight embedded dispute resolution. Admins act as escrow judges in B2C merchant friction cases, retaining permanent conflict parity.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <footer class="mt-10 py-32 text-center relative z-10">
+    <h2 class="text-6xl md:text-8xl font-black text-white mb-10">Fund the Foundation.</h2>
+    <p class="text-2xl text-gray-400 max-w-3xl mx-auto font-light mb-16">The era of fragmented African e-commerce is over.</p>
+    <button class="px-16 py-6 bg-[#D4AF37] text-black text-2xl font-black rounded-2xl hover:bg-white hover:scale-110 transition-all shadow-[0_0_80px_rgba(212,175,55,0.5)] tracking-widest uppercase">
+      Request Term Sheet
+    </button>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-up');
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    document.querySelectorAll('.glass-card').forEach((el, i) => {
+      el.style.animationDelay = `${(i % 3) * 150}ms`;
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

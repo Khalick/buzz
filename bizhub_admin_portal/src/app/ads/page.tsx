@@ -110,6 +110,7 @@ export default function FeaturedAdsPage() {
 
       // Create new ad with defaults
       const newAd = {
+        title: 'Ad Campaign',
         merchant: formData.merchantId, // simplified, usually would map ID to name
         slot: formData.slot,
         status: 'scheduled',
