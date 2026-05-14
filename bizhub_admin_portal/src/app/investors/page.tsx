@@ -185,7 +185,7 @@ export default function InvestorPitchPage() {
               { title: "Row-Level Security", desc: "Military-grade data siloing natively within PostgreSQL preventing unauthorized data leakage.", icon: <Lock /> },
               { title: "AI Moderation", desc: "Automated 'Proof of Visit' flagging and fraud detection processing images directly at the edge.", icon: <ShieldCheck /> }
             ].map((f, i) => (
-              <div key={i} className={`glass-panel p-10 rounded-2xl hover:-translate-y-2 transition-all duration-300 animate-fade-up hover:bg-[#1B4332]/40`} style={{ animationDelay: \`\${i * 150}ms\` }}>
+              <div key={i} className={`glass-panel p-10 rounded-2xl hover:-translate-y-2 transition-all duration-300 animate-fade-up hover:bg-[#1B4332]/40`} style={{ animationDelay: `${i * 150}ms` }}>
                  <div className="w-14 h-14 bg-black/40 rounded-xl flex items-center justify-center mb-6 text-[#D4AF37] border border-white/5 mx-auto">
                     {f.icon}
                  </div>
