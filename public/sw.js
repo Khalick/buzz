@@ -3,7 +3,7 @@
 // Production-grade PWA with offline-first POS support
 // ================================================================
 
-const CACHE_VERSION = 'bizhub-v4';
+const CACHE_VERSION = 'bizhub-v5';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 const POS_CACHE = `${CACHE_VERSION}-pos`;

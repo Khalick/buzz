@@ -88,7 +88,7 @@ export function usePWA(): PWAStatus {
 
     // Register the service worker
     navigator.serviceWorker
-      .register('/sw.js', { scope: '/' })
+      .register('/sw.js?v=5', { scope: '/' })
       .then((reg) => {
         setRegistration(reg);
         setIsReady(true);
