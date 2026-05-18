@@ -290,7 +290,7 @@ export default function POSPage() {
              B
            </div>
            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-500 dark:from-white dark:to-gray-400 hidden sm:block">
-             BizHub POS
+             BizHub POS (v5 Update)
            </h1>
          </div>
          
