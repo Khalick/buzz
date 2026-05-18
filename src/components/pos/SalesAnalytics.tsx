@@ -73,29 +73,29 @@ export default function SalesAnalytics({ orders }: SalesAnalyticsProps) {
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-800">
         <h2 className="text-lg font-bold dark:text-gray-100 flex items-center gap-2">
-          <BarChart3 size={18} className="text-indigo-500" /> Analytics
+          <BarChart3 size={18} className="text-[#2D6A4F]" /> Analytics
         </h2>
       </div>
 
       <div className="p-4 space-y-5">
         {/* Today Metrics */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl p-4 text-white">
+          <div className="bg-gradient-to-br from-[#0D1F16] to-[#1B4332] border border-[#D4AF37]/20 rounded-2xl p-4 text-[#D4AF37]">
             <DollarSign size={16} className="opacity-60 mb-1" />
             <div className="text-xl font-black">KES {analytics.todayRevenue.toLocaleString()}</div>
             <div className="text-xs opacity-70 font-bold">Today&apos;s Revenue</div>
           </div>
-          <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-4 text-white">
+          <div className="bg-gradient-to-br from-[#2D6A4F] to-[#40916C] border border-[#D4AF37]/20 rounded-2xl p-4 text-white">
             <ShoppingCart size={16} className="opacity-60 mb-1" />
             <div className="text-xl font-black">{analytics.todayOrders}</div>
             <div className="text-xs opacity-70 font-bold">Transactions</div>
           </div>
-          <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-4 text-white">
+          <div className="bg-gradient-to-br from-[#D4AF37] to-[#B8972E] border border-[#1B4332]/20 rounded-2xl p-4 text-[#0D1F16]">
             <TrendingUp size={16} className="opacity-60 mb-1" />
             <div className="text-xl font-black">KES {Math.round(analytics.todayAvg).toLocaleString()}</div>
             <div className="text-xs opacity-70 font-bold">Avg Ticket</div>
           </div>
-          <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-4 text-white">
+          <div className="bg-gradient-to-br from-[#1B4332] to-[#2D6A4F] border border-[#D4AF37]/20 rounded-2xl p-4 text-[#D4AF37]">
             <Package size={16} className="opacity-60 mb-1" />
             <div className="text-xl font-black">{analytics.todayItems}</div>
             <div className="text-xs opacity-70 font-bold">Items Sold</div>
@@ -112,14 +112,14 @@ export default function SalesAnalytics({ orders }: SalesAnalyticsProps) {
                 <div className="w-full rounded-t-lg transition-all relative group cursor-pointer"
                   style={{
                     height: `${Math.max((day.revenue / analytics.maxRevenue) * 100, 4)}%`,
-                    background: i === 6 ? 'linear-gradient(to top, #6366f1, #818cf8)' : 'linear-gradient(to top, #e5e7eb, #d1d5db)',
+                    background: i === 6 ? 'linear-gradient(to top, #1B4332, #2D6A4F)' : 'linear-gradient(to top, #e5e7eb, #d1d5db)',
                   }}>
                   {/* Tooltip */}
                   <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
                     KES {day.revenue.toLocaleString()}
                   </div>
                 </div>
-                <div className={`text-[10px] font-bold ${i === 6 ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400'}`}>{day.label}</div>
+                <div className={`text-[10px] font-bold ${i === 6 ? 'text-[#1B4332] dark:text-[#D4AF37]' : 'text-gray-400'}`}>{day.label}</div>
               </div>
             ))}
           </div>
@@ -130,9 +130,9 @@ export default function SalesAnalytics({ orders }: SalesAnalyticsProps) {
           <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Payment Methods</h3>
           <div className="space-y-2.5">
             {[
-              { key: 'cash', label: 'Cash', icon: <Banknote size={14} />, color: '#3b82f6', amount: analytics.methods.cash },
-              { key: 'mobile_money', label: 'M-Pesa', icon: <Smartphone size={14} />, color: '#22c55e', amount: analytics.methods.mobile_money },
-              { key: 'card', label: 'Card', icon: <CreditCard size={14} />, color: '#8b5cf6', amount: analytics.methods.card },
+              { key: 'cash', label: 'Cash', icon: <Banknote size={14} />, color: '#2D6A4F', amount: analytics.methods.cash },
+              { key: 'mobile_money', label: 'M-Pesa', icon: <Smartphone size={14} />, color: '#D4AF37', amount: analytics.methods.mobile_money },
+              { key: 'card', label: 'Card', icon: <CreditCard size={14} />, color: '#1B4332', amount: analytics.methods.card },
             ].map(m => {
               const pct = (m.amount / analytics.totalMethods) * 100;
               return (
@@ -165,7 +165,7 @@ export default function SalesAnalytics({ orders }: SalesAnalyticsProps) {
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{p.name}</div>
                     <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mt-1 overflow-hidden">
-                      <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${(p.revenue / analytics.maxProductRevenue) * 100}%` }} />
+                      <div className="h-full bg-[#D4AF37] rounded-full" style={{ width: `${(p.revenue / analytics.maxProductRevenue) * 100}%` }} />
                     </div>
                   </div>
                   <div className="text-right shrink-0">
@@ -187,7 +187,7 @@ export default function SalesAnalytics({ orders }: SalesAnalyticsProps) {
                 <div className="w-full rounded-t transition-all"
                   style={{
                     height: `${Math.max((h.count / analytics.maxHourCount) * 100, 8)}%`,
-                    backgroundColor: h.count > 0 ? `rgba(99, 102, 241, ${0.3 + (h.count / analytics.maxHourCount) * 0.7})` : '#e5e7eb',
+                    backgroundColor: h.count > 0 ? `rgba(45, 106, 79, ${0.3 + (h.count / analytics.maxHourCount) * 0.7})` : '#e5e7eb',
                   }} />
                 <div className="text-[8px] text-gray-400 font-medium">{h.label}</div>
               </div>

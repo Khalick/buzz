@@ -111,7 +111,7 @@ export default function ReceiptPreview({ receipt, isOpen, onClose }: ReceiptPrev
           <div ref={receiptRef} className="p-6 space-y-4">
             {/* Header */}
             <div className="text-center pb-4 border-b-2 border-dashed border-gray-200 dark:border-gray-700">
-              <div className="h-12 w-12 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-xl flex items-center justify-center text-white font-black text-xl mx-auto mb-2 shadow-lg">B</div>
+              <div className="h-12 w-12 bg-gradient-to-br from-[#0D1F16] to-[#1B4332] rounded-xl flex items-center justify-center text-[#D4AF37] font-black text-xl mx-auto mb-2 shadow-lg border border-[#D4AF37]/20">B</div>
               <h1 className="text-lg font-black text-gray-900 dark:text-gray-100">{receipt.businessName}</h1>
               {receipt.businessPhone && <p className="text-xs text-gray-400 flex items-center justify-center gap-1 mt-1"><Phone size={10} />{receipt.businessPhone}</p>}
               <p className="text-xs text-gray-400 mt-2 font-mono">{receipt.receiptNumber}</p>
@@ -151,7 +151,7 @@ export default function ReceiptPreview({ receipt, isOpen, onClose }: ReceiptPrev
                 <span>KES {receipt.subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
               </div>
               {receipt.discountAmount > 0 && (
-                <div className="flex justify-between text-green-600">
+                <div className="flex justify-between text-[#2D6A4F] dark:text-[#52B788]">
                   <span>Discount {receipt.discountType === 'percent' ? '' : ''}</span>
                   <span>-KES {receipt.discountAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                 </div>
@@ -179,7 +179,7 @@ export default function ReceiptPreview({ receipt, isOpen, onClose }: ReceiptPrev
                 </div>
               )}
               {receipt.changeDue != null && receipt.changeDue > 0 && (
-                <div className="flex justify-between text-emerald-600 font-bold">
+                <div className="flex justify-between text-[#2D6A4F] dark:text-[#52B788] font-bold">
                   <span>Change</span>
                   <span>KES {receipt.changeDue.toLocaleString()}</span>
                 </div>

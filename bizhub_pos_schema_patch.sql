@@ -85,3 +85,6 @@ CREATE POLICY "pos_order_item_owner_insert" ON public.pos_order_items FOR INSERT
     JOIN public.businesses b ON po.business_id = b.id
     WHERE po.id = pos_order_id AND b.owner_id = auth.uid()
   ));
+
+-- Reload PostgREST schema cache
+NOTIFY pgrst, 'reload schema';

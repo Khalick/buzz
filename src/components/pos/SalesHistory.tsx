@@ -54,9 +54,9 @@ export default function SalesHistory({ orders, onViewReceipt, isLoading }: Sales
   const todayAvg = todayOrders.length > 0 ? todayRevenue / todayOrders.length : 0;
 
   const getPaymentIcon = (method: string) => {
-    if (method === 'cash') return <Banknote size={14} className="text-blue-500" />;
-    if (method === 'mobile_money') return <Smartphone size={14} className="text-green-500" />;
-    return <CreditCard size={14} className="text-purple-500" />;
+    if (method === 'cash') return <Banknote size={14} className="text-[#2D6A4F]" />;
+    if (method === 'mobile_money') return <Smartphone size={14} className="text-[#D4AF37]" />;
+    return <CreditCard size={14} className="text-[#1B4332]" />;
   };
 
   return (
@@ -64,21 +64,21 @@ export default function SalesHistory({ orders, onViewReceipt, isLoading }: Sales
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-800">
         <h2 className="text-lg font-bold dark:text-gray-100 flex items-center gap-2 mb-3">
-          <History size={18} className="text-indigo-500" /> Sales History
+          <History size={18} className="text-[#2D6A4F]" /> Sales History
         </h2>
 
         {/* Today's Summary */}
         <div className="grid grid-cols-3 gap-2 mb-3">
-          <div className="bg-gradient-to-br from-indigo-500/10 to-blue-500/10 rounded-xl p-3 text-center">
-            <div className="text-lg font-black text-indigo-600 dark:text-indigo-400">{todayOrders.length}</div>
+          <div className="bg-[#1B4332]/5 dark:bg-[#1B4332]/20 border border-[#D4AF37]/20 rounded-xl p-3 text-center">
+            <div className="text-lg font-black text-[#1B4332] dark:text-[#D4AF37]">{todayOrders.length}</div>
             <div className="text-[10px] font-bold text-gray-500 uppercase">Sales</div>
           </div>
-          <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-xl p-3 text-center">
-            <div className="text-sm font-black text-emerald-600 dark:text-emerald-400 truncate">KES {todayRevenue.toLocaleString()}</div>
+          <div className="bg-[#2D6A4F]/5 dark:bg-[#2D6A4F]/20 border border-[#D4AF37]/20 rounded-xl p-3 text-center">
+            <div className="text-sm font-black text-[#2D6A4F] dark:text-[#52B788] truncate">KES {todayRevenue.toLocaleString()}</div>
             <div className="text-[10px] font-bold text-gray-500 uppercase">Revenue</div>
           </div>
-          <div className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-xl p-3 text-center">
-            <div className="text-sm font-black text-amber-600 dark:text-amber-400 truncate">KES {Math.round(todayAvg).toLocaleString()}</div>
+          <div className="bg-[#D4AF37]/5 dark:bg-[#D4AF37]/10 border border-[#D4AF37]/20 rounded-xl p-3 text-center">
+            <div className="text-sm font-black text-[#D4AF37] dark:text-[#D4AF37] truncate">KES {Math.round(todayAvg).toLocaleString()}</div>
             <div className="text-[10px] font-bold text-gray-500 uppercase">Avg Ticket</div>
           </div>
         </div>
@@ -86,7 +86,7 @@ export default function SalesHistory({ orders, onViewReceipt, isLoading }: Sales
         {/* Search */}
         <div className="relative mb-2">
           <input type="text" placeholder="Search receipts..." value={search} onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500" />
+            className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#D4AF37]" />
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
         </div>
 
@@ -94,14 +94,14 @@ export default function SalesHistory({ orders, onViewReceipt, isLoading }: Sales
         <div className="flex gap-1.5">
           {['today', 'week', 'all'].map(d => (
             <button key={d} onClick={() => setFilterDate(d)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors ${filterDate === d ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-gray-200'}`}>
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors ${filterDate === d ? 'bg-[#1B4332] text-[#D4AF37]' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-gray-200'}`}>
               {d === 'today' ? 'Today' : d === 'week' ? '7 Days' : 'All'}
             </button>
           ))}
           <div className="w-px bg-gray-200 dark:bg-gray-700 mx-1" />
           {['all', 'cash', 'mobile_money', 'card'].map(m => (
             <button key={m} onClick={() => setFilterMethod(m)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors ${filterMethod === m ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-gray-200'}`}>
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors ${filterMethod === m ? 'bg-[#1B4332] text-[#D4AF37]' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-gray-200'}`}>
               {m === 'all' ? 'All' : m === 'cash' ? '💵' : m === 'mobile_money' ? '📱' : '💳'}
             </button>
           ))}
@@ -112,7 +112,7 @@ export default function SalesHistory({ orders, onViewReceipt, isLoading }: Sales
       <div className="flex-1 overflow-y-auto p-2">
         {isLoading ? (
           <div className="flex items-center justify-center h-32 text-gray-400">
-            <div className="animate-spin h-6 w-6 border-2 border-indigo-500 border-t-transparent rounded-full" />
+            <div className="animate-spin h-6 w-6 border-2 border-[#D4AF37] border-t-transparent rounded-full" />
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-32 text-gray-400 text-sm">
@@ -134,7 +134,7 @@ export default function SalesHistory({ orders, onViewReceipt, isLoading }: Sales
                   {isExpanded ? <ChevronDown size={14} className="text-gray-400 shrink-0" /> : <ChevronRight size={14} className="text-gray-400 shrink-0" />}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs text-indigo-500 font-bold">{order.receipt_number || '—'}</span>
+                      <span className="font-mono text-xs text-[#2D6A4F] dark:text-[#D4AF37] font-bold">{order.receipt_number || '—'}</span>
                       {order.customer_name && <span className="text-xs text-gray-400 truncate">• {order.customer_name}</span>}
                     </div>
                     <div className="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
@@ -157,14 +157,14 @@ export default function SalesHistory({ orders, onViewReceipt, isLoading }: Sales
                       </div>
                     ))}
                     {order.discount_amount > 0 && (
-                      <div className="flex justify-between text-xs text-green-600">
+                      <div className="flex justify-between text-xs text-[#2D6A4F] dark:text-[#52B788]">
                         <span>Discount</span>
                         <span>-KES {order.discount_amount.toLocaleString()}</span>
                       </div>
                     )}
                     {order.notes && <div className="text-xs text-gray-400 italic">📝 {order.notes}</div>}
                     <button onClick={() => onViewReceipt(order)}
-                      className="w-full mt-2 py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-lg text-xs font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors flex items-center justify-center gap-1">
+                      className="w-full mt-2 py-2 bg-[#1B4332]/5 dark:bg-[#1B4332]/20 border border-[#D4AF37]/20 text-[#1B4332] dark:text-[#D4AF37] rounded-lg text-xs font-bold hover:bg-[#1B4332]/10 dark:hover:bg-[#1B4332]/30 transition-colors flex items-center justify-center gap-1">
                       <Receipt size={12} /> View Receipt
                     </button>
                   </div>

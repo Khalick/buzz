@@ -1,10 +1,5 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
-import { createClient } from '@supabase/supabase-js';
-
-// We require the app's Supabase client or we create a fresh one
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from '@/lib/supabase';
 
 interface POSDatabase extends DBSchema {
   products: {
@@ -201,7 +196,7 @@ export async function syncOrdersUp() {
           receipt_number: order.receipt_number
         })
         .select()
-        .single();
+        .maybeSingle();
         
       if (orderError) throw orderError;
 
@@ -223,7 +218,7 @@ export async function syncOrdersUp() {
         
         // Decrement stock for the items
         for(const item of order.items) {
-            const { data: p } = await supabase.from('pos_products').select('stock_quantity').eq('id', item.pos_product_id).single();
+            const { data: p } = await supabase.from('pos_products').select('stock_quantity').eq('id', item.pos_product_id).maybeSingle();
             if(p) {
                await supabase.from('pos_products').update({stock_quantity: Math.max(0, (p.stock_quantity || 0) - item.quantity)}).eq('id', item.pos_product_id);
             }

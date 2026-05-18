@@ -151,7 +151,7 @@ export default function DirectoryPage() {
 
   const BusinessCard = ({ business }: { business: Business }) => {
     const getWhatsAppLink = () => {
-      const phone = business.contact.whatsapp || business.contact.phone || '';
+      const phone = business.contact?.whatsapp || business.contact?.phone || '';
       return `https://wa.me/${phone?.replace(/\D/g, '')}`;
     };
 
@@ -260,7 +260,7 @@ export default function DirectoryPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-2" onClick={(e) => e.stopPropagation()}>
-            {(business.contact.whatsapp || business.contact.phone) && (
+            {(business.contact?.whatsapp || business.contact?.phone) && (
               <a
                 href={getWhatsAppLink()}
                 target="_blank"

@@ -13,9 +13,9 @@ export interface POSCategory {
 }
 
 const PRESET_COLORS = [
-  '#6366f1', '#8b5cf6', '#ec4899', '#ef4444', '#f97316',
-  '#eab308', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6',
-  '#64748b', '#1B4332',
+  '#1B4332', '#2D6A4F', '#D4AF37', '#ec4899', '#ef4444',
+  '#f97316', '#eab308', '#22c55e', '#14b8a6', '#06b6d4',
+  '#64748b', '#0D1F16',
 ];
 
 interface CategoryManagerProps {
@@ -28,7 +28,7 @@ interface CategoryManagerProps {
 
 export default function CategoryManager({ categories, onSave, onUpdate, onDelete, onClose }: CategoryManagerProps) {
   const [newName, setNewName] = useState('');
-  const [newColor, setNewColor] = useState('#6366f1');
+  const [newColor, setNewColor] = useState('#1B4332');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
 
@@ -36,7 +36,7 @@ export default function CategoryManager({ categories, onSave, onUpdate, onDelete
     if (!newName.trim()) return;
     onSave({ name: newName.trim(), color: newColor, icon: 'tag', sort_order: categories.length, business_id: '' });
     setNewName('');
-    setNewColor('#6366f1');
+    setNewColor('#1B4332');
   };
 
   const startEdit = (cat: POSCategory) => {
@@ -56,7 +56,7 @@ export default function CategoryManager({ categories, onSave, onUpdate, onDelete
       <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
         <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
           <h2 className="text-xl font-bold dark:text-gray-100 flex items-center gap-2">
-            <Tag size={20} className="text-indigo-500" /> Categories
+            <Tag size={20} className="text-[#2D6A4F]" /> Categories
           </h2>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
             <X size={20} className="text-gray-500" />
@@ -72,12 +72,12 @@ export default function CategoryManager({ categories, onSave, onUpdate, onDelete
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
               placeholder="New category name..."
-              className="flex-1 px-4 py-2.5 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="flex-1 px-4 py-2.5 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
             />
             <button
               onClick={handleAdd}
               disabled={!newName.trim()}
-              className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold disabled:opacity-50 transition-colors flex items-center gap-1"
+              className="px-4 py-2.5 bg-[#1B4332] hover:bg-[#0D1F16] text-[#D4AF37] rounded-xl text-sm font-bold disabled:opacity-50 transition-colors flex items-center gap-1"
             >
               <Plus size={16} /> Add
             </button>
@@ -88,7 +88,7 @@ export default function CategoryManager({ categories, onSave, onUpdate, onDelete
               <button
                 key={c}
                 onClick={() => setNewColor(c)}
-                className={`w-7 h-7 rounded-full transition-all ${newColor === c ? 'ring-2 ring-offset-2 ring-indigo-500 scale-110' : 'hover:scale-110'}`}
+                className={`w-7 h-7 rounded-full transition-all ${newColor === c ? 'ring-2 ring-offset-2 ring-[#D4AF37] scale-110' : 'hover:scale-110'}`}
                 style={{ backgroundColor: c }}
               />
             ))}
@@ -111,7 +111,7 @@ export default function CategoryManager({ categories, onSave, onUpdate, onDelete
                     onChange={(e) => setEditName(e.target.value)}
                     onBlur={() => saveEdit(cat.id)}
                     onKeyDown={(e) => e.key === 'Enter' && saveEdit(cat.id)}
-                    className="flex-1 px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded text-sm outline-none border border-indigo-500"
+                    className="flex-1 px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded text-sm outline-none border border-[#D4AF37]"
                   />
                 ) : (
                   <span

@@ -30,7 +30,7 @@ export default function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcuts
       <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in" onClick={e => e.stopPropagation()}>
         <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
           <h2 className="text-xl font-bold dark:text-gray-100 flex items-center gap-2">
-            <Keyboard size={20} className="text-indigo-500" /> Keyboard Shortcuts
+            <Keyboard size={20} className="text-[#2D6A4F]" /> Keyboard Shortcuts
           </h2>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
             <X size={20} className="text-gray-500" />

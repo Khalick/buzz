@@ -12,12 +12,8 @@ import ReceiptPreview from '@/components/pos/ReceiptPreview';
 import KeyboardShortcuts from '@/components/pos/KeyboardShortcuts';
 import { syncProductsDown, initSyncListeners, getLocalCategories, initDB } from '@/lib/posOfflineSync';
 import { Clock, DownloadCloud, History, LayoutDashboard, Package, Tag as TagIcon, Settings, Keyboard, PlayCircle } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import InstallPrompt from '@/components/pwa/InstallPrompt';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 type Panel = 'cart' | 'history' | 'analytics' | 'products' | 'categories';
 
@@ -104,11 +100,11 @@ export default function POSPage() {
       if (user) {
         setCashierId(user.id);
         // We'd ideally fetch their profile for name
-        const { data: biz } = await supabase.from('businesses').select('id, name, phone').eq('owner_id', user.id).single();
+        const { data: biz } = await supabase.from('businesses').select('id, name, contact').eq('owner_id', user.id).limit(1).maybeSingle();
         if (biz) {
           setBusinessId(biz.id);
           setBusinessName(biz.name);
-          setBusinessPhone(biz.phone || '');
+          setBusinessPhone(biz.contact?.phone || '');
           await handleForceSync(biz.id);
           await loadOrders(biz.id);
         } else {
@@ -290,7 +286,7 @@ export default function POSPage() {
       {/* POS Top Header */}
       <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 shrink-0 shadow-sm z-10">
          <div className="flex items-center gap-4">
-           <div className="h-10 w-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md">
+           <div className="h-10 w-10 bg-gradient-to-br from-[#0D1F16] to-[#1B4332] rounded-xl flex items-center justify-center text-[#D4AF37] font-black text-xl shadow-md border border-[#D4AF37]/20">
              B
            </div>
            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-500 dark:from-white dark:to-gray-400 hidden sm:block">
@@ -309,7 +305,7 @@ export default function POSPage() {
          </div>
 
          <div className="flex items-center gap-4">
-           <button onClick={() => setShowShortcuts(true)} className="p-2 text-gray-400 hover:text-indigo-500 bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors" title="Keyboard Shortcuts (?)">
+           <button onClick={() => setShowShortcuts(true)} className="p-2 text-gray-400 hover:text-[#2D6A4F] bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors" title="Keyboard Shortcuts (?)">
              <Keyboard size={18} />
            </button>
            <button 
@@ -349,7 +345,7 @@ export default function POSPage() {
             ].map(tab => (
               <button key={tab.id} onClick={() => setActivePanel(tab.id as Panel)}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${
-                  activePanel === tab.id ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800'
+                  activePanel === tab.id ? 'bg-[#1B4332] text-[#D4AF37] shadow-sm' : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800'
                 }`}>
                 {tab.icon} <span className="hidden sm:inline">{tab.label}</span>
               </button>
