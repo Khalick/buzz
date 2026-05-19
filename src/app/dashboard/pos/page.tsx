@@ -100,7 +100,7 @@ export default function POSPage() {
       if (user) {
         setCashierId(user.id);
         // We'd ideally fetch their profile for name
-        const { data: biz } = await supabase.from('businesses').select('id, name, contact').eq('owner_id', user.id).limit(1).maybeSingle();
+        const { data: biz } = await supabase.from('businesses').select('id, name, contact').or(`owner_id.eq.${user.id},user_id.eq.${user.id}`).limit(1).maybeSingle();
         if (biz) {
           setBusinessId(biz.id);
           setBusinessName(biz.name);
@@ -236,39 +236,47 @@ export default function POSPage() {
 
   // CRUD Operations (Direct to Supabase, then sync down)
   const saveCategory = async (cat: Omit<POSCategory, 'id'>) => {
-    if (!businessId || !navigator.onLine) return; // Basic offline handling
+    if (!businessId) return alert('Error: No business associated with your account. Please set up a business first.');
+    if (!navigator.onLine) return alert('Error: You are currently offline. Sync not possible.');
     const { error } = await supabase.from('pos_categories').insert({ ...cat, business_id: businessId });
     if (!error) handleForceSync();
+    else alert('Error saving category: ' + error.message);
   };
   
   const updateCategory = async (id: string, data: Partial<POSCategory>) => {
-    if (!navigator.onLine) return;
+    if (!navigator.onLine) return alert('Error: You are currently offline.');
     const { error } = await supabase.from('pos_categories').update(data).eq('id', id);
     if (!error) handleForceSync();
+    else alert('Error updating category: ' + error.message);
   };
 
   const deleteCategory = async (id: string) => {
-    if (!navigator.onLine) return;
+    if (!navigator.onLine) return alert('Error: You are currently offline.');
     const { error } = await supabase.from('pos_categories').delete().eq('id', id);
     if (!error) handleForceSync();
+    else alert('Error deleting category: ' + error.message);
   };
 
   const saveProduct = async (product: Partial<POSProduct>) => {
-    if (!businessId || !navigator.onLine) return;
+    if (!businessId) return alert('Error: No business associated with your account.');
+    if (!navigator.onLine) return alert('Error: You are currently offline.');
     const { error } = await supabase.from('pos_products').insert({ ...product, business_id: businessId });
     if (!error) handleForceSync();
+    else alert('Error saving product: ' + error.message);
   };
 
   const updateProduct = async (id: string, data: Partial<POSProduct>) => {
-    if (!navigator.onLine) return;
+    if (!navigator.onLine) return alert('Error: You are currently offline.');
     const { error } = await supabase.from('pos_products').update(data).eq('id', id);
     if (!error) handleForceSync();
+    else alert('Error updating product: ' + error.message);
   };
 
   const deleteProduct = async (id: string) => {
-    if (!navigator.onLine) return;
+    if (!navigator.onLine) return alert('Error: You are currently offline.');
     const { error } = await supabase.from('pos_products').delete().eq('id', id);
     if (!error) handleForceSync();
+    else alert('Error deleting product: ' + error.message);
   };
 
   // Calculations
