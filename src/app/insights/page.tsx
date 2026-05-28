@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { supabase } from '@/lib/supabase';
 import { TrendingUp, BarChart3, Users, Award } from 'lucide-react';
 
 interface CategoryStats {
@@ -26,7 +27,9 @@ export default function CompetitorInsightsPage() {
   const fetchInsights = async () => {
     try {
       setLoading(true);
-      const token = await user!.getIdToken();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      
       const response = await fetch('/api/insights', {
         headers: {
           'Authorization': `Bearer ${token}`

@@ -40,6 +40,9 @@ export default function EditBusinessPage() {
   const [saved, setSaved] = useState(false);
   const [newImages, setNewImages] = useState<File[]>([]);
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationError, setLocationError] = useState('');
+  const [gettingLocation, setGettingLocation] = useState(false);
 
   // Form state
   const [form, setForm] = useState({
@@ -92,6 +95,10 @@ export default function EditBusinessPage() {
         instagram: data.social_media?.instagram || '',
         twitter: data.social_media?.twitter || '',
       });
+      // Pre-populate GPS coordinates if they exist
+      if (data.coordinates?.latitude && data.coordinates?.longitude) {
+        setLocation({ lat: data.coordinates.latitude, lng: data.coordinates.longitude });
+      }
       setHours(data.business_hours || {
         monday: { open: '09:00', close: '17:00', closed: false },
         tuesday: { open: '09:00', close: '17:00', closed: false },
@@ -145,6 +152,32 @@ export default function EditBusinessPage() {
     setNewImagePreviews(prev => prev.filter((_, i) => i !== index));
   };
 
+  const getCurrentLocation = () => {
+    setGettingLocation(true);
+    setLocationError('');
+
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported by your browser');
+      setGettingLocation(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        setGettingLocation(false);
+      },
+      (error) => {
+        setLocationError('Unable to get your location. Please try again.');
+        setGettingLocation(false);
+        console.error('Geolocation error:', error);
+      }
+    );
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -179,6 +212,7 @@ export default function EditBusinessPage() {
             instagram: form.instagram || null,
             twitter: form.twitter || null,
           },
+          coordinates: location ? { latitude: location.lat, longitude: location.lng } : undefined,
           business_hours: hours,
           images: allImages,
         }),
@@ -284,6 +318,40 @@ export default function EditBusinessPage() {
               <input name="address" value={form.address} onChange={handleChange}
                 className="w-full px-4 py-3 border-2 border-[#1B4332]/10 rounded-xl focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]/30 outline-none transition-all" />
             </div>
+
+            {/* GPS Location Pin */}
+            <div className="bg-[#1B4332]/5 border border-[#1B4332]/10 rounded-xl p-4">
+              <p className="text-sm text-[#525252] mb-3 flex items-start gap-2">
+                <MapPin className="h-4 w-4 text-[#1B4332] mt-0.5 flex-shrink-0" />
+                Update your business pin for Google Maps directions.
+              </p>
+              <button
+                type="button"
+                onClick={getCurrentLocation}
+                disabled={gettingLocation}
+                className="bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-semibold py-2.5 px-5 rounded-xl disabled:opacity-50 transition-colors flex items-center gap-2"
+              >
+                <MapPin className="h-4 w-4" />
+                {gettingLocation ? 'Getting Location...' : location ? 'Update Location' : 'Pin Current Location'}
+              </button>
+              {location && (
+                <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-xl">
+                  <p className="text-sm text-green-800 font-medium flex items-center gap-1.5">
+                    <CheckCircle className="h-4 w-4" />
+                    Location pinned!
+                  </p>
+                  <p className="text-xs text-green-700 mt-1 ml-6">
+                    {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
+                  </p>
+                </div>
+              )}
+              {locationError && (
+                <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-xl">
+                  <p className="text-sm text-red-800">{locationError}</p>
+                </div>
+              )}
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-[#1A1A1A] mb-1.5">Website</label>

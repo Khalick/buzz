@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import ProductGrid from '@/components/pos/ProductGrid';
 import Cart, { CartItem } from '@/components/pos/Cart';
 import CheckoutModal from '@/components/pos/CheckoutModal';
@@ -11,7 +12,7 @@ import SalesAnalytics from '@/components/pos/SalesAnalytics';
 import ReceiptPreview from '@/components/pos/ReceiptPreview';
 import KeyboardShortcuts from '@/components/pos/KeyboardShortcuts';
 import { syncProductsDown, initSyncListeners, getLocalCategories, initDB } from '@/lib/posOfflineSync';
-import { Clock, DownloadCloud, History, LayoutDashboard, Package, Tag as TagIcon, Settings, Keyboard, PlayCircle } from 'lucide-react';
+import { Clock, DownloadCloud, History, LayoutDashboard, Package, Tag as TagIcon, Settings, Keyboard, PlayCircle, Wallet } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import InstallPrompt from '@/components/pwa/InstallPrompt';
 
@@ -313,9 +314,17 @@ export default function POSPage() {
          </div>
 
          <div className="flex items-center gap-4">
-           <button onClick={() => setShowShortcuts(true)} className="p-2 text-gray-400 hover:text-[#2D6A4F] bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors" title="Keyboard Shortcuts (?)">
-             <Keyboard size={18} />
-           </button>
+            <Link
+              href="/dashboard/credit-health"
+              className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[#D4AF37]/15 to-[#D4AF37]/5 text-[#856404] hover:from-[#D4AF37]/25 border border-[#D4AF37]/40 rounded-lg text-sm font-semibold transition-all"
+              title="Credit Health Dashboard"
+            >
+              <Wallet size={16} />
+              <span className="hidden sm:inline">Credit</span>
+            </Link>
+            <button onClick={() => setShowShortcuts(true)} className="p-2 text-gray-400 hover:text-[#2D6A4F] bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors" title="Keyboard Shortcuts (?)">
+              <Keyboard size={18} />
+            </button>
            <button 
              onClick={() => handleForceSync()} 
              disabled={isSyncing}

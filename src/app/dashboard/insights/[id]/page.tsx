@@ -84,7 +84,7 @@ export default function InsightsDashboard() {
 
   reviews.forEach(r => {
     if (!r.comment) return;
-    const words = r.comment.toLowerCase().replace(/[^a-z0-s]/g, ' ').split(/\s+/);
+    const words = r.comment.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/);
     
     let isPos = false;
     let isNeg = false;

@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useBusinessOwner } from '@/hooks/useBusinessOwner';
-import { LayoutDashboard, Star, Eye, MessageCircle, Edit3, Tag, Plus, Building2, CheckCircle, Clock, TrendingUp, Sparkles, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Star, Eye, MessageCircle, Edit3, Tag, Plus, Building2, CheckCircle, Clock, TrendingUp, Sparkles, ShieldCheck, Wallet } from 'lucide-react';
 
 export default function DashboardPage() {
   const { businesses, loading, user, isMerchant, userRole } = useBusinessOwner();
@@ -179,6 +179,13 @@ export default function DashboardPage() {
                   Get Verified
                 </Link>
                 <Link
+                  href="/dashboard/credit-health"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-[#D4AF37]/15 to-[#D4AF37]/5 text-[#856404] border border-[#D4AF37]/40 font-semibold py-2.5 px-5 rounded-xl hover:from-[#D4AF37]/25 hover:to-[#D4AF37]/15 transition-colors text-sm"
+                >
+                  <Wallet className="h-4 w-4" />
+                  Credit Health
+                </Link>
+                <Link
                   href="/directory/add"
                   className="inline-flex items-center gap-2 bg-[#1B4332] text-white font-semibold py-2.5 px-5 rounded-xl hover:bg-[#2D6A4F] transition-colors text-sm"
                 >
@@ -264,6 +271,13 @@ export default function DashboardPage() {
                       >
                         <TrendingUp className="h-4 w-4" />
                         View
+                      </Link>
+                      <Link
+                        href="/dashboard/credit-health"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#D4AF37]/15 to-[#D4AF37]/5 text-[#856404] border-2 border-[#D4AF37]/30 text-sm font-semibold rounded-xl hover:from-[#D4AF37]/25 hover:to-[#D4AF37]/15 transition-colors"
+                      >
+                        <Wallet className="h-4 w-4" />
+                        Credit
                       </Link>
                     </div>
                   </div>

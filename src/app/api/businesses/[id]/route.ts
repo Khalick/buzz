@@ -116,6 +116,7 @@ export async function PUT(
     if (body.address !== undefined) allowedFields.address = validateText(body.address?.toString() || '', 'address', { maxLength: 200, required: false });
     if (body.contact !== undefined) allowedFields.contact = body.contact; 
     if (body.location !== undefined) allowedFields.location = body.location;
+    if (body.coordinates !== undefined) allowedFields.coordinates = body.coordinates;
     if (body.business_hours !== undefined) allowedFields.business_hours = body.business_hours;
     if (body.social_media !== undefined) allowedFields.social_media = body.social_media;
     
