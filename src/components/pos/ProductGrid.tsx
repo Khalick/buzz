@@ -122,17 +122,17 @@ export default function ProductGrid({ onAddToCart, categories, refreshKey }: Pro
     return matchSearch && matchCategory && isActive;
   });
 
-  const getCategoryColor = (catId?: string) => categories.find(c => c.id === catId)?.color || '#1B4332';
+  const getCategoryColor = (catId?: string) => categories.find(c => c.id === catId)?.color || '#0A1D37';
 
   return (
     <div className="flex flex-col h-full space-y-4">
       {/* Search bar with scan indicator */}
-      <div className={`relative transition-all duration-200 ${scanFlash ? 'ring-2 ring-[#2D6A4F] rounded-2xl' : ''}`}>
+      <div className={`relative transition-all duration-200 ${scanFlash ? 'ring-2 ring-[#A51C30] rounded-2xl' : ''}`}>
         <input
           ref={searchRef}
           type="text"
           placeholder="Scan barcode or search products..."
-          className="w-full p-4 pl-12 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 outline-none text-lg transition-shadow focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+          className="w-full p-4 pl-12 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 outline-none text-lg transition-shadow focus:ring-2 focus:ring-[#B39A74] focus:border-transparent"
           value={search}
           onChange={e => setSearch(e.target.value)}
           autoFocus
@@ -206,7 +206,7 @@ export default function ProductGrid({ onAddToCart, categories, refreshKey }: Pro
                   className={`group flex flex-col items-center justify-center p-5 rounded-2xl shadow-sm transition-all border border-transparent relative ${
                     outOfStock
                       ? 'bg-gray-100 dark:bg-gray-800/30 opacity-60 cursor-not-allowed'
-                      : 'bg-white dark:bg-gray-800 hover:shadow-xl active:scale-95 hover:border-[#D4AF37]/50'
+                      : 'bg-white dark:bg-gray-800 hover:shadow-xl active:scale-95 hover:border-[#B39A74]/50'
                   }`}
                 >
                   {/* Low stock badge */}

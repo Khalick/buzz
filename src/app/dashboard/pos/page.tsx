@@ -295,7 +295,7 @@ export default function POSPage() {
       {/* POS Top Header */}
       <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 shrink-0 shadow-sm z-10">
          <div className="flex items-center gap-4">
-           <div className="h-10 w-10 bg-gradient-to-br from-[#0D1F16] to-[#1B4332] rounded-xl flex items-center justify-center text-[#D4AF37] font-black text-xl shadow-md border border-[#D4AF37]/20">
+           <div className="h-10 w-10 bg-gradient-to-br from-[#0A1D37] to-[#1B3A5C] rounded-xl flex items-center justify-center text-[#B39A74] font-black text-xl shadow-md border border-[#B39A74]/20">
              B
            </div>
            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-500 dark:from-white dark:to-gray-400 hidden sm:block">
@@ -316,13 +316,13 @@ export default function POSPage() {
          <div className="flex items-center gap-4">
             <Link
               href="/dashboard/credit-health"
-              className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[#D4AF37]/15 to-[#D4AF37]/5 text-[#856404] hover:from-[#D4AF37]/25 border border-[#D4AF37]/40 rounded-lg text-sm font-semibold transition-all"
+              className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[#B39A74]/15 to-[#B39A74]/5 text-[#B39A74] hover:from-[#B39A74]/25 border border-[#B39A74]/40 rounded-lg text-sm font-semibold transition-all"
               title="Credit Health Dashboard"
             >
               <Wallet size={16} />
               <span className="hidden sm:inline">Credit</span>
             </Link>
-            <button onClick={() => setShowShortcuts(true)} className="p-2 text-gray-400 hover:text-[#2D6A4F] bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors" title="Keyboard Shortcuts (?)">
+            <button onClick={() => setShowShortcuts(true)} className="p-2 text-gray-400 hover:text-[#A51C30] bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors" title="Keyboard Shortcuts (?)">
               <Keyboard size={18} />
             </button>
            <button 
@@ -362,7 +362,7 @@ export default function POSPage() {
             ].map(tab => (
               <button key={tab.id} onClick={() => setActivePanel(tab.id as Panel)}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${
-                  activePanel === tab.id ? 'bg-[#1B4332] text-[#D4AF37] shadow-sm' : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800'
+                  activePanel === tab.id ? 'bg-[#0A1D37] text-[#B39A74] shadow-sm' : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800'
                 }`}>
                 {tab.icon} <span className="hidden sm:inline">{tab.label}</span>
               </button>

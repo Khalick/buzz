@@ -119,7 +119,7 @@ export default function CheckoutModal({
             </div>
             <h2 className="text-3xl font-black text-gray-900 dark:text-gray-100">Payment Successful!</h2>
             {paymentMethod === 'cash' && changeDue > 0 && (
-              <div className="text-2xl font-black text-[#2D6A4F]">
+              <div className="text-2xl font-black text-[#A51C30]">
                 Change: KES {changeDue.toLocaleString()}
               </div>
             )}
@@ -138,7 +138,7 @@ export default function CheckoutModal({
               {/* Total */}
               <div className="text-center">
                 <p className="text-gray-500 font-medium mb-1 text-sm">Total Amount Due</p>
-                <div className="text-4xl font-black bg-gradient-to-r from-[#0D1F16] to-[#1B4332] bg-clip-text text-transparent">
+                <div className="text-4xl font-black bg-gradient-to-r from-[#0A1D37] to-[#1B3A5C] bg-clip-text text-transparent">
                   KES {total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </div>
                 {discountAmount > 0 && (
@@ -151,17 +151,17 @@ export default function CheckoutModal({
                 <p className="font-semibold text-sm text-gray-700 dark:text-gray-300">Payment Method</p>
                 <div className="grid grid-cols-3 gap-3">
                   <button onClick={() => { setPaymentMethod('cash'); setAmountTendered(''); }}
-                    className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${paymentMethod === 'cash' ? 'border-[#D4AF37] bg-[#1B4332]/5 text-[#1B4332] dark:bg-[#1B4332]/30 dark:text-[#D4AF37]' : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-[#D4AF37]/50'}`}>
+                    className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${paymentMethod === 'cash' ? 'border-[#B39A74] bg-[#0A1D37]/5 text-[#0A1D37] dark:bg-[#0A1D37]/30 dark:text-[#B39A74]' : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-[#B39A74]/50'}`}>
                     <Banknote size={28} className="mb-1" />
                     <span className="font-bold text-xs">Cash</span>
                   </button>
                   <button onClick={() => setPaymentMethod('mobile_money')}
-                    className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${paymentMethod === 'mobile_money' ? 'border-[#D4AF37] bg-[#1B4332]/5 text-[#1B4332] dark:bg-[#1B4332]/30 dark:text-[#D4AF37]' : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-[#D4AF37]/50'}`}>
+                    className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${paymentMethod === 'mobile_money' ? 'border-[#B39A74] bg-[#0A1D37]/5 text-[#0A1D37] dark:bg-[#0A1D37]/30 dark:text-[#B39A74]' : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-[#B39A74]/50'}`}>
                     <Smartphone size={28} className="mb-1" />
                     <span className="font-bold text-xs">M-Pesa</span>
                   </button>
                   <button onClick={() => setPaymentMethod('card')}
-                    className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${paymentMethod === 'card' ? 'border-[#D4AF37] bg-[#1B4332]/5 text-[#1B4332] dark:bg-[#1B4332]/30 dark:text-[#D4AF37]' : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-[#D4AF37]/50'}`}>
+                    className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${paymentMethod === 'card' ? 'border-[#B39A74] bg-[#0A1D37]/5 text-[#0A1D37] dark:bg-[#0A1D37]/30 dark:text-[#B39A74]' : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-[#B39A74]/50'}`}>
                     <CreditCard size={28} className="mb-1" />
                     <span className="font-bold text-xs">Card</span>
                   </button>
@@ -179,7 +179,7 @@ export default function CheckoutModal({
                       KES {amountTendered || '0'}
                     </div>
                     {tenderedNum >= total && (
-                      <div className="text-sm font-bold text-[#2D6A4F] mt-1">
+                      <div className="text-sm font-bold text-[#A51C30] mt-1">
                         Change: KES {changeDue.toLocaleString()}
                       </div>
                     )}
@@ -190,13 +190,13 @@ export default function CheckoutModal({
                     {DENOMINATIONS.map(d => (
                       <button key={d} onClick={() => setAmountTendered(String(d))}
                         className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${
-                          Number(amountTendered) === d ? 'bg-[#1B4332] text-[#D4AF37]' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200'
+                          Number(amountTendered) === d ? 'bg-[#0A1D37] text-[#B39A74]' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200'
                         }`}>
                         {d.toLocaleString()}
                       </button>
                     ))}
                     <button onClick={() => setAmountTendered(String(Math.ceil(total)))}
-                      className="px-3 py-2 rounded-lg text-sm font-bold bg-[#2D6A4F]/10 dark:bg-[#2D6A4F]/20 text-[#2D6A4F] dark:text-[#52B788] hover:bg-[#2D6A4F]/20 transition-colors">
+                      className="px-3 py-2 rounded-lg text-sm font-bold bg-[#A51C30]/10 dark:bg-[#A51C30]/20 text-[#A51C30] dark:text-red-400 hover:bg-[#A51C30]/20 transition-colors">
                       Exact
                     </button>
                   </div>
@@ -222,7 +222,7 @@ export default function CheckoutModal({
               <button
                 onClick={handleCheckout}
                 disabled={isProcessing || !canPay}
-                className="w-full py-4 bg-gradient-to-r from-[#1B4332] to-[#2D6A4F] hover:from-[#0D1F16] hover:to-[#1B4332] border border-[#D4AF37]/30 text-[#D4AF37] text-lg font-bold rounded-2xl shadow-lg transition-transform transform active:scale-95 flex justify-center items-center gap-3 disabled:opacity-50"
+                className="w-full py-4 bg-gradient-to-r from-[#0A1D37] to-[#1B3A5C] hover:from-[#051C11] hover:to-[#0A1D37] border border-[#B39A74]/40 text-[#B39A74] text-lg font-bold rounded-2xl shadow-lg transition-transform transform active:scale-95 flex justify-center items-center gap-3 disabled:opacity-50"
               >
                 {isProcessing ? (
                   <span className="animate-pulse">Processing...</span>

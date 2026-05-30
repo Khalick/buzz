@@ -89,10 +89,10 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
           {/* Header */}
           <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
             <h2 className="text-lg font-bold dark:text-gray-100 flex items-center gap-2">
-              <Package size={18} className="text-[#2D6A4F]" /> Products
+              <Package size={18} className="text-[#A51C30]" /> Products
               <span className="text-xs font-normal bg-gray-100 dark:bg-gray-800 text-gray-500 px-2 py-0.5 rounded-full">{products.length}</span>
             </h2>
-            <button onClick={openNew} className="px-3 py-1.5 bg-[#1B4332] hover:bg-[#0D1F16] text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1">
+            <button onClick={openNew} className="px-3 py-1.5 bg-[#0A1D37] hover:bg-[#1B3A5C] text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1">
               <Plus size={14} /> New
             </button>
           </div>
@@ -101,7 +101,7 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
           <div className="px-4 py-2">
             <input
               type="text" placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#D4AF37]"
+              className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74]"
             />
           </div>
 
@@ -115,7 +115,7 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
             ) : (
               filtered.map(p => (
                 <div key={p.id} onClick={() => openEdit(p)}
-                  className={`flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-all mb-1 border border-transparent hover:border-[#D4AF37]/50 ${
+                  className={`flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-all mb-1 border border-transparent hover:border-[#B39A74]/50 ${
                     p.is_active ? 'hover:bg-gray-50 dark:hover:bg-gray-800/50' : 'opacity-50 bg-gray-50 dark:bg-gray-800/30'
                   }`}>
                   <div className="h-10 w-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0"
@@ -161,7 +161,7 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Product Name *</label>
               <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-                placeholder="e.g. Nyama Choma Special" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#D4AF37]" />
+                placeholder="e.g. Nyama Choma Special" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74]" />
             </div>
 
             {/* Price + Cost */}
@@ -169,12 +169,12 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1"><DollarSign size={12} />Sell Price *</label>
                 <input type="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })}
-                  placeholder="0.00" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#D4AF37]" />
+                  placeholder="0.00" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74]" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Cost Price</label>
                 <input type="number" value={form.cost_price} onChange={e => setForm({ ...form, cost_price: e.target.value })}
-                  placeholder="0.00" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#D4AF37]" />
+                  placeholder="0.00" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74]" />
               </div>
             </div>
 
@@ -183,12 +183,12 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1"><Hash size={12} />Stock Qty</label>
                 <input type="number" value={form.stock_quantity} onChange={e => setForm({ ...form, stock_quantity: e.target.value })}
-                  placeholder="0" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#D4AF37]" />
+                  placeholder="0" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74]" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1"><Tag size={12} />Category</label>
                 <select value={form.category_id} onChange={e => setForm({ ...form, category_id: e.target.value })}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#D4AF37] appearance-none">
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74] appearance-none">
                   <option value="">None</option>
                   {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
@@ -200,12 +200,12 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1"><Barcode size={12} />Barcode</label>
                 <input value={form.barcode} onChange={e => setForm({ ...form, barcode: e.target.value })}
-                  placeholder="Scan or type..." className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#D4AF37]" />
+                  placeholder="Scan or type..." className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74]" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">SKU</label>
                 <input value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })}
-                  placeholder="e.g. NC-001" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#D4AF37]" />
+                  placeholder="e.g. NC-001" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74]" />
               </div>
             </div>
 
@@ -213,7 +213,7 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
             <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Product is Active</span>
               <button onClick={() => setForm({ ...form, is_active: !form.is_active })}
-                className={`w-12 h-6 rounded-full transition-colors relative ${form.is_active ? 'bg-[#2D6A4F]' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                className={`w-12 h-6 rounded-full transition-colors relative ${form.is_active ? 'bg-[#A51C30]' : 'bg-gray-300 dark:bg-gray-600'}`}>
                 <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform shadow-sm ${form.is_active ? 'translate-x-6' : 'translate-x-0.5'}`} />
               </button>
             </div>
@@ -245,7 +245,7 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
           {/* Save Button */}
           <div className="p-4 border-t border-gray-200 dark:border-gray-800">
             <button onClick={handleSubmit} disabled={!form.name || !form.price}
-              className="w-full py-3 bg-gradient-to-r from-[#1B4332] to-[#2D6A4F] hover:from-[#0D1F16] hover:to-[#1B4332] border border-[#D4AF37]/30 text-[#D4AF37] font-bold rounded-xl shadow-lg disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+              className="w-full py-3 bg-gradient-to-r from-[#0A1D37] to-[#1B3A5C] hover:from-[#051C11] hover:to-[#0A1D37] border border-[#B39A74]/40 text-[#B39A74] font-bold rounded-xl shadow-lg disabled:opacity-50 transition-all flex items-center justify-center gap-2">
               <Save size={16} /> {editingProduct ? 'Update Product' : 'Create Product'}
             </button>
           </div>
