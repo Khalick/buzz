@@ -101,7 +101,7 @@ export default function POSPage() {
       if (user) {
         setCashierId(user.id);
         // We'd ideally fetch their profile for name
-        const { data: biz } = await supabase.from('businesses').select('id, name, contact').or(`owner_id.eq.${user.id},user_id.eq.${user.id}`).limit(1).maybeSingle();
+        const { data: biz } = await supabase.from('businesses').select('id, name, contact').or(`owner_id.eq.${user.id},submitted_by.eq.${user.id}`).limit(1).maybeSingle();
         if (biz) {
           setBusinessId(biz.id);
           setBusinessName(biz.name);
