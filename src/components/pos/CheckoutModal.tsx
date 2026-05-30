@@ -114,7 +114,7 @@ export default function CheckoutModal({
       <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all animate-scale-in">
         {success ? (
           <div className="p-12 flex flex-col items-center justify-center text-center space-y-4">
-            <div className="h-24 w-24 bg-green-100 dark:bg-green-900/30 text-green-500 rounded-full flex items-center justify-center mb-4 animate-scale-in">
+            <div className="h-24 w-24 bg-[#B39A74]/15 dark:bg-[#B39A74]/25 text-[#B39A74] rounded-full flex items-center justify-center mb-4 animate-scale-in">
               <CheckCircle size={48} />
             </div>
             <h2 className="text-3xl font-black text-gray-900 dark:text-gray-100">Payment Successful!</h2>
@@ -142,7 +142,7 @@ export default function CheckoutModal({
                   KES {total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </div>
                 {discountAmount > 0 && (
-                  <div className="text-sm text-green-600 mt-1">Includes KES {discountAmount.toLocaleString()} discount</div>
+                  <div className="text-sm text-[#A51C30] font-bold mt-1">Includes KES {discountAmount.toLocaleString()} discount</div>
                 )}
               </div>
 

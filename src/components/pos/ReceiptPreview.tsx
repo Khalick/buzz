@@ -97,7 +97,7 @@ export default function ReceiptPreview({ receipt, isOpen, onClose }: ReceiptPrev
             <button onClick={handlePrint} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-gray-600 dark:text-gray-400" title="Print">
               <Printer size={18} />
             </button>
-            <button onClick={handleWhatsApp} className="p-2 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors text-green-600" title="Share via WhatsApp">
+            <button onClick={handleWhatsApp} className="p-2 hover:bg-[#B39A74]/15 dark:hover:bg-[#B39A74]/25 rounded-lg transition-colors text-[#B39A74]" title="Share via WhatsApp">
               <Share2 size={18} />
             </button>
             <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
@@ -204,7 +204,7 @@ export default function ReceiptPreview({ receipt, isOpen, onClose }: ReceiptPrev
         {/* Bottom action */}
         <div className="p-4 border-t border-gray-100 dark:border-gray-800 flex gap-3">
           <button onClick={handleWhatsApp}
-            className="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
+            className="flex-1 py-3 bg-[#A51C30] hover:bg-[#8B1728] text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
             <Share2 size={16} /> WhatsApp Receipt
           </button>
           <button onClick={onClose}
