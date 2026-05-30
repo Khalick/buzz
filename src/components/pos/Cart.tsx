@@ -57,10 +57,10 @@ export default function Cart({
   };
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 shadow-xl">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-900 border-l border-[#E6E1D5] dark:border-gray-800 shadow-xl">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
-        <h2 className="text-lg font-bold bg-gradient-to-r from-[#0A1D37] to-[#1B3A5C] bg-clip-text text-transparent drop-shadow-sm">
+      <div className="p-4 border-b border-[#E6E1D5] dark:border-gray-800 flex justify-between items-center">
+        <h2 className="text-lg font-bold text-[#0A1D37] dark:text-[#B39A74]">
           Current Order
         </h2>
         <div className="flex items-center gap-2">
@@ -79,13 +79,13 @@ export default function Cart({
       <div className="flex gap-1.5 px-4 py-2 border-b border-gray-100 dark:border-gray-800">
         <button onClick={() => setShowDiscount(!showDiscount)}
           className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1 ${
-            discount.type !== 'none' ? 'bg-[#0A1D37]/10 dark:bg-[#0A1D37]/30 text-[#0A1D37] dark:text-[#B39A74]' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-gray-200'
+            discount.type !== 'none' ? 'bg-[#FAF8F5] dark:bg-[#0A1D37]/30 text-[#0A1D37] dark:text-[#B39A74] border border-[#E6E1D5]' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#6B6B6B] hover:bg-[#E6E1D5]/50'
           }`}>
           <Percent size={10} /> {discount.type !== 'none' ? 'Discount ✓' : 'Discount'}
         </button>
         <button onClick={() => setShowCustomer(!showCustomer)}
           className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1 ${
-            customerName ? 'bg-[#0A1D37]/10 dark:bg-[#0A1D37]/30 text-[#0A1D37] dark:text-[#B39A74]' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-gray-200'
+            customerName ? 'bg-[#FAF8F5] dark:bg-[#0A1D37]/30 text-[#0A1D37] dark:text-[#B39A74] border border-[#E6E1D5]' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#6B6B6B] hover:bg-[#E6E1D5]/50'
           }`}>
           <User size={10} /> {customerName || 'Customer'}
         </button>
@@ -99,12 +99,12 @@ export default function Cart({
 
       {/* Discount panel */}
       {showDiscount && (
-        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-[#0A1D37]/5 dark:bg-[#0A1D37]/10 animate-fade-in space-y-2">
+        <div className="px-4 py-3 border-b border-[#E6E1D5] dark:border-gray-800 bg-[#FAF8F5] dark:bg-gray-800/50 animate-fade-in space-y-2">
           <div className="flex gap-2">
             <input type="number" value={discountInput} onChange={e => setDiscountInput(e.target.value)} placeholder="Amount"
               className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 rounded-lg text-sm outline-none border border-gray-200 dark:border-gray-700" />
-            <button onClick={() => applyDiscount('percent')} className={`px-3 py-2 rounded-lg text-xs font-bold transition-colors ${discount.type === 'percent' ? 'bg-[#0A1D37] text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600'}`}>%</button>
-            <button onClick={() => applyDiscount('fixed')} className={`px-3 py-2 rounded-lg text-xs font-bold transition-colors ${discount.type === 'fixed' ? 'bg-[#0A1D37] text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600'}`}>KES</button>
+            <button onClick={() => applyDiscount('percent')} className={`px-3 py-2 rounded-lg text-xs font-bold transition-colors ${discount.type === 'percent' ? 'bg-[#A51C30] text-white' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#6B6B6B] border border-[#E6E1D5]'}`}>%</button>
+            <button onClick={() => applyDiscount('fixed')} className={`px-3 py-2 rounded-lg text-xs font-bold transition-colors ${discount.type === 'fixed' ? 'bg-[#A51C30] text-white' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#6B6B6B] border border-[#E6E1D5]'}`}>KES</button>
             {discount.type !== 'none' && (
               <button onClick={() => applyDiscount('none')} className="px-2 py-2 text-[#A51C30] text-xs font-bold">✕</button>
             )}
@@ -114,7 +114,7 @@ export default function Cart({
 
       {/* Customer panel */}
       {showCustomer && (
-        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-[#0A1D37]/5 dark:bg-[#0A1D37]/10 animate-fade-in space-y-2">
+        <div className="px-4 py-3 border-b border-[#E6E1D5] dark:border-gray-800 bg-[#FAF8F5] dark:bg-gray-800/50 animate-fade-in space-y-2">
           <input type="text" value={customerName} onChange={e => onCustomerChange(e.target.value, customerPhone)}
             placeholder="Customer name" className="w-full px-3 py-2 bg-white dark:bg-gray-800 rounded-lg text-sm outline-none border border-gray-200 dark:border-gray-700" />
           <input type="tel" value={customerPhone} onChange={e => onCustomerChange(customerName, e.target.value)}
@@ -170,7 +170,7 @@ export default function Cart({
       </div>
 
       {/* Totals */}
-      <div className="p-4 bg-gray-50 dark:bg-gray-800/80 border-t border-gray-200 dark:border-gray-800 backdrop-blur-md space-y-1.5">
+      <div className="p-4 bg-[#FAF8F5] dark:bg-gray-800/80 border-t border-[#E6E1D5] dark:border-gray-800 backdrop-blur-md space-y-1.5">
         <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
           <span>Subtotal ({items.reduce((s, i) => s + i.quantity, 0)} items)</span>
           <span>KES {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
@@ -193,7 +193,7 @@ export default function Cart({
         <button
           onClick={onCheckout}
           disabled={items.length === 0}
-          className="w-full py-3.5 mt-2 bg-gradient-to-r from-[#0A1D37] to-[#1B3A5C] hover:from-[#051C11] hover:to-[#0A1D37] border border-[#B39A74]/40 disabled:opacity-50 disabled:cursor-not-allowed text-[#B39A74] font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform active:scale-[0.98] flex justify-center items-center gap-2 text-base"
+          className="w-full py-3.5 mt-2 bg-[#A51C30] hover:bg-[#8B1728] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform active:scale-[0.98] flex justify-center items-center gap-2 text-base"
         >
           Charge KES {total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
         </button>

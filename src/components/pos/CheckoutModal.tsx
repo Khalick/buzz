@@ -138,7 +138,7 @@ export default function CheckoutModal({
               {/* Total */}
               <div className="text-center">
                 <p className="text-gray-500 font-medium mb-1 text-sm">Total Amount Due</p>
-                <div className="text-4xl font-black bg-gradient-to-r from-[#0A1D37] to-[#1B3A5C] bg-clip-text text-transparent">
+                <div className="text-4xl font-black text-[#0A1D37] dark:text-[#B39A74]">
                   KES {total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </div>
                 {discountAmount > 0 && (
@@ -151,17 +151,17 @@ export default function CheckoutModal({
                 <p className="font-semibold text-sm text-gray-700 dark:text-gray-300">Payment Method</p>
                 <div className="grid grid-cols-3 gap-3">
                   <button onClick={() => { setPaymentMethod('cash'); setAmountTendered(''); }}
-                    className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${paymentMethod === 'cash' ? 'border-[#B39A74] bg-[#0A1D37]/5 text-[#0A1D37] dark:bg-[#0A1D37]/30 dark:text-[#B39A74]' : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-[#B39A74]/50'}`}>
+                    className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${paymentMethod === 'cash' ? 'border-[#B39A74] bg-[#FAF8F5] text-[#0A1D37] dark:bg-gray-800 dark:text-[#B39A74]' : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-[#B39A74]/50'}`}>
                     <Banknote size={28} className="mb-1" />
                     <span className="font-bold text-xs">Cash</span>
                   </button>
                   <button onClick={() => setPaymentMethod('mobile_money')}
-                    className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${paymentMethod === 'mobile_money' ? 'border-[#B39A74] bg-[#0A1D37]/5 text-[#0A1D37] dark:bg-[#0A1D37]/30 dark:text-[#B39A74]' : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-[#B39A74]/50'}`}>
+                    className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${paymentMethod === 'mobile_money' ? 'border-[#B39A74] bg-[#FAF8F5] text-[#0A1D37] dark:bg-gray-800 dark:text-[#B39A74]' : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-[#B39A74]/50'}`}>
                     <Smartphone size={28} className="mb-1" />
                     <span className="font-bold text-xs">M-Pesa</span>
                   </button>
                   <button onClick={() => setPaymentMethod('card')}
-                    className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${paymentMethod === 'card' ? 'border-[#B39A74] bg-[#0A1D37]/5 text-[#0A1D37] dark:bg-[#0A1D37]/30 dark:text-[#B39A74]' : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-[#B39A74]/50'}`}>
+                    className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${paymentMethod === 'card' ? 'border-[#B39A74] bg-[#FAF8F5] text-[#0A1D37] dark:bg-gray-800 dark:text-[#B39A74]' : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-[#B39A74]/50'}`}>
                     <CreditCard size={28} className="mb-1" />
                     <span className="font-bold text-xs">Card</span>
                   </button>
@@ -190,7 +190,7 @@ export default function CheckoutModal({
                     {DENOMINATIONS.map(d => (
                       <button key={d} onClick={() => setAmountTendered(String(d))}
                         className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${
-                          Number(amountTendered) === d ? 'bg-[#0A1D37] text-[#B39A74]' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200'
+                          Number(amountTendered) === d ? 'bg-[#A51C30] text-white' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#2D2D2D] dark:text-gray-300 border border-[#E6E1D5] hover:bg-[#E6E1D5]/50'
                         }`}>
                         {d.toLocaleString()}
                       </button>

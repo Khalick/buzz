@@ -76,7 +76,7 @@ export default function CategoryManager({ categories, onSave, onUpdate, onDelete
             <button
               onClick={handleAdd}
               disabled={!newName.trim()}
-              className="px-4 py-2.5 bg-[#0A1D37] hover:bg-[#1B3A5C] text-[#B39A74] rounded-xl text-sm font-bold disabled:opacity-50 transition-colors flex items-center gap-1"
+              className="px-4 py-2.5 bg-[#A51C30] hover:bg-[#8B1728] text-white rounded-xl text-sm font-bold disabled:opacity-50 transition-colors flex items-center gap-1"
             >
               <Plus size={16} /> Add
             </button>

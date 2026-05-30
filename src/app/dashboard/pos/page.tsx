@@ -290,7 +290,7 @@ export default function POSPage() {
   const total = afterDiscount + tax;
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-gray-100 dark:bg-gray-900 font-sans">
+    <div className="flex flex-col h-screen overflow-hidden bg-[#FAF8F5] dark:bg-gray-900 font-sans">
       
       {/* POS Top Header */}
       <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 shrink-0 shadow-sm z-10">

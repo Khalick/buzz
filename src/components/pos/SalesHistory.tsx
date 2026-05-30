@@ -69,7 +69,7 @@ export default function SalesHistory({ orders, onViewReceipt, isLoading }: Sales
 
         {/* Today's Summary */}
         <div className="grid grid-cols-3 gap-2 mb-3">
-          <div className="bg-[#0A1D37]/5 dark:bg-[#0A1D37]/20 border border-[#B39A74]/20 rounded-xl p-3 text-center">
+          <div className="bg-[#FAF8F5] dark:bg-gray-800 border border-[#E6E1D5] dark:border-gray-700 rounded-xl p-3 text-center">
             <div className="text-lg font-black text-[#0A1D37] dark:text-[#B39A74]">{todayOrders.length}</div>
             <div className="text-[10px] font-bold text-gray-500 uppercase">Sales</div>
           </div>
@@ -94,14 +94,14 @@ export default function SalesHistory({ orders, onViewReceipt, isLoading }: Sales
         <div className="flex gap-1.5">
           {['today', 'week', 'all'].map(d => (
             <button key={d} onClick={() => setFilterDate(d)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors ${filterDate === d ? 'bg-[#0A1D37] text-[#B39A74]' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-gray-200'}`}>
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors ${filterDate === d ? 'bg-[#A51C30] text-white' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#6B6B6B] border border-[#E6E1D5] hover:bg-[#E6E1D5]/50'}`}>
               {d === 'today' ? 'Today' : d === 'week' ? '7 Days' : 'All'}
             </button>
           ))}
           <div className="w-px bg-gray-200 dark:bg-gray-700 mx-1" />
           {['all', 'cash', 'mobile_money', 'card'].map(m => (
             <button key={m} onClick={() => setFilterMethod(m)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors ${filterMethod === m ? 'bg-[#0A1D37] text-[#B39A74]' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-gray-200'}`}>
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors ${filterMethod === m ? 'bg-[#A51C30] text-white' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#6B6B6B] border border-[#E6E1D5] hover:bg-[#E6E1D5]/50'}`}>
               {m === 'all' ? 'All' : m === 'cash' ? '💵' : m === 'mobile_money' ? '📱' : '💳'}
             </button>
           ))}
@@ -164,7 +164,7 @@ export default function SalesHistory({ orders, onViewReceipt, isLoading }: Sales
                     )}
                     {order.notes && <div className="text-xs text-gray-400 italic">📝 {order.notes}</div>}
                     <button onClick={() => onViewReceipt(order)}
-                      className="w-full mt-2 py-2 bg-[#0A1D37]/5 dark:bg-[#0A1D37]/20 border border-[#B39A74]/35 text-[#0A1D37] dark:text-[#B39A74] rounded-lg text-xs font-bold hover:bg-[#0A1D37]/10 dark:hover:bg-[#0A1D37]/30 transition-colors flex items-center justify-center gap-1">
+                      className="w-full mt-2 py-2 bg-[#FAF8F5] dark:bg-gray-800 border border-[#E6E1D5] dark:border-gray-700 text-[#0A1D37] dark:text-[#B39A74] rounded-lg text-xs font-bold hover:bg-[#E6E1D5]/50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-1">
                       <Receipt size={12} /> View Receipt
                     </button>
                   </div>

@@ -80,25 +80,25 @@ export default function SalesAnalytics({ orders }: SalesAnalyticsProps) {
       <div className="p-4 space-y-5">
         {/* Today Metrics */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-gradient-to-br from-[#0A1D37] to-[#1B3A5C] border border-[#B39A74]/20 rounded-2xl p-4 text-[#B39A74]">
-            <DollarSign size={16} className="opacity-60 mb-1" />
-            <div className="text-xl font-black font-mono">KES {analytics.todayRevenue.toLocaleString()}</div>
-            <div className="text-xs opacity-70 font-bold">Today&apos;s Revenue</div>
+          <div className="bg-white dark:bg-gray-800 border border-[#E6E1D5] dark:border-gray-700 border-t-[3px] border-t-[#0A1D37] rounded-lg p-4">
+            <DollarSign size={16} className="text-[#B39A74] mb-1" />
+            <div className="text-xl font-black font-mono text-[#0A1D37] dark:text-[#B39A74]">KES {analytics.todayRevenue.toLocaleString()}</div>
+            <div className="text-xs text-[#6B6B6B] font-bold">Today&apos;s Revenue</div>
           </div>
-          <div className="bg-gradient-to-br from-[#A51C30] to-[#8B1728] border border-[#B39A74]/20 rounded-2xl p-4 text-white">
-            <ShoppingCart size={16} className="opacity-60 mb-1" />
-            <div className="text-xl font-black font-mono">{analytics.todayOrders}</div>
-            <div className="text-xs opacity-70 font-bold">Transactions</div>
+          <div className="bg-white dark:bg-gray-800 border border-[#E6E1D5] dark:border-gray-700 border-t-[3px] border-t-[#A51C30] rounded-lg p-4">
+            <ShoppingCart size={16} className="text-[#A51C30] mb-1" />
+            <div className="text-xl font-black font-mono text-[#0A1D37] dark:text-[#B39A74]">{analytics.todayOrders}</div>
+            <div className="text-xs text-[#6B6B6B] font-bold">Transactions</div>
           </div>
-          <div className="bg-gradient-to-br from-[#B39A74] to-[#8F7757] border border-[#0A1D37]/20 rounded-2xl p-4 text-white">
-            <TrendingUp size={16} className="opacity-60 mb-1" />
-            <div className="text-xl font-black font-mono">KES {Math.round(analytics.todayAvg).toLocaleString()}</div>
-            <div className="text-xs opacity-70 font-bold">Avg Ticket</div>
+          <div className="bg-white dark:bg-gray-800 border border-[#E6E1D5] dark:border-gray-700 border-t-[3px] border-t-[#B39A74] rounded-lg p-4">
+            <TrendingUp size={16} className="text-[#B39A74] mb-1" />
+            <div className="text-xl font-black font-mono text-[#0A1D37] dark:text-[#B39A74]">KES {Math.round(analytics.todayAvg).toLocaleString()}</div>
+            <div className="text-xs text-[#6B6B6B] font-bold">Avg Ticket</div>
           </div>
-          <div className="bg-gradient-to-br from-[#0A1D37] to-[#1B3A5C] border border-[#B39A74]/20 rounded-2xl p-4 text-[#B39A74]">
-            <Package size={16} className="opacity-60 mb-1" />
-            <div className="text-xl font-black font-mono">{analytics.todayItems}</div>
-            <div className="text-xs opacity-70 font-bold">Items Sold</div>
+          <div className="bg-white dark:bg-gray-800 border border-[#E6E1D5] dark:border-gray-700 border-t-[3px] border-t-[#0A1D37] rounded-lg p-4">
+            <Package size={16} className="text-[#0A1D37] dark:text-[#B39A74] mb-1" />
+            <div className="text-xl font-black font-mono text-[#0A1D37] dark:text-[#B39A74]">{analytics.todayItems}</div>
+            <div className="text-xs text-[#6B6B6B] font-bold">Items Sold</div>
           </div>
         </div>
 
@@ -112,7 +112,7 @@ export default function SalesAnalytics({ orders }: SalesAnalyticsProps) {
                 <div className="w-full rounded-t-lg transition-all relative group cursor-pointer"
                   style={{
                     height: `${Math.max((day.revenue / analytics.maxRevenue) * 100, 4)}%`,
-                    background: i === 6 ? 'linear-gradient(to top, #0A1D37, #1B3A5C)' : 'linear-gradient(to top, #e5e7eb, #d1d5db)',
+                    background: i === 6 ? 'linear-gradient(to top, #A51C30, #8B1728)' : 'linear-gradient(to top, #E6E1D5, #C8C1B3)',
                   }}>
                   {/* Tooltip */}
                   <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">

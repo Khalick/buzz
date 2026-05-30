@@ -92,7 +92,7 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
               <Package size={18} className="text-[#A51C30]" /> Products
               <span className="text-xs font-normal bg-gray-100 dark:bg-gray-800 text-gray-500 px-2 py-0.5 rounded-full">{products.length}</span>
             </h2>
-            <button onClick={openNew} className="px-3 py-1.5 bg-[#0A1D37] hover:bg-[#1B3A5C] text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1">
+            <button onClick={openNew} className="px-3 py-1.5 bg-[#A51C30] hover:bg-[#8B1728] text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1">
               <Plus size={14} /> New
             </button>
           </div>
