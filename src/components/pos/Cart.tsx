@@ -65,13 +65,13 @@ export default function Cart({
         </h2>
         <div className="flex items-center gap-2">
           <button onClick={onHoldOrder} disabled={items.length === 0} title="Hold Order (F3)"
-            className="relative p-1.5 hover:bg-amber-50 dark:hover:bg-amber-900/20 text-amber-600 rounded-lg transition-colors disabled:opacity-30">
+            className="relative p-1.5 hover:bg-[#B39A74]/15 dark:hover:bg-[#B39A74]/25 text-[#B39A74] rounded-lg transition-colors disabled:opacity-30">
             <PauseCircle size={18} />
             {heldCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{heldCount}</span>
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#B39A74] text-white text-[10px] font-bold rounded-full flex items-center justify-center">{heldCount}</span>
             )}
           </button>
-          <button onClick={onClear} disabled={items.length === 0} className="text-red-500 hover:text-red-700 text-xs font-medium transition-colors disabled:opacity-30">Clear</button>
+          <button onClick={onClear} disabled={items.length === 0} className="text-[#A51C30] hover:text-[#8B1728] text-xs font-medium transition-colors disabled:opacity-30">Clear</button>
         </div>
       </div>
 
@@ -106,7 +106,7 @@ export default function Cart({
             <button onClick={() => applyDiscount('percent')} className={`px-3 py-2 rounded-lg text-xs font-bold transition-colors ${discount.type === 'percent' ? 'bg-[#0A1D37] text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600'}`}>%</button>
             <button onClick={() => applyDiscount('fixed')} className={`px-3 py-2 rounded-lg text-xs font-bold transition-colors ${discount.type === 'fixed' ? 'bg-[#0A1D37] text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600'}`}>KES</button>
             {discount.type !== 'none' && (
-              <button onClick={() => applyDiscount('none')} className="px-2 py-2 text-red-500 text-xs font-bold">✕</button>
+              <button onClick={() => applyDiscount('none')} className="px-2 py-2 text-[#A51C30] text-xs font-bold">✕</button>
             )}
           </div>
         </div>
@@ -144,14 +144,14 @@ export default function Cart({
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start">
                   <span className="font-semibold text-sm text-gray-800 dark:text-gray-100 truncate">{item.name}</span>
-                  <span className="font-bold text-sm text-[#A51C30] dark:text-red-400 ml-2 shrink-0">
+                  <span className="font-bold text-sm text-[#A51C30] dark:text-[#B39A74] ml-2 shrink-0">
                     KES {item.total_price.toLocaleString()}
                   </span>
                 </div>
                 <div className="text-xs text-gray-400 mt-0.5">KES {item.unit_price.toLocaleString()} each</div>
               </div>
               <div className="flex bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 overflow-hidden shrink-0">
-                <button onClick={() => onUpdateQuantity(item.pos_product_id, -1)} className="p-1.5 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30 transition-colors">
+                <button onClick={() => onUpdateQuantity(item.pos_product_id, -1)} className="p-1.5 hover:bg-[#A51C30]/10 hover:text-[#A51C30] dark:hover:bg-[#A51C30]/20 transition-colors">
                   <Minus size={14} />
                 </button>
                 <div className="px-3 py-1.5 font-bold text-sm text-gray-700 dark:text-gray-200 min-w-[2rem] text-center border-x border-gray-100 dark:border-gray-600">
@@ -161,7 +161,7 @@ export default function Cart({
                   <Plus size={14} />
                 </button>
               </div>
-              <button onClick={() => onRemove(item.pos_product_id)} className="p-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+              <button onClick={() => onRemove(item.pos_product_id)} className="p-1 text-gray-300 hover:text-[#A51C30] opacity-0 group-hover:opacity-100 transition-all">
                 <Trash2 size={14} />
               </button>
             </div>
@@ -176,7 +176,7 @@ export default function Cart({
           <span>KES {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
         </div>
         {discountAmount > 0 && (
-          <div className="flex justify-between text-sm text-[#A51C30] dark:text-red-400">
+          <div className="flex justify-between text-sm text-[#A51C30] dark:text-[#B39A74]">
             <span>Discount {discount.type === 'percent' ? `(${discount.value}%)` : ''}</span>
             <span>-KES {discountAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
           </div>

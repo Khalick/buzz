@@ -151,7 +151,7 @@ export default function ReceiptPreview({ receipt, isOpen, onClose }: ReceiptPrev
                 <span>KES {receipt.subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
               </div>
               {receipt.discountAmount > 0 && (
-                <div className="flex justify-between text-[#A51C30] dark:text-red-400 font-bold">
+                <div className="flex justify-between text-[#A51C30] dark:text-[#B39A74] font-bold">
                   <span>Discount {receipt.discountType === 'percent' ? '' : ''}</span>
                   <span>-KES {receipt.discountAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                 </div>
@@ -179,7 +179,7 @@ export default function ReceiptPreview({ receipt, isOpen, onClose }: ReceiptPrev
                 </div>
               )}
               {receipt.changeDue != null && receipt.changeDue > 0 && (
-                <div className="flex justify-between text-[#A51C30] dark:text-red-400 font-bold">
+                <div className="flex justify-between text-[#A51C30] dark:text-[#B39A74] font-bold">
                   <span>Change</span>
                   <span>KES {receipt.changeDue.toLocaleString()}</span>
                 </div>

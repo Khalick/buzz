@@ -307,7 +307,7 @@ export default function POSPage() {
          <div className="flex items-center gap-2 overflow-x-auto max-w-lg scrollbar-hide px-4">
            {heldOrders.map((ho) => (
              <button key={ho.id} onClick={() => restoreHeldOrder(ho.id)}
-               className="px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-lg text-xs font-bold whitespace-nowrap hover:bg-amber-200 transition-colors flex items-center gap-1 border border-amber-200 dark:border-amber-800">
+               className="px-3 py-1 bg-[#B39A74]/15 dark:bg-[#B39A74]/25 text-[#B39A74] dark:text-[#B39A74] rounded-lg text-xs font-bold whitespace-nowrap hover:bg-[#B39A74]/25 transition-colors flex items-center gap-1 border border-[#B39A74]/30 dark:border-[#B39A74]/40">
                <PlayCircle size={12} /> {ho.label} ({ho.items.length})
              </button>
            ))}

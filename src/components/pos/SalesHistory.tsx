@@ -74,7 +74,7 @@ export default function SalesHistory({ orders, onViewReceipt, isLoading }: Sales
             <div className="text-[10px] font-bold text-gray-500 uppercase">Sales</div>
           </div>
           <div className="bg-[#A51C30]/5 dark:bg-[#A51C30]/20 border border-[#B39A74]/20 rounded-xl p-3 text-center">
-            <div className="text-sm font-black text-[#A51C30] dark:text-red-400 truncate">KES {todayRevenue.toLocaleString()}</div>
+            <div className="text-sm font-black text-[#A51C30] dark:text-[#B39A74] truncate">KES {todayRevenue.toLocaleString()}</div>
             <div className="text-[10px] font-bold text-gray-500 uppercase">Revenue</div>
           </div>
           <div className="bg-[#B39A74]/5 dark:bg-[#B39A74]/10 border border-[#B39A74]/20 rounded-xl p-3 text-center">
@@ -157,7 +157,7 @@ export default function SalesHistory({ orders, onViewReceipt, isLoading }: Sales
                       </div>
                     ))}
                     {order.discount_amount > 0 && (
-                      <div className="flex justify-between text-xs text-[#A51C30] dark:text-red-400">
+                      <div className="flex justify-between text-xs text-[#A51C30] dark:text-[#B39A74]">
                         <span>Discount</span>
                         <span>-KES {order.discount_amount.toLocaleString()}</span>
                       </div>

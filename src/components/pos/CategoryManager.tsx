@@ -13,9 +13,8 @@ export interface POSCategory {
 }
 
 const PRESET_COLORS = [
-  '#0A1D37', '#A51C30', '#B39A74', '#ec4899', '#ef4444',
-  '#f97316', '#eab308', '#22c55e', '#14b8a6', '#06b6d4',
-  '#64748b', '#1B3A5C',
+  '#0A1D37', '#A51C30', '#B39A74', '#1B3A5C',
+  '#2B3E50', '#CBB593', '#7D1220', '#061224'
 ];
 
 interface CategoryManagerProps {
@@ -134,7 +133,7 @@ export default function CategoryManager({ categories, onSave, onUpdate, onDelete
                 </div>
                 <button
                   onClick={() => onDelete(cat.id)}
-                  className="p-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                  className="p-1 text-gray-300 hover:text-[#A51C30] opacity-0 group-hover:opacity-100 transition-all"
                 >
                   <Trash2 size={14} />
                 </button>

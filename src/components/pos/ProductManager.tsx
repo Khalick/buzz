@@ -135,7 +135,7 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
                   </div>
                   <div className="text-right shrink-0">
                     <div className="font-bold text-sm text-gray-800 dark:text-gray-200">KES {p.price.toLocaleString()}</div>
-                    <div className={`text-xs font-medium ${p.stock_quantity <= 5 ? 'text-red-500' : p.stock_quantity <= 10 ? 'text-amber-500' : 'text-gray-400'}`}>
+                    <div className={`text-xs font-medium ${p.stock_quantity <= 5 ? 'text-[#A51C30]' : p.stock_quantity <= 10 ? 'text-[#B39A74]' : 'text-gray-400'}`}>
                       {p.stock_quantity <= 0 ? '⚠ Out' : `${p.stock_quantity} left`}
                     </div>
                   </div>
@@ -220,7 +220,7 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
 
             {/* Low stock warning */}
             {editingProduct && editingProduct.stock_quantity <= 5 && editingProduct.stock_quantity > 0 && (
-              <div className="flex items-center gap-2 px-4 py-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl text-amber-700 dark:text-amber-400 text-sm">
+              <div className="flex items-center gap-2 px-4 py-3 bg-[#B39A74]/10 dark:bg-[#B39A74]/20 rounded-xl text-[#B39A74] dark:text-[#B39A74] text-sm">
                 <AlertTriangle size={16} /> Low stock warning — only {editingProduct.stock_quantity} units left
               </div>
             )}
@@ -230,11 +230,11 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
               <div className="pt-2">
                 {deleteConfirm === editingProduct.id ? (
                   <div className="flex gap-2">
-                    <button onClick={() => handleDelete(editingProduct.id)} className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-bold transition-colors">Yes, Delete</button>
+                    <button onClick={() => handleDelete(editingProduct.id)} className="flex-1 py-2.5 bg-[#A51C30] hover:bg-[#8B1728] text-white rounded-xl text-sm font-bold transition-colors">Yes, Delete</button>
                     <button onClick={() => setDeleteConfirm(null)} className="flex-1 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold transition-colors">Cancel</button>
                   </div>
                 ) : (
-                  <button onClick={() => setDeleteConfirm(editingProduct.id)} className="w-full py-2.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors">
+                  <button onClick={() => setDeleteConfirm(editingProduct.id)} className="w-full py-2.5 text-[#A51C30] hover:bg-[#A51C30]/10 dark:hover:bg-[#A51C30]/15 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors">
                     <Trash2 size={14} /> Delete Product
                   </button>
                 )}

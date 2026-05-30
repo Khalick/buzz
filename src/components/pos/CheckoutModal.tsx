@@ -196,7 +196,7 @@ export default function CheckoutModal({
                       </button>
                     ))}
                     <button onClick={() => setAmountTendered(String(Math.ceil(total)))}
-                      className="px-3 py-2 rounded-lg text-sm font-bold bg-[#A51C30]/10 dark:bg-[#A51C30]/20 text-[#A51C30] dark:text-red-400 hover:bg-[#A51C30]/20 transition-colors">
+                      className="px-3 py-2 rounded-lg text-sm font-bold bg-[#A51C30]/10 dark:bg-[#A51C30]/20 text-[#A51C30] dark:text-[#B39A74] hover:bg-[#A51C30]/20 transition-colors">
                       Exact
                     </button>
                   </div>

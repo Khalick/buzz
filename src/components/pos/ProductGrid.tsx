@@ -140,7 +140,7 @@ export default function ProductGrid({ onAddToCart, categories, refreshKey }: Pro
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
 
         {isOffline && (
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 px-3 py-1 bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 rounded-full text-xs font-bold animate-pulse">
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 px-3 py-1 bg-[#B39A74]/20 dark:bg-[#B39A74]/30 text-[#B39A74] dark:text-[#B39A74] rounded-full text-xs font-bold animate-pulse">
             <WifiOff size={14} /> Offline
           </div>
         )}
@@ -211,12 +211,12 @@ export default function ProductGrid({ onAddToCart, categories, refreshKey }: Pro
                 >
                   {/* Low stock badge */}
                   {lowStock && (
-                    <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-full text-[10px] font-bold">
+                    <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-[#B39A74]/20 dark:bg-[#B39A74]/30 text-[#B39A74] dark:text-[#B39A74] rounded-full text-[10px] font-bold">
                       Low
                     </div>
                   )}
                   {outOfStock && (
-                    <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-500 rounded-full text-[10px] font-bold">
+                    <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-[#A51C30]/15 dark:bg-[#A51C30]/25 text-[#A51C30] rounded-full text-[10px] font-bold">
                       Out
                     </div>
                   )}

@@ -160,7 +160,7 @@ export default function SalesAnalytics({ orders }: SalesAnalyticsProps) {
               {analytics.topProducts.map((p, i) => (
                 <div key={p.name} className="flex items-center gap-3">
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0 ${
-                    i === 0 ? 'bg-amber-500' : i === 1 ? 'bg-gray-400' : i === 2 ? 'bg-amber-700' : 'bg-gray-300'
+                    i === 0 ? 'bg-[#B39A74]' : i === 1 ? 'bg-gray-400' : i === 2 ? 'bg-[#2B3E50]' : 'bg-gray-300'
                   }`}>{i + 1}</div>
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{p.name}</div>
