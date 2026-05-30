@@ -148,7 +148,6 @@ function buildSecurityHeaders(nonce: string): Record<string, string> {
     // Cross-Origin policies
     'Cross-Origin-Opener-Policy': 'same-origin',
     'Cross-Origin-Resource-Policy': 'same-origin',
-    'Cross-Origin-Embedder-Policy': 'require-corp',
   };
 }
 
@@ -182,7 +181,7 @@ function getThreatScore(req: NextRequest): number {
 // ============================================================
 // MAIN MIDDLEWARE
 // ============================================================
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Skip static assets and Next.js internals

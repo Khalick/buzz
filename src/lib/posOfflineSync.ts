@@ -170,12 +170,17 @@ export async function syncOrdersUp() {
   const db = await initDB();
   if (!db || typeof window === 'undefined' || !navigator.onLine) return;
 
-  const tx = db.transaction('syncQueue', 'readwrite');
-  const store = tx.objectStore('syncQueue');
-  const pendingOrders = await store.getAll();
+  // Step 1: Read all pending orders in a short-lived read transaction
+  const readTx = db.transaction('syncQueue', 'readonly');
+  const pendingOrders = await readTx.objectStore('syncQueue').getAll();
+  await readTx.done;
 
   if (pendingOrders.length === 0) return;
 
+  // Track which orders were successfully synced
+  const syncedOrderIds: number[] = [];
+
+  // Step 2: Sync each order to Supabase (outside any IDB transaction)
   for (const order of pendingOrders) {
     try {
       // Create main order record
@@ -217,24 +222,33 @@ export async function syncOrdersUp() {
         if (itemError) throw itemError;
         
         // Decrement stock for the items
-        for(const item of order.items) {
-            const { data: p } = await supabase.from('pos_products').select('stock_quantity').eq('id', item.pos_product_id).maybeSingle();
-            if(p) {
-               await supabase.from('pos_products').update({stock_quantity: Math.max(0, (p.stock_quantity || 0) - item.quantity)}).eq('id', item.pos_product_id);
-            }
+        for (const item of order.items) {
+          const { data: p } = await supabase.from('pos_products').select('stock_quantity').eq('id', item.pos_product_id).maybeSingle();
+          if (p) {
+            await supabase.from('pos_products').update({ stock_quantity: Math.max(0, (p.stock_quantity || 0) - item.quantity) }).eq('id', item.pos_product_id);
+          }
         }
       }
 
-      // successfully synced, remove from local queue
-      if (order.id) {
-        await store.delete(order.id);
+      // Mark this order as successfully synced
+      if (order.id !== undefined) {
+        syncedOrderIds.push(order.id);
       }
     } catch (e) {
       console.error('Failed to sync order up, retrying later:', e);
-      // We do not delete from store, so it will be retried on next sync
+      // Do not add to syncedOrderIds — it will be retried on next sync
     }
   }
-  await tx.done;
+
+  // Step 3: Remove synced orders in a new short-lived write transaction
+  if (syncedOrderIds.length > 0) {
+    const deleteTx = db.transaction('syncQueue', 'readwrite');
+    const deleteStore = deleteTx.objectStore('syncQueue');
+    for (const id of syncedOrderIds) {
+      await deleteStore.delete(id);
+    }
+    await deleteTx.done;
+  }
 }
 
 // 5. Setup event listeners
