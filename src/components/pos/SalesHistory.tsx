@@ -56,7 +56,7 @@ export default function SalesHistory({ orders, onViewReceipt, isLoading }: Sales
   const getPaymentIcon = (method: string) => {
     if (method === 'cash') return <Banknote size={14} className="text-[#A51C30]" />;
     if (method === 'mobile_money') return <Smartphone size={14} className="text-[#B39A74]" />;
-    return <CreditCard size={14} className="text-[#0A1D37]" />;
+    return <CreditCard size={14} className="text-[#A51C30]" />;
   };
 
   return (
@@ -70,7 +70,7 @@ export default function SalesHistory({ orders, onViewReceipt, isLoading }: Sales
         {/* Today's Summary */}
         <div className="grid grid-cols-3 gap-2 mb-3">
           <div className="bg-[#FAF8F5] dark:bg-gray-800 border border-[#E6E1D5] dark:border-gray-700 rounded-xl p-3 text-center">
-            <div className="text-lg font-black text-[#0A1D37] dark:text-[#B39A74]">{todayOrders.length}</div>
+            <div className="text-lg font-black text-[#A51C30] dark:text-[#B39A74]">{todayOrders.length}</div>
             <div className="text-[10px] font-bold text-gray-500 uppercase">Sales</div>
           </div>
           <div className="bg-[#A51C30]/5 dark:bg-[#A51C30]/20 border border-[#B39A74]/20 rounded-xl p-3 text-center">
@@ -164,7 +164,7 @@ export default function SalesHistory({ orders, onViewReceipt, isLoading }: Sales
                     )}
                     {order.notes && <div className="text-xs text-gray-400 italic">📝 {order.notes}</div>}
                     <button onClick={() => onViewReceipt(order)}
-                      className="w-full mt-2 py-2 bg-[#FAF8F5] dark:bg-gray-800 border border-[#E6E1D5] dark:border-gray-700 text-[#0A1D37] dark:text-[#B39A74] rounded-lg text-xs font-bold hover:bg-[#E6E1D5]/50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-1">
+                      className="w-full mt-2 py-2 bg-[#FAF8F5] dark:bg-gray-800 border border-[#E6E1D5] dark:border-gray-700 text-[#A51C30] dark:text-[#B39A74] rounded-lg text-xs font-bold hover:bg-[#E6E1D5]/50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-1">
                       <Receipt size={12} /> View Receipt
                     </button>
                   </div>

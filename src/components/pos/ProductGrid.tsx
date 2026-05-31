@@ -122,7 +122,7 @@ export default function ProductGrid({ onAddToCart, categories, refreshKey }: Pro
     return matchSearch && matchCategory && isActive;
   });
 
-  const getCategoryColor = (catId?: string) => categories.find(c => c.id === catId)?.color || '#0A1D37';
+  const getCategoryColor = (catId?: string) => categories.find(c => c.id === catId)?.color || '#A51C30';
 
   return (
     <div className="flex flex-col h-full space-y-4">

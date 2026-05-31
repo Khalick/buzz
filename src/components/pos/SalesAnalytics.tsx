@@ -80,24 +80,24 @@ export default function SalesAnalytics({ orders }: SalesAnalyticsProps) {
       <div className="p-4 space-y-5">
         {/* Today Metrics */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white dark:bg-gray-800 border border-[#E6E1D5] dark:border-gray-700 border-t-[3px] border-t-[#0A1D37] rounded-lg p-4">
+          <div className="bg-white dark:bg-gray-800 border border-[#E6E1D5] dark:border-gray-700 border-t-[3px] border-t-[#A51C30] rounded-lg p-4">
             <DollarSign size={16} className="text-[#B39A74] mb-1" />
-            <div className="text-xl font-black font-mono text-[#0A1D37] dark:text-[#B39A74]">KES {analytics.todayRevenue.toLocaleString()}</div>
+            <div className="text-xl font-black font-mono text-[#A51C30] dark:text-[#B39A74]">KES {analytics.todayRevenue.toLocaleString()}</div>
             <div className="text-xs text-[#6B6B6B] font-bold">Today&apos;s Revenue</div>
           </div>
           <div className="bg-white dark:bg-gray-800 border border-[#E6E1D5] dark:border-gray-700 border-t-[3px] border-t-[#A51C30] rounded-lg p-4">
             <ShoppingCart size={16} className="text-[#A51C30] mb-1" />
-            <div className="text-xl font-black font-mono text-[#0A1D37] dark:text-[#B39A74]">{analytics.todayOrders}</div>
+            <div className="text-xl font-black font-mono text-[#A51C30] dark:text-[#B39A74]">{analytics.todayOrders}</div>
             <div className="text-xs text-[#6B6B6B] font-bold">Transactions</div>
           </div>
           <div className="bg-white dark:bg-gray-800 border border-[#E6E1D5] dark:border-gray-700 border-t-[3px] border-t-[#B39A74] rounded-lg p-4">
             <TrendingUp size={16} className="text-[#B39A74] mb-1" />
-            <div className="text-xl font-black font-mono text-[#0A1D37] dark:text-[#B39A74]">KES {Math.round(analytics.todayAvg).toLocaleString()}</div>
+            <div className="text-xl font-black font-mono text-[#A51C30] dark:text-[#B39A74]">KES {Math.round(analytics.todayAvg).toLocaleString()}</div>
             <div className="text-xs text-[#6B6B6B] font-bold">Avg Ticket</div>
           </div>
-          <div className="bg-white dark:bg-gray-800 border border-[#E6E1D5] dark:border-gray-700 border-t-[3px] border-t-[#0A1D37] rounded-lg p-4">
-            <Package size={16} className="text-[#0A1D37] dark:text-[#B39A74] mb-1" />
-            <div className="text-xl font-black font-mono text-[#0A1D37] dark:text-[#B39A74]">{analytics.todayItems}</div>
+          <div className="bg-white dark:bg-gray-800 border border-[#E6E1D5] dark:border-gray-700 border-t-[3px] border-t-[#A51C30] rounded-lg p-4">
+            <Package size={16} className="text-[#A51C30] dark:text-[#B39A74] mb-1" />
+            <div className="text-xl font-black font-mono text-[#A51C30] dark:text-[#B39A74]">{analytics.todayItems}</div>
             <div className="text-xs text-[#6B6B6B] font-bold">Items Sold</div>
           </div>
         </div>
@@ -119,7 +119,7 @@ export default function SalesAnalytics({ orders }: SalesAnalyticsProps) {
                     KES {day.revenue.toLocaleString()}
                   </div>
                 </div>
-                <div className={`text-[10px] font-bold ${i === 6 ? 'text-[#0A1D37] dark:text-[#B39A74]' : 'text-gray-400'}`}>{day.label}</div>
+                <div className={`text-[10px] font-bold ${i === 6 ? 'text-[#A51C30] dark:text-[#B39A74]' : 'text-gray-400'}`}>{day.label}</div>
               </div>
             ))}
           </div>
@@ -132,7 +132,7 @@ export default function SalesAnalytics({ orders }: SalesAnalyticsProps) {
             {[
               { key: 'cash', label: 'Cash', icon: <Banknote size={14} />, color: '#A51C30', amount: analytics.methods.cash },
               { key: 'mobile_money', label: 'M-Pesa', icon: <Smartphone size={14} />, color: '#B39A74', amount: analytics.methods.mobile_money },
-              { key: 'card', label: 'Card', icon: <CreditCard size={14} />, color: '#0A1D37', amount: analytics.methods.card },
+              { key: 'card', label: 'Card', icon: <CreditCard size={14} />, color: '#A51C30', amount: analytics.methods.card },
             ].map(m => {
               const pct = (m.amount / analytics.totalMethods) * 100;
               return (

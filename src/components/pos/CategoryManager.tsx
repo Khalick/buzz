@@ -13,8 +13,8 @@ export interface POSCategory {
 }
 
 const PRESET_COLORS = [
-  '#0A1D37', '#A51C30', '#B39A74', '#1B3A5C',
-  '#2B3E50', '#CBB593', '#7D1220', '#061224'
+  '#A51C30', '#B39A74', '#7D1220', '#CBB593',
+  '#2B3E50', '#8B1728', '#D4A574', '#061224'
 ];
 
 interface CategoryManagerProps {
@@ -27,7 +27,7 @@ interface CategoryManagerProps {
 
 export default function CategoryManager({ categories, onSave, onUpdate, onDelete, onClose }: CategoryManagerProps) {
   const [newName, setNewName] = useState('');
-  const [newColor, setNewColor] = useState('#0A1D37');
+  const [newColor, setNewColor] = useState('#A51C30');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
 
@@ -35,7 +35,7 @@ export default function CategoryManager({ categories, onSave, onUpdate, onDelete
     if (!newName.trim()) return;
     onSave({ name: newName.trim(), color: newColor, icon: 'tag', sort_order: categories.length, business_id: '' });
     setNewName('');
-    setNewColor('#0A1D37');
+    setNewColor('#A51C30');
   };
 
   const startEdit = (cat: POSCategory) => {

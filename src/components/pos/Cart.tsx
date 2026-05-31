@@ -60,7 +60,7 @@ export default function Cart({
     <div className="flex flex-col h-full bg-white dark:bg-gray-900 border-l border-[#E6E1D5] dark:border-gray-800 shadow-xl">
       {/* Header */}
       <div className="p-4 border-b border-[#E6E1D5] dark:border-gray-800 flex justify-between items-center">
-        <h2 className="text-lg font-bold text-[#0A1D37] dark:text-[#B39A74]">
+        <h2 className="text-lg font-bold text-[#A51C30] dark:text-[#B39A74]">
           Current Order
         </h2>
         <div className="flex items-center gap-2">
@@ -79,13 +79,13 @@ export default function Cart({
       <div className="flex gap-1.5 px-4 py-2 border-b border-gray-100 dark:border-gray-800">
         <button onClick={() => setShowDiscount(!showDiscount)}
           className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1 ${
-            discount.type !== 'none' ? 'bg-[#FAF8F5] dark:bg-[#0A1D37]/30 text-[#0A1D37] dark:text-[#B39A74] border border-[#E6E1D5]' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#6B6B6B] hover:bg-[#E6E1D5]/50'
+            discount.type !== 'none' ? 'bg-[#FAF8F5] dark:bg-[#A51C30]/30 text-[#A51C30] dark:text-[#B39A74] border border-[#E6E1D5]' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#6B6B6B] hover:bg-[#E6E1D5]/50'
           }`}>
           <Percent size={10} /> {discount.type !== 'none' ? 'Discount ✓' : 'Discount'}
         </button>
         <button onClick={() => setShowCustomer(!showCustomer)}
           className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1 ${
-            customerName ? 'bg-[#FAF8F5] dark:bg-[#0A1D37]/30 text-[#0A1D37] dark:text-[#B39A74] border border-[#E6E1D5]' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#6B6B6B] hover:bg-[#E6E1D5]/50'
+            customerName ? 'bg-[#FAF8F5] dark:bg-[#A51C30]/30 text-[#A51C30] dark:text-[#B39A74] border border-[#E6E1D5]' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#6B6B6B] hover:bg-[#E6E1D5]/50'
           }`}>
           <User size={10} /> {customerName || 'Customer'}
         </button>
@@ -187,7 +187,7 @@ export default function Cart({
         </div>
         <div className="flex justify-between text-xl font-black text-gray-900 dark:text-gray-50 pt-2 border-t border-gray-200 dark:border-gray-700">
           <span>Total</span>
-          <span className="text-[#0A1D37] dark:text-[#B39A74]">KES {total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+          <span className="text-[#A51C30] dark:text-[#B39A74]">KES {total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
         </div>
 
         <button
