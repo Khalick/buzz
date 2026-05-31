@@ -7,8 +7,8 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
 
 export const metadata: Metadata = {
-  title: 'BizHub Admin | Master Control Portal',
-  description: 'The central administration portal for BizHub Network.',
+  title: 'Lokari Admin | Master Control Portal',
+  description: 'The central administration portal for Lokari Network.',
 };
 
 export default function RootLayout({

@@ -196,7 +196,7 @@ export default function ReceiptPreview({ receipt, isOpen, onClose }: ReceiptPrev
             {/* Footer */}
             <div className="text-center pt-4 border-t border-dashed border-gray-200 dark:border-gray-700 space-y-1">
               <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Thank you for your purchase! 🙏</p>
-              <p className="text-xs text-gray-400">Powered by St. Charles POS</p>
+              <p className="text-xs text-gray-400">Powered by Lokari POS</p>
             </div>
           </div>
         </div>

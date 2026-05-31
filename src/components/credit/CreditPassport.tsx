@@ -114,7 +114,7 @@ export default function CreditPassport({
           <div className="w-5 h-5 rounded bg-gradient-to-br from-[#1B4332] to-[#2D6A4F] flex items-center justify-center">
             <span className="text-[8px] font-bold text-white">T</span>
           </div>
-          <span className="text-[10px] text-[#737373] font-medium">Verified by ThikaBizHub</span>
+          <span className="text-[10px] text-[#737373] font-medium">Verified by ThikaLokari</span>
         </div>
         <span className="text-[10px] text-[#A3A3A3]">{computedDate}</span>
       </div>

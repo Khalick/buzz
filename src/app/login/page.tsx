@@ -90,7 +90,7 @@ const LoginPage = () => {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-white">
-                  ThikaBiz<span className="text-[#D4AF37]">Hub</span>
+                  ThikaLok<span className="text-[#D4AF37]">ari</span>
                 </h1>
                 <p className="text-sm text-white/60">Your Local Business Directory</p>
               </div>
@@ -130,7 +130,7 @@ const LoginPage = () => {
                 <span className="text-white font-bold text-lg">T</span>
               </div>
               <span className="text-xl font-bold text-[#1B4332]">
-                ThikaBiz<span className="text-[#D4AF37]">Hub</span>
+                ThikaLok<span className="text-[#D4AF37]">ari</span>
               </span>
             </Link>
           </div>
@@ -142,7 +142,7 @@ const LoginPage = () => {
                 {isSignUp ? 'Create Account' : 'Welcome Back'}
               </h2>
               <p className="text-[#525252]">
-                {isSignUp ? 'Join the ThikaBizHub community' : 'Sign in to your account'}
+                {isSignUp ? 'Join the ThikaLokari community' : 'Sign in to your account'}
               </p>
             </div>
 

@@ -17,7 +17,7 @@ class BizHubApp extends ConsumerWidget {
     final theme = AppTheme.spotifyTheme();
 
     return MaterialApp.router(
-      title: 'BizHub Network',
+      title: 'Lokari Network',
       theme: theme,
       darkTheme: theme,
       themeMode: ThemeMode.dark,

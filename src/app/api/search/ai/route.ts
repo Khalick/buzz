@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       return `- ${b.name} (${b.category}) | Location: ${loc} | Rating: ${b.rating || 0}/5 (${b.review_count || 0} reviews) | Phone: ${b.contact?.phone || 'N/A'}`;
     }).join('\n');
 
-    const systemPrompt = `You are BizHub Assistant, an expert on local businesses in Thika, Kenya. You help users find businesses and answer questions about local services.
+    const systemPrompt = `You are Lokari Assistant, an expert on local businesses in Thika, Kenya. You help users find businesses and answer questions about local services.
 
 Here are the businesses in our directory:
 ${businessContext}

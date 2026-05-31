@@ -132,7 +132,7 @@ const InvitePage = ({ params }: InvitePageProps) => {
       default:
         return {
           title: 'Platform Invitation',
-          description: 'You\'ve been invited to join ThikaBizHub.',
+          description: 'You\'ve been invited to join ThikaLokari.',
           icon: '🎉',
           color: 'green',
         };
@@ -270,7 +270,7 @@ const InvitePage = ({ params }: InvitePageProps) => {
 
           <div className="mt-6 text-center">
             <p className="text-xs text-gray-500">
-              By accepting this invitation, you agree to ThikaBizHub's terms of service.
+              By accepting this invitation, you agree to ThikaLokari's terms of service.
             </p>
           </div>
         </div>

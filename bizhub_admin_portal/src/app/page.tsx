@@ -116,7 +116,7 @@ export default function Dashboard() {
         <h1 className="text-3xl font-black text-[#D4AF37] tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>
           Overview
         </h1>
-        <p className="text-[#E0E0E0]/70 mt-1">Live metrics from the BizHub Network database.</p>
+        <p className="text-[#E0E0E0]/70 mt-1">Live metrics from the Lokari Network database.</p>
       </div>
 
       {/* KPI Grid */}

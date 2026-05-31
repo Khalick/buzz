@@ -200,7 +200,7 @@ const AddBusinessPage = () => {
             </div>
             <h2 className="text-2xl font-bold text-[#1A1A1A] mb-2">Business Submitted!</h2>
             <p className="text-[#525252] mb-6">
-              Your business has been submitted for review. We&apos;ll notify you once it&apos;s approved and live on ThikaBizHub.
+              Your business has been submitted for review. We&apos;ll notify you once it&apos;s approved and live on ThikaLokari.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
@@ -239,7 +239,7 @@ const AddBusinessPage = () => {
             List Your Business
           </span>
           <h1 className="text-3xl md:text-4xl font-bold text-white heading-display mb-3">
-            Get Your Business on ThikaBizHub
+            Get Your Business on ThikaLokari
           </h1>
           <p className="text-lg text-white/70 max-w-xl mx-auto">
             Fill out the form below and reach thousands of local customers

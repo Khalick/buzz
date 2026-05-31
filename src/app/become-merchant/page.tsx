@@ -82,7 +82,7 @@ export default function BecomeMerchantPage() {
                 <Store className="h-6 w-6 text-[#D4AF37]" />
               </div>
               <h1 className="text-2xl font-bold text-[#1A1A1A]">Become a Merchant</h1>
-              <p className="text-sm text-[#737373] mt-2">Grow your business on ThikaBizHub by upgrading to a merchant account.</p>
+              <p className="text-sm text-[#737373] mt-2">Grow your business on ThikaLokari by upgrading to a merchant account.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">

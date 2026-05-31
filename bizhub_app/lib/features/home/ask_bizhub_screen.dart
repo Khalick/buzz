@@ -85,7 +85,7 @@ class _AskBizHubScreenState extends State<AskBizHubScreen> {
           children: [
             Icon(Icons.auto_awesome, color: Color(0xFFD4AF37), size: 20),
             SizedBox(width: 8),
-            Text('Ask BizHub'),
+            Text('Ask Lokari'),
           ],
         ),
         centerTitle: true,

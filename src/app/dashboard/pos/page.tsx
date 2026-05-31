@@ -35,7 +35,7 @@ export default function POSPage() {
   const [businessId, setBusinessId] = useState<string>('');
   const [cashierId, setCashierId] = useState<string>('');
   const [cashierName, setCashierName] = useState<string>('');
-  const [businessName, setBusinessName] = useState<string>('BizHub POS');
+  const [businessName, setBusinessName] = useState<string>('Lokari POS');
   const [businessPhone, setBusinessPhone] = useState<string>('');
   const [isSyncing, setIsSyncing] = useState(false);
   const [time, setTime] = useState('');
@@ -300,7 +300,7 @@ export default function POSPage() {
              B
            </div>
            <h1 className="text-xl font-bold text-white hidden sm:block">
-             St. Charles Point of Sale
+             Lokari Point of Sale
            </h1>
          </div>
          

@@ -44,7 +44,7 @@ export default function InstallPrompt() {
         <div className="fixed top-0 inset-x-0 z-[60] bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 px-6 flex items-center justify-between shadow-lg animate-slideDown">
           <div className="flex items-center gap-3">
             <RefreshCw size={18} className="animate-spin-slow" />
-            <span className="font-semibold text-sm">A new version of BizHub is available</span>
+            <span className="font-semibold text-sm">A new version of Lokari is available</span>
           </div>
           <button
             onClick={applyUpdate}
@@ -89,7 +89,7 @@ export default function InstallPrompt() {
               <Check size={20} />
             </div>
             <div>
-              <p className="font-bold">BizHub Installed!</p>
+              <p className="font-bold">Lokari Installed!</p>
               <p className="text-sm opacity-80">Find it on your home screen</p>
             </div>
           </div>
@@ -110,7 +110,7 @@ export default function InstallPrompt() {
                     <Smartphone size={24} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900 dark:text-gray-100">Install BizHub</h3>
+                    <h3 className="font-bold text-gray-900 dark:text-gray-100">Install Lokari</h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400">Works offline • Fast access</p>
                   </div>
                 </div>
@@ -124,7 +124,7 @@ export default function InstallPrompt() {
               </div>
 
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
-                Install BizHub on your device for instant POS access, offline sales processing, and push notifications.
+                Install Lokari on your device for instant POS access, offline sales processing, and push notifications.
               </p>
 
               <div className="flex gap-3">

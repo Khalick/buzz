@@ -23,7 +23,7 @@ export default function FeaturesSection() {
                         Everything You Need
                     </h2>
                     <p className="text-lg text-[#525252] max-w-2xl mx-auto">
-                        Discover the features that make ThikaBizHub the perfect platform for finding and connecting with local businesses.
+                        Discover the features that make ThikaLokari the perfect platform for finding and connecting with local businesses.
                     </p>
                 </div>
 

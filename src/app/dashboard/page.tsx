@@ -128,7 +128,7 @@ export default function DashboardPage() {
             </div>
             <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">No Businesses Yet</h3>
             <p className="text-[#525252] mb-6">
-              List your first business on ThikaBizHub and start reaching local customers.
+              List your first business on ThikaLokari and start reaching local customers.
             </p>
             <Link
               href="/directory/add"

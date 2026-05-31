@@ -381,7 +381,7 @@ export default function CreditHealthPage() {
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2">
               <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
               <p className="text-xs text-amber-800">
-                Self-declared scores are capped at <strong>650/900</strong>. Activate the free BizHub POS to unlock the full 900-point scale with verified transaction data.
+                Self-declared scores are capped at <strong>650/900</strong>. Activate the free Lokari POS to unlock the full 900-point scale with verified transaction data.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

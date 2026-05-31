@@ -134,7 +134,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    'B',
+                    'L',
                     style: theme.textTheme.headlineMedium?.copyWith(
                       color: Colors.black,
                       fontWeight: FontWeight.w800,
@@ -144,7 +144,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'BizHub Network',
+                'Lokari Network',
                 style: theme.textTheme.headlineLarge,
               ),
               const SizedBox(height: 4),
@@ -173,7 +173,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const SizedBox(height: 4),
                     Text(
                       _isSignUp
-                          ? 'Join the BizHub community'
+                          ? 'Join the Lokari community'
                           : 'Sign in to your account',
                       style: theme.textTheme.bodySmall,
                     ),

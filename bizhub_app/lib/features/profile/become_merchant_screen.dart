@@ -84,7 +84,7 @@ class _BecomeMerchantScreenState extends ConsumerState<BecomeMerchantScreen> {
               const Icon(Icons.store, size: 64, color: SpotifyColors.green),
               const SizedBox(height: 16),
               const Text(
-                'Grow your business on ThikaBizHub by upgrading to a merchant account.',
+                'Grow your business on ThikaLokari by upgrading to a merchant account.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,

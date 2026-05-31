@@ -112,9 +112,9 @@ export default function CustomerRequestsDashboard() {
               <Inbox className="w-8 h-8 text-[#1B4332]/50" />
             </div>
             <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">No Requests Yet</h3>
-            <p className="text-[#525252] mb-6">You haven't broadcasted any requests to businesses yet. Use AskBizHub to find what you need!</p>
+            <p className="text-[#525252] mb-6">You haven't broadcasted any requests to businesses yet. Use AskLokari to find what you need!</p>
             <Link href="/" className="bg-[#1B4332] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#2D6A4F] transition-colors">
-              Chat with AskBizHub
+              Chat with AskLokari
             </Link>
           </div>
         ) : (
@@ -175,7 +175,7 @@ export default function CustomerRequestsDashboard() {
                           <div className="flex justify-end gap-2">
                             {quote.businesses?.contact?.whatsapp && (
                               <a 
-                                href={`https://wa.me/${quote.businesses.contact.whatsapp.replace(/\D/g,'')}?text=${encodeURIComponent(`Hi ${quote.businesses.name}, I'm following up on your quote sent via ThikaBizHub regarding my request: "${req.description.substring(0, 50)}..."`)}`}
+                                href={`https://wa.me/${quote.businesses.contact.whatsapp.replace(/\D/g,'')}?text=${encodeURIComponent(`Hi ${quote.businesses.name}, I'm following up on your quote sent via ThikaLokari regarding my request: "${req.description.substring(0, 50)}..."`)}`}
                                 target="_blank"
                                 rel="noopener noreferrer" 
                                 className="px-4 py-1.5 bg-[#25D366] text-white text-xs font-bold rounded-lg hover:bg-[#1EBE5D] transition-colors"

@@ -92,7 +92,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               // Header
               Text(
                 _currentStep == 0
-                    ? '🎉 Welcome to BizHub!'
+                    ? '🎉 Welcome to Lokari!'
                     : _currentStep == 1
                         ? '📍 Set Your Location'
                         : '✨ Almost Done!',

@@ -232,7 +232,7 @@ export default function AskBizHub() {
         >
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5" />
-            <span className="text-sm font-semibold hidden sm:inline">Ask BizHub</span>
+            <span className="text-sm font-semibold hidden sm:inline">Ask Lokari</span>
           </div>
         </button>
       )}
@@ -247,7 +247,7 @@ export default function AskBizHub() {
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-[#D4AF37]" />
               <div>
-                <h3 className="text-white font-bold text-sm">Ask BizHub</h3>
+                <h3 className="text-white font-bold text-sm">Ask Lokari</h3>
                 <p className="text-white/60 text-[10px]">AI-powered business discovery</p>
               </div>
             </div>

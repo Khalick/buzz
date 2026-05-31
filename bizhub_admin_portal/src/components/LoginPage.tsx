@@ -38,7 +38,7 @@ export default function LoginPage() {
             <ShieldCheck size={32} color="#D4AF37" />
           </div>
           <h1 className="text-3xl font-black tracking-tight text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>
-            Biz<span style={{ color: '#D4AF37' }}>Hub</span> Admin
+            Lok<span style={{ color: '#D4AF37' }}>ari</span> Admin
           </h1>
           <p className="mt-2 text-sm font-medium uppercase tracking-widest" style={{ color: 'rgba(212,175,55,0.7)' }}>Master Control Portal</p>
         </div>
@@ -67,7 +67,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@bizhub.co.ke"
+                placeholder="admin@lokari.co.ke"
                 required
                 className="w-full px-4 py-3 rounded-xl text-white outline-none transition-all"
                 style={{

@@ -116,7 +116,7 @@ export default function BusinessDetailPage() {
   const getWhatsAppLink = () => {
     if (!business) return '#';
     const phone = business.contact.whatsapp || business.contact.phone;
-    const message = `Hi! I found your business "${business.name}" on ThikaBizHub. I'd like to know more.`;
+    const message = `Hi! I found your business "${business.name}" on ThikaLokari. I'd like to know more.`;
     return `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
   };
 
@@ -129,7 +129,7 @@ export default function BusinessDetailPage() {
     if (navigator.share && business) {
       await navigator.share({
         title: business.name,
-        text: `Check out ${business.name} on ThikaBizHub!`,
+        text: `Check out ${business.name} on ThikaLokari!`,
         url: window.location.href,
       });
     } else {

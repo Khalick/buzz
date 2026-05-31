@@ -147,7 +147,7 @@ export default function SmartAlertsModal({
             )}
             {!currentSearch && (!currentCategory || currentCategory === 'All Categories') && (!currentCounty || currentCounty === 'All Counties') && (
               <div className="text-[#737373] italic">
-                Any new business added to ThikaBizHub
+                Any new business added to ThikaLokari
               </div>
             )}
           </div>

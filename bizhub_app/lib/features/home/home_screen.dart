@@ -44,7 +44,7 @@ class HomeScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'BizHub',
+                    'Lokari',
                     style: theme.textTheme.displayLarge,
                   ),
                   Row(

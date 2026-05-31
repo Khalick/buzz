@@ -75,7 +75,7 @@ class BusinessDetailScreen extends ConsumerWidget {
                   IconButton(
                     icon: const Icon(Icons.share, color: Colors.white),
                     onPressed: () {
-                      SharePlus.instance.share(ShareParams(text: 'Check out ${business.name} on BizHub: https://thikabizhub.com/business/${business.id}'));
+                      SharePlus.instance.share(ShareParams(text: 'Check out ${business.name} on Lokari: https://thikabizhub.com/business/${business.id}'));
                     },
                   ),
                 ],

@@ -280,7 +280,7 @@ const ProfilePage = () => {
             {profile.display_name || 'Your Profile'}
           </h1>
           <p className="text-white/70">
-            Manage your account and see your activity on ThikaBizHub
+            Manage your account and see your activity on ThikaLokari
           </p>
         </div>
       </div>

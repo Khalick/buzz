@@ -76,7 +76,7 @@ export default function CheckoutModal({
 
       const receiptData = {
         receiptNumber,
-        businessName: 'BizHub Merchant', // Would come from business profile
+        businessName: 'Lokari Merchant', // Would come from business profile
         items: items.map(i => ({ name: i.name, quantity: i.quantity, unit_price: i.unit_price, total_price: i.total_price })),
         subtotal,
         discountAmount,

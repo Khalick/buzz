@@ -23,13 +23,13 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "ThikaBizHub - Your Premier Local Business Directory",
+  title: "ThikaLokari - Your Premier Local Business Directory",
   description: "Discover, connect, and thrive with local businesses in Thika, Kenya. Find verified businesses, exclusive deals, and share your experiences.",
   keywords: "Thika, Kenya, business directory, local businesses, deals, discounts, premium directory",
-  authors: [{ name: "ThikaBizHub Team" }],
+  authors: [{ name: "ThikaLokari Team" }],
   manifest: "/manifest.json",
   openGraph: {
-    title: "ThikaBizHub - Your Premier Local Business Directory",
+    title: "ThikaLokari - Your Premier Local Business Directory",
     description: "Connecting you with the best local businesses in Thika, Kenya",
     type: "website",
     locale: "en_US",

@@ -69,7 +69,7 @@ export default function InvestorPitchPage() {
             <Globe2 size={16} /> Seed Round Deck 2026
           </div>
           <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-8 animate-fade-up delay-100" style={{ fontFamily: 'Outfit, sans-serif' }}>
-            <span className="text-white">Biz</span><span className="text-gradient">Hub</span>
+            <span className="text-white">Lok</span><span className="text-gradient">ari</span>
           </h1>
           <p className="text-2xl md:text-3xl font-light text-[#E0E0E0] max-w-4xl leading-relaxed mb-12 animate-fade-up delay-200">
             The AI-Powered Commerce Fabric formalizing Africa's $300B Invisible Economy.
@@ -161,7 +161,7 @@ export default function InvestorPitchPage() {
               <div className="space-y-8 animate-fade-up">
                 <h2 className="text-4xl font-bold text-white">The Financial Data Moat</h2>
                 <p className="text-lg text-[#E0E0E0]/80">
-                  BizHub doesn't just connect—it processes. With frictionless M-Pesa integration for consumers and automated Corporate Invoicing for B2B gig services, we act as the central ledger for a previously invisible economy.
+                  Lokari doesn't just connect—it processes. With frictionless M-Pesa integration for consumers and automated Corporate Invoicing for B2B gig services, we act as the central ledger for a previously invisible economy.
                 </p>
                 <ul className="space-y-4 pt-4">
                   <li className="flex items-center gap-3 text-white/90"><Database size={18} className="text-[#D4AF37]" /> Proprietary Credit Scoring Data</li>
@@ -204,7 +204,7 @@ export default function InvestorPitchPage() {
                Contact Fund Managers
              </button>
           </div>
-          <p className="text-white/40 mt-12 text-sm">© 2026 BizHub Technologies Inc. Confidential Investment Documentation.</p>
+          <p className="text-white/40 mt-12 text-sm">© 2026 Lokari Technologies Inc. Confidential Investment Documentation.</p>
         </footer>
 
       </div>
