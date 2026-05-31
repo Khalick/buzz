@@ -127,12 +127,12 @@ export default function ProductGrid({ onAddToCart, categories, refreshKey }: Pro
   return (
     <div className="flex flex-col h-full space-y-4">
       {/* Search bar with scan indicator */}
-      <div className={`relative transition-all duration-200 ${scanFlash ? 'ring-2 ring-[#A51C30] rounded-2xl' : ''}`}>
+      <div className={`relative transition-all duration-200 ${scanFlash ? 'ring-2 ring-[#A51C30]' : ''}`}>
         <input
           ref={searchRef}
           type="text"
           placeholder="Scan barcode or search products..."
-          className="w-full p-4 pl-12 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 outline-none text-lg transition-shadow focus:ring-2 focus:ring-[#B39A74] focus:border-transparent"
+          className="w-full p-4 pl-12 pos-input outline-none text-lg transition-shadow"
           value={search}
           onChange={e => setSearch(e.target.value)}
           autoFocus
@@ -151,10 +151,10 @@ export default function ProductGrid({ onAddToCart, categories, refreshKey }: Pro
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
           <button
             onClick={() => setActiveCategory('all')}
-            className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+            className={`px-4 py-2 text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
               activeCategory === 'all'
-                ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-md'
-                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-400'
+                ? 'bg-gray-900 text-white shadow-md'
+                : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-400'
             }`}
           >
             All ({products.filter(p => p.is_active !== false).length})
@@ -165,10 +165,10 @@ export default function ProductGrid({ onAddToCart, categories, refreshKey }: Pro
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all shrink-0 flex items-center gap-1.5 ${
+                className={`px-4 py-2 text-sm font-bold whitespace-nowrap transition-all shrink-0 flex items-center gap-1.5 ${
                   activeCategory === cat.id
                     ? 'text-white shadow-md'
-                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-400'
+                    : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-400'
                 }`}
                 style={activeCategory === cat.id ? { backgroundColor: cat.color } : {}}
               >
@@ -203,32 +203,32 @@ export default function ProductGrid({ onAddToCart, categories, refreshKey }: Pro
                   key={p.id}
                   onClick={() => !outOfStock && onAddToCart(p)}
                   disabled={outOfStock}
-                  className={`group flex flex-col items-center justify-center p-5 rounded-2xl shadow-sm transition-all border border-transparent relative ${
+                  className={`group flex flex-col items-center justify-center p-5 shadow-sm transition-all border border-[#E6E1D5] relative ${
                     outOfStock
-                      ? 'bg-gray-100 dark:bg-gray-800/30 opacity-60 cursor-not-allowed'
-                      : 'bg-white dark:bg-gray-800 hover:shadow-xl active:scale-95 hover:border-[#B39A74]/50'
+                      ? 'bg-gray-100 opacity-60 cursor-not-allowed'
+                      : 'bg-white hover:shadow-md active:scale-95 hover:border-[#B39A74]'
                   }`}
                 >
                   {/* Low stock badge */}
                   {lowStock && (
-                    <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-[#B39A74]/20 dark:bg-[#B39A74]/30 text-[#B39A74] dark:text-[#B39A74] rounded-full text-[10px] font-bold">
+                    <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-[#B39A74]/20 text-[#B39A74] rounded-full text-[10px] font-bold">
                       Low
                     </div>
                   )}
                   {outOfStock && (
-                    <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-[#A51C30]/15 dark:bg-[#A51C30]/25 text-[#A51C30] rounded-full text-[10px] font-bold">
+                    <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-[#A51C30]/15 text-[#A51C30] rounded-full text-[10px] font-bold">
                       Out
                     </div>
                   )}
                   
                   <div
-                    className="h-16 w-16 rounded-2xl flex items-center justify-center text-white font-bold text-xl mb-3 transform group-hover:scale-110 transition-transform shadow-inner"
-                    style={{ background: `linear-gradient(135deg, ${getCategoryColor(p.category_id)}, ${getCategoryColor(p.category_id)}dd)` }}
+                    className="h-16 w-16 flex items-center justify-center text-white font-bold text-xl mb-3 transform group-hover:scale-105 transition-transform"
+                    style={{ background: getCategoryColor(p.category_id) }}
                   >
                     {p.name.charAt(0)}
                   </div>
-                  <span className="font-semibold text-gray-800 dark:text-gray-100 text-center line-clamp-2 w-full text-sm">{p.name}</span>
-                  <span className="font-black mt-1.5 text-sm" style={{ color: getCategoryColor(p.category_id) }}>
+                  <span className="font-semibold text-gray-800 text-center line-clamp-2 w-full text-sm">{p.name}</span>
+                  <span className="font-bold mt-1.5 text-sm" style={{ color: getCategoryColor(p.category_id) }}>
                     KES {p.price?.toLocaleString()}
                   </span>
                   <span className="text-[10px] text-gray-400 mt-0.5">

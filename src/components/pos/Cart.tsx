@@ -78,20 +78,20 @@ export default function Cart({
       {/* Quick action pills */}
       <div className="flex gap-1.5 px-4 py-2 border-b border-gray-100 dark:border-gray-800">
         <button onClick={() => setShowDiscount(!showDiscount)}
-          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1 ${
-            discount.type !== 'none' ? 'bg-[#FAF8F5] dark:bg-[#A51C30]/30 text-[#A51C30] dark:text-[#B39A74] border border-[#E6E1D5]' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#6B6B6B] hover:bg-[#E6E1D5]/50'
+          className={`px-2.5 py-1 text-[11px] font-bold transition-colors flex items-center gap-1 ${
+            discount.type !== 'none' ? 'pos-pill-active' : 'pos-pill-inactive'
           }`}>
           <Percent size={10} /> {discount.type !== 'none' ? 'Discount ✓' : 'Discount'}
         </button>
         <button onClick={() => setShowCustomer(!showCustomer)}
-          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1 ${
-            customerName ? 'bg-[#FAF8F5] dark:bg-[#A51C30]/30 text-[#A51C30] dark:text-[#B39A74] border border-[#E6E1D5]' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#6B6B6B] hover:bg-[#E6E1D5]/50'
+          className={`px-2.5 py-1 text-[11px] font-bold transition-colors flex items-center gap-1 ${
+            customerName ? 'pos-pill-active' : 'pos-pill-inactive'
           }`}>
           <User size={10} /> {customerName || 'Customer'}
         </button>
         <button onClick={() => setShowNotes(!showNotes)}
-          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1 ${
-            orderNotes ? 'bg-[#B39A74]/15 dark:bg-[#B39A74]/30 text-[#B39A74] dark:text-[#B39A74]' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-gray-200'
+          className={`px-2.5 py-1 text-[11px] font-bold transition-colors flex items-center gap-1 ${
+            orderNotes ? 'pos-pill-active' : 'pos-pill-inactive'
           }`}>
           <MessageSquare size={10} /> {orderNotes ? 'Note ✓' : 'Note'}
         </button>
@@ -102,9 +102,9 @@ export default function Cart({
         <div className="px-4 py-3 border-b border-[#E6E1D5] dark:border-gray-800 bg-[#FAF8F5] dark:bg-gray-800/50 animate-fade-in space-y-2">
           <div className="flex gap-2">
             <input type="number" value={discountInput} onChange={e => setDiscountInput(e.target.value)} placeholder="Amount"
-              className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 rounded-lg text-sm outline-none border border-gray-200 dark:border-gray-700" />
-            <button onClick={() => applyDiscount('percent')} className={`px-3 py-2 rounded-lg text-xs font-bold transition-colors ${discount.type === 'percent' ? 'bg-[#A51C30] text-white' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#6B6B6B] border border-[#E6E1D5]'}`}>%</button>
-            <button onClick={() => applyDiscount('fixed')} className={`px-3 py-2 rounded-lg text-xs font-bold transition-colors ${discount.type === 'fixed' ? 'bg-[#A51C30] text-white' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#6B6B6B] border border-[#E6E1D5]'}`}>KES</button>
+              className="flex-1 pos-input" />
+            <button onClick={() => applyDiscount('percent')} className={`px-3 py-2 text-xs font-bold transition-colors ${discount.type === 'percent' ? 'pos-btn-primary' : 'bg-[#FAF8F5] text-[#6B6B6B] border border-[#E6E1D5]'}`}>%</button>
+            <button onClick={() => applyDiscount('fixed')} className={`px-3 py-2 text-xs font-bold transition-colors ${discount.type === 'fixed' ? 'pos-btn-primary' : 'bg-[#FAF8F5] text-[#6B6B6B] border border-[#E6E1D5]'}`}>KES</button>
             {discount.type !== 'none' && (
               <button onClick={() => applyDiscount('none')} className="px-2 py-2 text-[#A51C30] text-xs font-bold">✕</button>
             )}
@@ -116,9 +116,9 @@ export default function Cart({
       {showCustomer && (
         <div className="px-4 py-3 border-b border-[#E6E1D5] dark:border-gray-800 bg-[#FAF8F5] dark:bg-gray-800/50 animate-fade-in space-y-2">
           <input type="text" value={customerName} onChange={e => onCustomerChange(e.target.value, customerPhone)}
-            placeholder="Customer name" className="w-full px-3 py-2 bg-white dark:bg-gray-800 rounded-lg text-sm outline-none border border-gray-200 dark:border-gray-700" />
+            placeholder="Customer name" className="w-full pos-input" />
           <input type="tel" value={customerPhone} onChange={e => onCustomerChange(customerName, e.target.value)}
-            placeholder="Phone (e.g. 0712...)" className="w-full px-3 py-2 bg-white dark:bg-gray-800 rounded-lg text-sm outline-none border border-gray-200 dark:border-gray-700" />
+            placeholder="Phone (e.g. 0712...)" className="w-full pos-input" />
         </div>
       )}
 
@@ -126,7 +126,7 @@ export default function Cart({
       {showNotes && (
         <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-[#B39A74]/10 dark:bg-[#B39A74]/20 animate-fade-in">
           <textarea value={orderNotes} onChange={e => onNotesChange(e.target.value)}
-            placeholder="Order notes..." rows={2} className="w-full px-3 py-2 bg-white dark:bg-gray-800 rounded-lg text-sm outline-none border border-gray-200 dark:border-gray-700 resize-none" />
+            placeholder="Order notes..." rows={2} className="w-full pos-input resize-none" />
         </div>
       )}
 
@@ -193,7 +193,7 @@ export default function Cart({
         <button
           onClick={onCheckout}
           disabled={items.length === 0}
-          className="w-full py-3.5 mt-2 bg-[#A51C30] hover:bg-[#8B1728] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform active:scale-[0.98] flex justify-center items-center gap-2 text-base"
+          className="w-full py-3.5 mt-2 pos-btn-primary disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold transition-all flex justify-center items-center gap-2 text-base"
         >
           Charge KES {total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
         </button>

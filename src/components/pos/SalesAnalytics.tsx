@@ -103,7 +103,7 @@ export default function SalesAnalytics({ orders }: SalesAnalyticsProps) {
         </div>
 
         {/* 7-Day Revenue Chart */}
-        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4">
+        <div className="bg-gray-50 border border-[#E6E1D5] p-4">
           <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Last 7 Days Revenue</h3>
           <div className="flex items-end gap-2 h-28">
             {analytics.last7.map((day, i) => (
@@ -126,7 +126,7 @@ export default function SalesAnalytics({ orders }: SalesAnalyticsProps) {
         </div>
 
         {/* Payment Breakdown */}
-        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4">
+        <div className="bg-gray-50 border border-[#E6E1D5] p-4">
           <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Payment Methods</h3>
           <div className="space-y-2.5">
             {[
@@ -151,7 +151,7 @@ export default function SalesAnalytics({ orders }: SalesAnalyticsProps) {
         </div>
 
         {/* Top Products */}
-        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4">
+        <div className="bg-gray-50 border border-[#E6E1D5] p-4">
           <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Top Selling Products</h3>
           {analytics.topProducts.length === 0 ? (
             <div className="text-center text-gray-400 text-xs py-4">No sales data yet</div>
@@ -179,7 +179,7 @@ export default function SalesAnalytics({ orders }: SalesAnalyticsProps) {
         </div>
 
         {/* Peak Hours */}
-        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4">
+        <div className="bg-gray-50 border border-[#E6E1D5] p-4">
           <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1"><Clock size={12} />Today&apos;s Peak Hours</h3>
           <div className="flex gap-1 items-end h-12">
             {analytics.peakHours.map((h, i) => (

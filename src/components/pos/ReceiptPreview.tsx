@@ -89,7 +89,7 @@ export default function ReceiptPreview({ receipt, isOpen, onClose }: ReceiptPrev
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
+      <div className="bg-white border-t-4 border-[#0A1D37] shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
         {/* Actions bar */}
         <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
           <h2 className="text-lg font-bold dark:text-gray-100">Receipt</h2>
@@ -111,7 +111,7 @@ export default function ReceiptPreview({ receipt, isOpen, onClose }: ReceiptPrev
           <div ref={receiptRef} className="p-6 space-y-4">
             {/* Header */}
             <div className="text-center pb-4 border-b-2 border-dashed border-gray-200 dark:border-gray-700">
-              <div className="h-12 w-12 bg-[#A51C30] rounded-xl flex items-center justify-center text-white font-black text-xl mx-auto mb-2 shadow-lg border border-[#B39A74]/20">B</div>
+              <div className="h-12 w-12 badge-gold flex items-center justify-center text-[#0A1D37] font-black text-xl mx-auto mb-2 border border-[#B39A74]/50">B</div>
               <h1 className="text-lg font-black text-gray-900 dark:text-gray-100">{receipt.businessName}</h1>
               {receipt.businessPhone && <p className="text-xs text-gray-400 flex items-center justify-center gap-1 mt-1"><Phone size={10} />{receipt.businessPhone}</p>}
               <p className="text-xs text-gray-400 mt-2 font-mono">{receipt.receiptNumber}</p>
@@ -196,7 +196,7 @@ export default function ReceiptPreview({ receipt, isOpen, onClose }: ReceiptPrev
             {/* Footer */}
             <div className="text-center pt-4 border-t border-dashed border-gray-200 dark:border-gray-700 space-y-1">
               <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Thank you for your purchase! 🙏</p>
-              <p className="text-xs text-gray-400">Powered by BizHub POS</p>
+              <p className="text-xs text-gray-400">Powered by St. Charles POS</p>
             </div>
           </div>
         </div>
@@ -204,11 +204,11 @@ export default function ReceiptPreview({ receipt, isOpen, onClose }: ReceiptPrev
         {/* Bottom action */}
         <div className="p-4 border-t border-gray-100 dark:border-gray-800 flex gap-3">
           <button onClick={handleWhatsApp}
-            className="flex-1 py-3 bg-[#A51C30] hover:bg-[#8B1728] text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
+            className="flex-1 py-3 pos-btn-primary text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors">
             <Share2 size={16} /> WhatsApp Receipt
           </button>
           <button onClick={onClose}
-            className="flex-1 py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-xl text-sm transition-colors">
+            className="flex-1 py-3 pos-btn-accent text-white font-semibold text-sm transition-colors">
             Done
           </button>
         </div>

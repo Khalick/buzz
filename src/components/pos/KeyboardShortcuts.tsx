@@ -27,7 +27,7 @@ export default function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcuts
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
-      <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in" onClick={e => e.stopPropagation()}>
+      <div className="bg-white border-t-4 border-[#0A1D37] shadow-2xl w-full max-w-md overflow-hidden animate-scale-in" onClick={e => e.stopPropagation()}>
         <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
           <h2 className="text-xl font-bold dark:text-gray-100 flex items-center gap-2">
             <Keyboard size={20} className="text-[#A51C30]" /> Keyboard Shortcuts
@@ -47,7 +47,7 @@ export default function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcuts
                     <span className="text-sm text-gray-700 dark:text-gray-300">{shortcut.action}</span>
                     <div className="flex gap-1">
                       {shortcut.keys.map(key => (
-                        <kbd key={key} className="px-2.5 py-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-xs font-mono font-bold text-gray-600 dark:text-gray-400 shadow-sm">
+                        <kbd key={key} className="px-2.5 py-1 bg-gray-100 border border-gray-200 rounded-[3px] text-xs font-mono font-bold text-gray-600 shadow-sm">
                           {key}
                         </kbd>
                       ))}

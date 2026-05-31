@@ -1,0 +1,170 @@
+/* Ivy League Editorial Design System — POS Subtree Theme Overrides */
+
+.pos-root {
+  font-family: var(--font-outfit), sans-serif !important;
+  color: #2D2D2D !important;
+  background-color: #FAF8F5 !important;
+}
+
+/* Base Headings - Playfair Display */
+.pos-root h1,
+.pos-root h2,
+.pos-root h3,
+.pos-root h4,
+.pos-root h5,
+.pos-root .heading-font,
+.pos-root [class*="font-bold"],
+.pos-root [class*="font-black"] {
+  font-family: var(--font-playfair), Georgia, serif !important;
+  font-weight: 700 !important;
+}
+
+/* Exclude certain elements from Playfair (e.g. inputs, buttons, monospaced text) */
+.pos-root button,
+.pos-root input,
+.pos-root textarea,
+.pos-root select,
+.pos-root label,
+.pos-root span,
+.pos-root .button-font,
+.pos-root [class*="font-mono"],
+.pos-root [class*="font-medium"],
+.pos-root [class*="font-semibold"] {
+  font-family: var(--font-outfit), sans-serif !important;
+}
+
+/* Sharp Editorial Borders - Override rounded classes */
+.pos-root * {
+  border-radius: 4px !important;
+}
+
+/* Keep structural rounded elements like checkboxes, small dots, circles */
+.pos-root .rounded-full,
+.pos-root .rounded-full * {
+  border-radius: 9999px !important;
+}
+
+/* POS Masthead (Academic Navy + Gold Border) */
+.pos-masthead {
+  background: #0A1D37 !important;
+  color: #FFFFFF !important;
+  border-bottom: 3px double #B39A74 !important;
+}
+
+.pos-masthead * {
+  color: #FFFFFF !important;
+}
+
+.pos-masthead button,
+.pos-masthead a {
+  border-radius: 3px !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+.pos-masthead button:hover,
+.pos-masthead a:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: #B39A74 !important;
+}
+
+/* Gold sub-badges inside Navy masthead */
+.pos-masthead .badge-gold {
+  background: #B39A74 !important;
+  color: #0A1D37 !important;
+}
+
+/* Neutral Linen Page BG */
+.pos-bg-linen {
+  background-color: #FAF8F5 !important;
+}
+
+/* White Card/Panel BG */
+.pos-bg-white {
+  background-color: #FFFFFF !important;
+}
+
+/* Borders */
+.pos-border {
+  border-color: #E6E1D5 !important;
+}
+
+.pos-border-dark {
+  border-color: #C8C1B3 !important;
+}
+
+/* Primary Crimson Button */
+.pos-btn-primary {
+  background-color: #A51C30 !important;
+  color: #FFFFFF !important;
+  border-radius: 3px !important;
+  font-weight: 600 !important;
+  transition: background-color 0.15s ease !important;
+  border: none !important;
+}
+
+.pos-btn-primary:hover {
+  background-color: #8B1728 !important;
+}
+
+/* Secondary Button */
+.pos-btn-secondary {
+  background-color: transparent !important;
+  color: #0A1D37 !important;
+  border: 1px solid #0A1D37 !important;
+  border-radius: 3px !important;
+  font-weight: 500 !important;
+  transition: all 0.15s ease !important;
+}
+
+.pos-btn-secondary:hover {
+  background-color: #0A1D37 !important;
+  color: #FFFFFF !important;
+}
+
+/* Accent Navy Button */
+.pos-btn-accent {
+  background-color: #0A1D37 !important;
+  color: #FFFFFF !important;
+  border-radius: 3px !important;
+  font-weight: 600 !important;
+  transition: background-color 0.15s ease !important;
+  border: none !important;
+}
+
+.pos-btn-accent:hover {
+  background-color: #1B3A5C !important;
+}
+
+/* Form Controls */
+.pos-input {
+  padding: 9px 12px !important;
+  border: 1px solid #C8C1B3 !important;
+  border-radius: 3px !important;
+  background-color: #FFFFFF !important;
+  outline: none !important;
+  font-size: 0.88rem !important;
+  color: #2D2D2D !important;
+  transition: border-color 0.15s ease !important;
+}
+
+.pos-input:focus {
+  border-color: #0A1D37 !important;
+}
+
+/* Quick action pills */
+.pos-pill-active {
+  background: #FAF8F5 !important;
+  border: 1px solid #E6E1D5 !important;
+  color: #A51C30 !important;
+}
+
+.pos-pill-inactive {
+  background: #FAF8F5 !important;
+  border: 1px solid transparent !important;
+  color: #6B6B6B !important;
+}
+
+.pos-pill-inactive:hover {
+  background: #E6E1D5/50 !important;
+}

@@ -52,7 +52,7 @@ export default function CategoryManager({ categories, onSave, onUpdate, onDelete
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
+      <div className="bg-white border-t-4 border-[#0A1D37] shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
         <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
           <h2 className="text-xl font-bold dark:text-gray-100 flex items-center gap-2">
             <Tag size={20} className="text-[#A51C30]" /> Categories
@@ -71,12 +71,12 @@ export default function CategoryManager({ categories, onSave, onUpdate, onDelete
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
               placeholder="New category name..."
-              className="flex-1 px-4 py-2.5 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74] focus:border-transparent"
+              className="flex-1 pos-input"
             />
             <button
               onClick={handleAdd}
               disabled={!newName.trim()}
-              className="px-4 py-2.5 bg-[#A51C30] hover:bg-[#8B1728] text-white rounded-xl text-sm font-bold disabled:opacity-50 transition-colors flex items-center gap-1"
+              className="px-4 py-2.5 pos-btn-primary text-white text-sm font-bold disabled:opacity-50 transition-colors flex items-center gap-1"
             >
               <Plus size={16} /> Add
             </button>
@@ -143,7 +143,7 @@ export default function CategoryManager({ categories, onSave, onUpdate, onDelete
         </div>
 
         <div className="p-4 border-t border-gray-100 dark:border-gray-800">
-          <button onClick={onClose} className="w-full py-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm transition-colors">
+          <button onClick={onClose} className="w-full py-2.5 pos-btn-accent text-white font-semibold text-sm transition-colors">
             Done
           </button>
         </div>

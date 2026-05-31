@@ -101,7 +101,7 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
           <div className="px-4 py-2">
             <input
               type="text" placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74]"
+              className="w-full pos-input"
             />
           </div>
 
@@ -161,7 +161,7 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Product Name *</label>
               <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-                placeholder="e.g. Nyama Choma Special" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74]" />
+                placeholder="e.g. Nyama Choma Special" className="w-full pos-input" />
             </div>
 
             {/* Price + Cost */}
@@ -169,12 +169,12 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1"><DollarSign size={12} />Sell Price *</label>
                 <input type="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })}
-                  placeholder="0.00" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74]" />
+                  placeholder="0.00" className="w-full pos-input" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Cost Price</label>
                 <input type="number" value={form.cost_price} onChange={e => setForm({ ...form, cost_price: e.target.value })}
-                  placeholder="0.00" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74]" />
+                  placeholder="0.00" className="w-full pos-input" />
               </div>
             </div>
 
@@ -183,12 +183,12 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1"><Hash size={12} />Stock Qty</label>
                 <input type="number" value={form.stock_quantity} onChange={e => setForm({ ...form, stock_quantity: e.target.value })}
-                  placeholder="0" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74]" />
+                  placeholder="0" className="w-full pos-input" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1"><Tag size={12} />Category</label>
                 <select value={form.category_id} onChange={e => setForm({ ...form, category_id: e.target.value })}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74] appearance-none">
+                  className="w-full pos-input appearance-none">
                   <option value="">None</option>
                   {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
@@ -200,12 +200,12 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1"><Barcode size={12} />Barcode</label>
                 <input value={form.barcode} onChange={e => setForm({ ...form, barcode: e.target.value })}
-                  placeholder="Scan or type..." className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74]" />
+                  placeholder="Scan or type..." className="w-full pos-input" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">SKU</label>
                 <input value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })}
-                  placeholder="e.g. NC-001" className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm outline-none border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-[#B39A74]" />
+                  placeholder="e.g. NC-001" className="w-full pos-input" />
               </div>
             </div>
 
@@ -245,7 +245,7 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
           {/* Save Button */}
           <div className="p-4 border-t border-gray-200 dark:border-gray-800">
             <button onClick={handleSubmit} disabled={!form.name || !form.price}
-              className="w-full py-3 bg-[#A51C30] hover:bg-[#8B1728] border border-[#B39A74]/40 text-white font-bold rounded-xl shadow-lg disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+              className="w-full py-3 pos-btn-primary text-white font-bold disabled:opacity-50 transition-all flex items-center justify-center gap-2">
               <Save size={16} /> {editingProduct ? 'Update Product' : 'Create Product'}
             </button>
           </div>

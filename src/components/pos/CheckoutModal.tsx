@@ -111,7 +111,7 @@ export default function CheckoutModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all animate-scale-in">
+      <div className="bg-white border-t-4 border-[#0A1D37] shadow-2xl w-full max-w-lg overflow-hidden transform transition-all animate-scale-in">
         {success ? (
           <div className="p-12 flex flex-col items-center justify-center text-center space-y-4">
             <div className="h-24 w-24 bg-[#B39A74]/15 dark:bg-[#B39A74]/25 text-[#B39A74] rounded-full flex items-center justify-center mb-4 animate-scale-in">
@@ -189,14 +189,14 @@ export default function CheckoutModal({
                   <div className="flex gap-2 flex-wrap">
                     {DENOMINATIONS.map(d => (
                       <button key={d} onClick={() => setAmountTendered(String(d))}
-                        className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${
-                          Number(amountTendered) === d ? 'bg-[#A51C30] text-white' : 'bg-[#FAF8F5] dark:bg-gray-800 text-[#2D2D2D] dark:text-gray-300 border border-[#E6E1D5] hover:bg-[#E6E1D5]/50'
+                        className={`px-3 py-2 text-sm font-bold transition-colors ${
+                          Number(amountTendered) === d ? 'pos-btn-primary' : 'bg-[#FAF8F5] text-[#2D2D2D] border border-[#E6E1D5] hover:bg-[#E6E1D5]/50'
                         }`}>
                         {d.toLocaleString()}
                       </button>
                     ))}
                     <button onClick={() => setAmountTendered(String(Math.ceil(total)))}
-                      className="px-3 py-2 rounded-lg text-sm font-bold bg-[#A51C30]/10 dark:bg-[#A51C30]/20 text-[#A51C30] dark:text-[#B39A74] hover:bg-[#A51C30]/20 transition-colors">
+                      className="px-3 py-2 text-sm font-bold bg-[#A51C30]/10 text-[#A51C30] hover:bg-[#A51C30]/20 transition-colors">
                       Exact
                     </button>
                   </div>
@@ -222,7 +222,7 @@ export default function CheckoutModal({
               <button
                 onClick={handleCheckout}
                 disabled={isProcessing || !canPay}
-                className="w-full py-4 bg-[#A51C30] hover:bg-[#8B1728] border border-[#B39A74]/40 text-white text-lg font-bold rounded-2xl shadow-lg transition-transform transform active:scale-95 flex justify-center items-center gap-3 disabled:opacity-50"
+                className="w-full py-4 pos-btn-primary text-white text-lg font-bold transition-all flex justify-center items-center gap-3 disabled:opacity-50"
               >
                 {isProcessing ? (
                   <span className="animate-pulse">Processing...</span>

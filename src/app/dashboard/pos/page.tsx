@@ -15,6 +15,7 @@ import { syncProductsDown, initSyncListeners, getLocalCategories, initDB } from 
 import { Clock, DownloadCloud, History, LayoutDashboard, Package, Tag as TagIcon, Settings, Keyboard, PlayCircle, Wallet } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import InstallPrompt from '@/components/pwa/InstallPrompt';
+import './pos.css';
 
 type Panel = 'cart' | 'history' | 'analytics' | 'products' | 'categories';
 
@@ -290,16 +291,16 @@ export default function POSPage() {
   const total = afterDiscount + tax;
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-[#FAF8F5] dark:bg-gray-900 font-sans">
+    <div className="flex flex-col h-screen overflow-hidden pos-root pos-bg-linen text-[#2D2D2D]">
       
       {/* POS Top Header */}
-      <header className="h-16 bg-white dark:bg-gray-900 border-b border-[#E6E1D5] dark:border-gray-800 flex items-center justify-between px-6 shrink-0 shadow-sm z-10">
+      <header className="h-16 pos-masthead flex items-center justify-between px-6 shrink-0 z-10">
          <div className="flex items-center gap-4">
-           <div className="h-10 w-10 bg-[#A51C30] rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md border border-[#B39A74]/20">
+           <div className="h-10 w-10 badge-gold flex items-center justify-center text-[#0A1D37] font-black text-xl border border-[#B39A74]/50">
              B
            </div>
-           <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-500 dark:from-white dark:to-gray-400 hidden sm:block">
-             BizHub POS (v5 Update)
+           <h1 className="text-xl font-bold text-white hidden sm:block">
+             St. Charles Point of Sale
            </h1>
          </div>
          
@@ -316,24 +317,24 @@ export default function POSPage() {
          <div className="flex items-center gap-4">
             <Link
               href="/dashboard/credit-health"
-              className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[#B39A74]/15 to-[#B39A74]/5 text-[#B39A74] hover:from-[#B39A74]/25 border border-[#B39A74]/40 rounded-lg text-sm font-semibold transition-all"
+              className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold transition-all"
               title="Credit Health Dashboard"
             >
               <Wallet size={16} />
               <span className="hidden sm:inline">Credit</span>
             </Link>
-            <button onClick={() => setShowShortcuts(true)} className="p-2 text-gray-400 hover:text-[#A51C30] bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors" title="Keyboard Shortcuts (?)">
+            <button onClick={() => setShowShortcuts(true)} className="p-2 hover:text-[#B39A74] transition-colors" title="Keyboard Shortcuts (?)">
               <Keyboard size={18} />
             </button>
            <button 
              onClick={() => handleForceSync()} 
              disabled={isSyncing}
-             className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-semibold transition-all disabled:opacity-50"
+             className="flex items-center gap-2 px-3 py-2 text-sm font-semibold transition-all disabled:opacity-50"
            >
              <DownloadCloud size={16} className={isSyncing ? "animate-bounce" : ""} />
              <span className="hidden sm:inline">Sync</span>
            </button>
-           <div className="hidden md:flex items-center gap-2 text-gray-500 dark:text-gray-400 font-medium text-sm">
+           <div className="hidden md:flex items-center gap-2 text-white/80 font-medium text-sm">
              <Clock size={16} />
              {time}
            </div>
@@ -361,8 +362,8 @@ export default function POSPage() {
               { id: 'categories', icon: <TagIcon size={16} />, label: 'Categories' },
             ].map(tab => (
               <button key={tab.id} onClick={() => setActivePanel(tab.id as Panel)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${
-                  activePanel === tab.id ? 'bg-[#A51C30] text-white shadow-sm' : 'text-gray-600 hover:bg-[#E6E1D5]/50 dark:hover:bg-gray-800'
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold whitespace-nowrap transition-colors border-t-2 ${
+                  activePanel === tab.id ? 'bg-[#0A1D37] text-white border-[#B39A74] rounded-t-[4px] rounded-b-none' : 'text-[#6B6B6B] border-transparent hover:bg-[#E6E1D5]/30'
                 }`}>
                 {tab.icon} <span className="hidden sm:inline">{tab.label}</span>
               </button>
