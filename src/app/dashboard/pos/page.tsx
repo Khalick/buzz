@@ -293,9 +293,9 @@ export default function POSPage() {
     <div className="flex flex-col h-screen overflow-hidden bg-[#FAF8F5] dark:bg-gray-900 font-sans">
       
       {/* POS Top Header */}
-      <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 shrink-0 shadow-sm z-10">
+      <header className="h-16 bg-white dark:bg-gray-900 border-b border-[#E6E1D5] dark:border-gray-800 flex items-center justify-between px-6 shrink-0 shadow-sm z-10">
          <div className="flex items-center gap-4">
-           <div className="h-10 w-10 bg-gradient-to-br from-[#0A1D37] to-[#1B3A5C] rounded-xl flex items-center justify-center text-[#B39A74] font-black text-xl shadow-md border border-[#B39A74]/20">
+           <div className="h-10 w-10 bg-[#A51C30] rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md border border-[#B39A74]/20">
              B
            </div>
            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-500 dark:from-white dark:to-gray-400 hidden sm:block">
@@ -349,10 +349,10 @@ export default function POSPage() {
         </div>
 
         {/* Right: Multi-Panel Area */}
-        <div className="w-full md:w-[400px] lg:w-[450px] shrink-0 flex flex-col border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 z-10 transition-transform transform">
+        <div className="w-full md:w-[400px] lg:w-[450px] shrink-0 flex flex-col border-l border-[#E6E1D5] dark:border-gray-800 bg-white dark:bg-gray-900 z-10 transition-transform transform">
           
           {/* Panel Navigation Tabs */}
-          <div className="flex p-2 gap-1 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 overflow-x-auto scrollbar-hide shrink-0">
+          <div className="flex p-2 gap-1 bg-[#FAF8F5] dark:bg-gray-900 border-b border-[#E6E1D5] dark:border-gray-800 overflow-x-auto scrollbar-hide shrink-0">
             {[
               { id: 'cart', icon: <ShoppingCart size={16} />, label: 'Cart' },
               { id: 'history', icon: <History size={16} />, label: 'History' },
@@ -362,7 +362,7 @@ export default function POSPage() {
             ].map(tab => (
               <button key={tab.id} onClick={() => setActivePanel(tab.id as Panel)}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${
-                  activePanel === tab.id ? 'bg-[#0A1D37] text-[#B39A74] shadow-sm' : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800'
+                  activePanel === tab.id ? 'bg-[#A51C30] text-white shadow-sm' : 'text-gray-600 hover:bg-[#E6E1D5]/50 dark:hover:bg-gray-800'
                 }`}>
                 {tab.icon} <span className="hidden sm:inline">{tab.label}</span>
               </button>

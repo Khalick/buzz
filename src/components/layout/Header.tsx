@@ -12,6 +12,7 @@ import ThemeToggle from '@/components/ui/ThemeToggle';
 const Header = () => {
   const { user, loading } = useAuth();
   const pathname = usePathname();
+  if (pathname?.startsWith('/dashboard/pos')) return null;
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);

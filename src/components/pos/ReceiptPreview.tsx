@@ -111,7 +111,7 @@ export default function ReceiptPreview({ receipt, isOpen, onClose }: ReceiptPrev
           <div ref={receiptRef} className="p-6 space-y-4">
             {/* Header */}
             <div className="text-center pb-4 border-b-2 border-dashed border-gray-200 dark:border-gray-700">
-              <div className="h-12 w-12 bg-gradient-to-br from-[#0A1D37] to-[#1B3A5C] rounded-xl flex items-center justify-center text-[#B39A74] font-black text-xl mx-auto mb-2 shadow-lg border border-[#B39A74]/20">B</div>
+              <div className="h-12 w-12 bg-[#A51C30] rounded-xl flex items-center justify-center text-white font-black text-xl mx-auto mb-2 shadow-lg border border-[#B39A74]/20">B</div>
               <h1 className="text-lg font-black text-gray-900 dark:text-gray-100">{receipt.businessName}</h1>
               {receipt.businessPhone && <p className="text-xs text-gray-400 flex items-center justify-center gap-1 mt-1"><Phone size={10} />{receipt.businessPhone}</p>}
               <p className="text-xs text-gray-400 mt-2 font-mono">{receipt.receiptNumber}</p>

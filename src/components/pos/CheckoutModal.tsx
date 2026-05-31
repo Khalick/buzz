@@ -222,7 +222,7 @@ export default function CheckoutModal({
               <button
                 onClick={handleCheckout}
                 disabled={isProcessing || !canPay}
-                className="w-full py-4 bg-gradient-to-r from-[#0A1D37] to-[#1B3A5C] hover:from-[#051C11] hover:to-[#0A1D37] border border-[#B39A74]/40 text-[#B39A74] text-lg font-bold rounded-2xl shadow-lg transition-transform transform active:scale-95 flex justify-center items-center gap-3 disabled:opacity-50"
+                className="w-full py-4 bg-[#A51C30] hover:bg-[#8B1728] border border-[#B39A74]/40 text-white text-lg font-bold rounded-2xl shadow-lg transition-transform transform active:scale-95 flex justify-center items-center gap-3 disabled:opacity-50"
               >
                 {isProcessing ? (
                   <span className="animate-pulse">Processing...</span>

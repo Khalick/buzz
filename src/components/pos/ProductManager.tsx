@@ -245,7 +245,7 @@ export default function ProductManager({ products, categories, onSave, onUpdate,
           {/* Save Button */}
           <div className="p-4 border-t border-gray-200 dark:border-gray-800">
             <button onClick={handleSubmit} disabled={!form.name || !form.price}
-              className="w-full py-3 bg-gradient-to-r from-[#0A1D37] to-[#1B3A5C] hover:from-[#051C11] hover:to-[#0A1D37] border border-[#B39A74]/40 text-[#B39A74] font-bold rounded-xl shadow-lg disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+              className="w-full py-3 bg-[#A51C30] hover:bg-[#8B1728] border border-[#B39A74]/40 text-white font-bold rounded-xl shadow-lg disabled:opacity-50 transition-all flex items-center justify-center gap-2">
               <Save size={16} /> {editingProduct ? 'Update Product' : 'Create Product'}
             </button>
           </div>

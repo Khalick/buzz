@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Sparkles, Send, X, Mic, MicOff, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
 interface Message {
@@ -25,6 +26,9 @@ interface SpeechRecognitionEvent extends Event {
 }
 
 export default function AskBizHub() {
+  const pathname = usePathname();
+  if (pathname?.startsWith('/dashboard/pos')) return null;
+
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
