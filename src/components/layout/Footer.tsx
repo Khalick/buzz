@@ -40,12 +40,12 @@ const Footer = () => {
                 <h3 className="text-2xl font-bold">
                   ThikaLok<span className="text-[#D4AF37]">ari</span>
                 </h3>
-                <p className="text-sm text-white/60">Your Local Business Directory</p>
+                <p className="text-sm text-white/60">Hyperlocal Trust Economy</p>
               </div>
             </div>
             <p className="text-white/70 mb-6 max-w-md leading-relaxed">
               Connecting you with the best local businesses in Thika, Kenya.
-              Discover exclusive deals, share your experiences, and support your community.
+              Discover exclusive deals, share your experiences, and support our community.
             </p>
 
             {/* Social Links */}
@@ -60,7 +60,7 @@ const Footer = () => {
                 </svg>
               </a>
               <a
-                href="instagram.com/bizhub_network"
+                href="https://www.instagram.com/lokari_kenya/"
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-[#D4AF37] flex items-center justify-center transition-all duration-300 group"
                 aria-label="Instagram"
               >
@@ -69,7 +69,7 @@ const Footer = () => {
                 </svg>
               </a>
               <a
-                href="facebook.com/share/17iYYz2U8T/"
+                href="https://www.facebook.com/profile.php?id=61588979216091/"
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-[#D4AF37] flex items-center justify-center transition-all duration-300 group"
                 aria-label="Facebook"
               >
@@ -78,7 +78,7 @@ const Footer = () => {
                 </svg>
               </a>
               <a
-                href="#"
+                href="https://wa.me/254789458334"
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-[#25D366] flex items-center justify-center transition-all duration-300 group"
                 aria-label="WhatsApp"
               >

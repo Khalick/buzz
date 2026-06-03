@@ -74,7 +74,7 @@ const Header = () => {
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold text-[#1B4332] tracking-tight">
-                ThikaBiz<span className="text-[#D4AF37]">Hub</span>
+                ThikaLok<span className="text-[#D4AF37]">ari</span>
               </span>
               <span className="text-[10px] text-[#525252] -mt-1 hidden sm:block">Your Local Business Directory</span>
             </div>
