@@ -33,9 +33,11 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                <span className="text-[#D4AF37] font-bold text-xl">T</span>
-              </div>
+              <img
+                src="/logo.png"
+                alt="ThikaLokari logo"
+                className="w-12 h-12 rounded-xl object-cover"
+              />
               <div>
                 <h3 className="text-2xl font-bold">
                   ThikaLok<span className="text-[#D4AF37]">ari</span>
