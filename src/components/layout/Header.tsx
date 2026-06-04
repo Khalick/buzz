@@ -68,14 +68,16 @@ const Header = () => {
             onClick={closeMobileMenu}
             className="flex items-center gap-2 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1B4332] to-[#2D6A4F] flex items-center justify-center shadow-lg group-hover:shadow-[#1B4332]/30 transition-all duration-300">
-              <span className="text-white font-bold text-lg">T</span>
-            </div>
+            <img
+              src="/logo.png"
+              alt="ThikaLokari logo"
+              className="w-10 h-10 rounded-xl object-cover shadow-lg group-hover:shadow-[#1B4332]/30 transition-all duration-300"
+            />
             <div className="flex flex-col">
               <span className="text-xl font-bold text-[#1B4332] tracking-tight">
                 ThikaLok<span className="text-[#D4AF37]">ari</span>
               </span>
-              <span className="text-[10px] text-[#525252] -mt-1 hidden sm:block">Your Local Business Directory</span>
+              <span className="text-[10px] text-[#525252] -mt-1 hidden sm:block">Hyperlocal Trust Economy</span>
             </div>
           </Link>
 

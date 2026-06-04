@@ -90,9 +90,9 @@ const LoginPage = () => {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-white">
-                  ThikaBiz<span className="text-[#D4AF37]">Hub</span>
+                  ThikaLok<span className="text-[#D4AF37]">ari</span>
                 </h1>
-                <p className="text-sm text-white/60">Your Local Business Directory</p>
+                <p className="text-sm text-white/60">Hyperlocal Trust Economy</p>
               </div>
             </div>
           </div>
@@ -126,11 +126,13 @@ const LoginPage = () => {
           {/* Mobile Logo */}
           <div className="lg:hidden mb-8 text-center">
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1B4332] to-[#2D6A4F] flex items-center justify-center">
-                <span className="text-white font-bold text-lg">T</span>
-              </div>
+              <img
+                src="/logo.png"
+                alt="ThikaLokari logo"
+                className="w-10 h-10 rounded-xl object-cover"
+              />
               <span className="text-xl font-bold text-[#1B4332]">
-                ThikaBiz<span className="text-[#D4AF37]">Hub</span>
+                ThikaLok<span className="text-[#D4AF37]">ari</span>
               </span>
             </Link>
           </div>
